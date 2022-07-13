@@ -6,10 +6,10 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
     id("xyz.jpenilla.run-paper") version "1.0.6"
 
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.liquibase.gradle") version "2.1.0"
-    id("org.sonarqube") version "3.4.0.2513"
-    jacoco
+    // LIQUIBASE
+    // alias(libs.plugins.liquibase)
+    // SonarQube
+    // id("org.sonarqube") version "3.4.0.2513"
 }
 
 group = "net.onelitefeather"
@@ -66,46 +66,11 @@ tasks {
             jvmTarget = "17"
         }
     }
-
-    test {
-        finalizedBy(rootProject.tasks.jacocoTestReport)
-        useJUnitPlatform()
-    }
-
-    build {
-        dependsOn(shadowJar)
-    }
-    jacocoTestReport {
-        dependsOn(rootProject.tasks.test)
-        reports {
-            xml.required.set(true)
-        }
-    }
-    getByName<org.sonarqube.gradle.SonarQubeTask>("sonarqube") {
-        dependsOn(rootProject.tasks.test)
-    }
-
-    runServer {
-        minecraftVersion("1.19.1")
-    }
-
-    shadowJar {
-        archiveFileName.set("${rootProject.name}.${archiveExtension.getOrElse("jar")}")
-    }
-}
-
-bukkit {
-    main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
-    apiVersion = "1.19"
-    name = "PandorasCluster"
-    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
-
-    authors = listOf("UniqueGame", "OneLiteFeather")
-
-    depend = listOf("ProtocolLib")
-}
-sonarqube {
+}*/
+/*sonarqube {
     properties {
-        property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYImhlbRTSfGYIFfefLS")
+        property("sonar.projectKey", "cliar_alwilda-loup_AYHtte8H7chqtZHGSV5T")
+        property("sonar.qualitygate.wait", true)
     }
 }
+*/
