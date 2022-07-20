@@ -1,17 +1,14 @@
 plugins {
     id("java")
     `java-library`
-    checkstyle
+//    checkstyle
     // FIXME
     // Bukkit
-    // id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
-    // id("xyz.jpenilla.run-paper") version "1.0.6"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("xyz.jpenilla.run-paper") version "1.0.6"
 
-    // Shadow
-    // id("com.github.johnrengelman.shadow") version "7.1.2"
-
-    // LIQUIBASE
-    // id("org.liquibase.gradle") version "2.1.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("org.liquibase.gradle") version "2.1.0"
 }
 
 group = "net.onelitefeather"
@@ -33,51 +30,26 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
-
-    // Sentry
-    compileOnly("io.sentry:sentry:5.7.3")
-    compileOnly("io.sentry:sentry-jul:5.7.3")
-
-    // CloudNet
-    compileOnly("de.dytanic.cloudnet:cloudnet-cloudperms:${cloudNetVersion}")
-    compileOnly("de.dytanic.cloudnet:cloudnet-bridge:${cloudNetVersion}")
-    compileOnly("de.dytanic.cloudnet:cloudnet-driver:${cloudNetVersion}")
-
-    // ChatComponents
-    compileOnly("net.kyori:adventure-api:4.10.1")
-    compileOnly("net.kyori:adventure-text-minimessage:4.10.1")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.10.1")
-
+    compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     // Commands
-    compileOnly("cloud.commandframework", "cloud-paper", "1.6.2")
-    compileOnly("cloud.commandframework", "cloud-annotations", "1.6.2")
-    compileOnly("cloud.commandframework", "cloud-minecraft-extras", "1.6.2")
-    compileOnly("me.lucko:commodore:1.13") {
+    implementation("cloud.commandframework", "cloud-paper", "1.7.0")
+    implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
+    implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
+    implementation("me.lucko:commodore:2.0") {
         isTransitive = false
     }
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0");
 
     // Database
-    compileOnly("org.hibernate:hibernate-core:6.0.0.Final")
-    // compileOnly("org.liquibase:liquibase-core:3.4.1") // Changelog based db
-    // compileOnly("org.hibernate.orm:hibernate-envers:6.0.0.Final") // Revision tracking
-    compileOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
-    // Hikaricp
-    // compileOnly("org.liquibase.ext:liquibase-hibernate5:4.9.1") // Changelog based db
-    compileOnly("com.zaxxer:HikariCP:5.0.1")
-    compileOnly("org.hibernate.orm:hibernate-hikaricp:6.0.0.Final")
+    implementation("org.hibernate:hibernate-core:6.1.1.Final")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.0.5")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.0.Final")
 
-    // liquibaseRuntime("org.liquibase.ext:liquibase-hibernate5:4.9.1") // Changelog based db
-    // liquibaseRuntime("org.mariadb.jdbc:mariadb-java-client:3.0.4") // Changelog based db
-
-    // Liquibase
-    // liquibaseRuntime("org.liquibase:liquibase-core:3.10.3")
-    // liquibaseRuntime("org.liquibase:liquibase-groovy-dsl:2.0.1")
-    // liquibaseRuntime("ch.qos.logback:logback-core:1.2.3")
-    // liquibaseRuntime("ch.qos.logback:logback-classic:1.2.3")
+    implementation("me.lucko:helper:5.6.10")
 
     // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 java {
@@ -86,29 +58,36 @@ java {
 }
 
 tasks {
+
     compileJava {
         options.release.set(17)
         options.encoding = "UTF-8"
     }
+
     test {
         useJUnitPlatform()
     }
-    /*runServer {
-        minecraftVersion("1.18.2")
-    }*/
-    /*shadowJar {
+
+    build {
+        dependsOn(shadowJar)
+    }
+
+    runServer {
+        minecraftVersion("1.19")
+    }
+
+    shadowJar {
         archiveFileName.set("${rootProject.name}.${archiveExtension.getOrElse("jar")}")
-    }*/
+    }
 }
 
-/*bukkit {
-    main = "${rootProject.group}.ElytraRace"
+bukkit {
+    main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
     apiVersion = "1.18"
-    name = ""
-    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
+    name = "PandorasCluster"
+    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
-    authors = listOf("TheMeinerLP", "OneLiteFeather")
+    authors = listOf("UniqueGame", "OneLiteFeather")
 
-    depend = listOf("helper")
-    softDepend = listOf("CloudNet-Bridge")
-}*/
+    depend = listOf("ProtocolLib")
+}
