@@ -1,3 +1,2 @@
-//TODO: Change project
-rootProject.name = "ExampleProject"
+rootProject.name = "PandorasCluster"
 
