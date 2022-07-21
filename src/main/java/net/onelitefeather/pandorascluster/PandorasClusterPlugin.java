@@ -9,8 +9,8 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.onelitefeather.pandorascluster.service.*;
-import net.onelitefeather.pandorascluster.service.LandService1;
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl;
 import net.onelitefeather.pandorascluster.commands.ClaimCommand;
 import net.onelitefeather.pandorascluster.commands.LandCommand;
 import net.onelitefeather.pandorascluster.listener.*;
@@ -25,55 +25,35 @@ import java.util.logging.Level;
 
 public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
-    private LandPlayerService landPlayerService;
-    private LandService1 landService1;
-    private DatabaseService databaseService;
-
-    private LandFlagService landFlagService;
-
     private PaperCommandManager<CommandSender> paperCommandManager;
     private AnnotationParser<CommandSender> annotationParser;
     private MinecraftHelp<CommandSender> minecraftHelp;
+
+    private PandorasClusterApiImpl api;
 
     @Override
     public void onEnable() {
 
         saveDefaultConfig();
 
-        PandorasClusterApiImpl api = new PandorasClusterApiImpl(this);
-        this.getServer().getServicesManager().register(PandorasClusterApi.class, api, this, ServicePriority.Highest);
-
-        String jdbcUrl = getConfig().getString("database.jdbcUrl", "'jdbc:mariadb://localhost:3306/playerkits?useSSL=false'");
-        String databaseDriver = getConfig().getString("database.driver", "org.mariadb.jdbc.Driver");
-        String username = getConfig().getString("database.username", "root");
-        String password = getConfig().getString("database.password", "TopSecret");
-
-        this.databaseService = new DatabaseService(this, jdbcUrl, username, password, databaseDriver);
-        this.databaseService.init();
-
-        this.landFlagService = new LandFlagService();
-
-        this.landService1 = new LandService1(this);
-
-        this.landPlayerService = new LandPlayerService(this);
-        this.landPlayerService.load();
+        this.api = new PandorasClusterApiImpl(this);
+        this.getServer().getServicesManager().register(PandorasClusterApi.class, this.api, this, ServicePriority.Highest);
 
         PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new PlayerConnectionListener(this), this);
+        pluginManager.registerEvents(new PlayerConnectionListener(this.api), this);
         pluginManager.registerEvents(new BlockProtectionListener(this), this);
-        pluginManager.registerEvents(new EntityProtectionListener(this, this.landFlagService), this);
+        pluginManager.registerEvents(new EntityProtectionListener(this, this.api.getLandFlagService()), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new VehicleProtectionListener(this.landService1, this.landFlagService), this);
+        pluginManager.registerEvents(new VehicleProtectionListener(this.api.getLandService(), this.api.getLandFlagService()), this);
         pluginManager.registerEvents(new ContainerProtectionListener(this), this);
-        pluginManager.registerEvents(new MenuListener(), this);
 
         buildCommandSystem();
     }
 
     @Override
     public void onDisable() {
+        this.api.getDatabaseService().shutdown();
         this.getServer().getServicesManager().unregisterAll(this);
-        this.databaseService.shutdown();
     }
 
     public PaperCommandManager<CommandSender> getPaperCommandManager() {
@@ -86,26 +66,6 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
     public MinecraftHelp<CommandSender> getMinecraftHelp() {
         return minecraftHelp;
-    }
-
-    public EntityDataStoreService getEntityDataStoreService() {
-        return entityDataStoreService;
-    }
-
-    public DatabaseService getDatabaseService() {
-        return databaseService;
-    }
-
-    public LandPlayerService getChunkPlayerService() {
-        return landPlayerService;
-    }
-
-    public LandFlagService getChunkFlagService() {
-        return landFlagService;
-    }
-
-    public LandService1 getWorldChunkManager() {
-        return landService1;
     }
 
     private void buildCommandSystem() {
@@ -131,7 +91,7 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
         this.minecraftHelp = MinecraftHelp.createNative("/pandorascluster help", this.paperCommandManager);
         this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.AQUA));
-        annotationParser.parse(new ClaimCommand(this));
-        annotationParser.parse(new LandCommand(this));
+        annotationParser.parse(new ClaimCommand(this.api));
+        annotationParser.parse(new LandCommand(this.api));
     }
 }
