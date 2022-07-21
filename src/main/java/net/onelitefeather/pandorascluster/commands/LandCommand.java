@@ -3,33 +3,30 @@ package net.onelitefeather.pandorascluster.commands;
 import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import net.kyori.adventure.text.Component;
-import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
-import net.onelitefeather.pandorascluster.chunk.WorldChunk;
-import net.onelitefeather.pandorascluster.service.LandService1;
-import net.onelitefeather.pandorascluster.util.Util;
+import net.onelitefeather.pandorascluster.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.land.Land;
+import net.onelitefeather.pandorascluster.menus.LandMainMenu;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class LandCommand {
+public record LandCommand(PandorasClusterApi api) {
 
-    private final LandService1 landService1;
-
-    public LandCommand(@NotNull PandorasClusterPlugin plugin) {
-        this.landService1 = plugin.getWorldChunkManager();
+    public LandCommand(@NotNull PandorasClusterApi api) {
+        this.api = api;
     }
 
     @CommandMethod("land")
     @CommandDescription("Open the land gui")
     public void execute(@NotNull Player player) {
 
-        WorldChunk worldChunk = this.landService1.getWorldChunk(player.getChunk());
-        if (worldChunk == null) {
+        Land land = this.api.getLand(player.getChunk());
+        if (land == null) {
             player.sendMessage(Component.text("Du befindest du nicht auf einem Chunk"));
             return;
         }
 
-        if (worldChunk.isOwner(player.getUniqueId()) || player.hasPermission("featherchunks.settings.others")) {
-            Util.openChunkMainMenu(player, worldChunk).open();
+        if (land.isOwner(player.getUniqueId()) || player.hasPermission("featherchunks.settings.others")) {
+            new LandMainMenu(player, 5, "Land Main Menu", land).open();
         }
     }
 }
