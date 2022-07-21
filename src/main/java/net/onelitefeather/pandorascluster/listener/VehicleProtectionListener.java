@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.listener;
 
 import net.onelitefeather.pandorascluster.chunk.WorldChunk;
+import net.onelitefeather.pandorascluster.service.LandService;
 import net.onelitefeather.pandorascluster.service.LandService1;
 import net.onelitefeather.pandorascluster.service.LandFlagService;
 import net.onelitefeather.pandorascluster.util.Permissions;
@@ -16,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public record VehicleProtectionListener(LandService1 landService1,
+public record VehicleProtectionListener(LandService landService,
                                         LandFlagService landFlagService) implements Listener {
 
     @EventHandler
@@ -24,7 +25,7 @@ public record VehicleProtectionListener(LandService1 landService1,
 
         Vehicle vehicle = event.getVehicle();
         Entity entered = event.getEntered();
-        WorldChunk worldChunk = this.landService1.getWorldChunk(vehicle.getChunk());
+        WorldChunk worldChunk = this.landService.getWorldChunk(vehicle.getChunk());
         if (worldChunk != null) {
             if (worldChunk.hasAccess(entered.getUniqueId())) return;
             if (this.landFlagService.getBoolean("vehicle-use")) return;
