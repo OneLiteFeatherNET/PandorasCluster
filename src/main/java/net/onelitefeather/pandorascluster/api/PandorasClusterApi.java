@@ -61,7 +61,7 @@ public interface PandorasClusterApi {
     @NotNull
     LandPlayerService getLandPlayerService();
 
-    DatabaseService getDatabaseService(;)
+    DatabaseService getDatabaseService();
 
     @NotNull
     LandService getLandService();
