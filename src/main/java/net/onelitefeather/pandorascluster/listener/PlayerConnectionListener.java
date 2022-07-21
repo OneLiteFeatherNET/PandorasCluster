@@ -1,6 +1,6 @@
 package net.onelitefeather.pandorascluster.listener;
 
-import net.onelitefeather.pandorascluster.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
