@@ -1,6 +1,6 @@
 package net.onelitefeather.pandorascluster.service;
 
-import net.onelitefeather.pandorascluster.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
