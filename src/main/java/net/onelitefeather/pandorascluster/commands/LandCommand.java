@@ -3,7 +3,7 @@ package net.onelitefeather.pandorascluster.commands;
 import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import net.kyori.adventure.text.Component;
-import net.onelitefeather.pandorascluster.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.menus.LandMainMenu;
 import org.bukkit.entity.Player;
