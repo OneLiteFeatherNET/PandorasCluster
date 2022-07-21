@@ -1,10 +1,9 @@
 package net.onelitefeather.pandorascluster.service;
 
-import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
-import net.onelitefeather.pandorascluster.chunk.WorldChunk;
-import net.onelitefeather.pandorascluster.chunk.flag.ChunkFlag;
+import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.land.player.LandMember;
+import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
-import net.onelitefeather.pandorascluster.player.ChunkPlayer;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -25,7 +24,7 @@ public final class DatabaseService {
     private final String driver;
     private SessionFactory sessionFactory;
 
-    public DatabaseService(@NotNull PandorasClusterPlugin plugin, @NotNull String jdbcUrl, @NotNull String username, @NotNull String password, @NotNull String driver) {
+    public DatabaseService(@NotNull String jdbcUrl, @NotNull String username, @NotNull String password, @NotNull String driver) {
         this.jdbcUrl = jdbcUrl;
         this.username = username;
         this.password = password;
@@ -67,10 +66,10 @@ public final class DatabaseService {
         properties.put(Environment.HBM2DDL_AUTO, Action.UPDATE);
 
         configuration.setProperties(properties);
-        configuration.addAnnotatedClass(ChunkPlayer.class);
+        configuration.addAnnotatedClass(LandPlayer.class);
         configuration.addAnnotatedClass(HomePosition.class);
-        configuration.addAnnotatedClass(WorldChunk.class);
-        configuration.addAnnotatedClass(ChunkFlag.class);
+        configuration.addAnnotatedClass(LandMember.class);
+        configuration.addAnnotatedClass(LandFlag.class);
 
         var registry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         this.sessionFactory = configuration.buildSessionFactory(registry);
