@@ -1,6 +1,6 @@
 package net.onelitefeather.pandorascluster.service;
 
-import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
+import net.onelitefeather.pandorascluster.PandorasClusterApi;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
@@ -16,11 +16,11 @@ public final class EntityDataStoreService {
     public static final String MENU_TRUST_PLAYER = "trust_player";
     public static final String MENU_CHANGE_CHUNK_OWNER = "change_chunk_owner";
 
-    private final PandorasClusterPlugin plugin;
+    private final PandorasClusterApi api;
     private final List<NamespacedKey> nameSpacedKeys;
 
-    public EntityDataStoreService(@NotNull PandorasClusterPlugin plugin) {
-        this.plugin = plugin;
+    public EntityDataStoreService(@NotNull PandorasClusterApi api) {
+        this.api = api;
         this.nameSpacedKeys = new ArrayList<>();
     }
 
@@ -62,7 +62,7 @@ public final class EntityDataStoreService {
 
         NamespacedKey namespacedKey = getNameSpacedKey(key);
         if (namespacedKey == null) {
-            namespacedKey = new NamespacedKey(this.plugin, key);
+            namespacedKey = new NamespacedKey(this.api.getPlugin(), key);
             this.nameSpacedKeys.add(namespacedKey);
         }
 
