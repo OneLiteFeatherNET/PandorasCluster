@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class Land implements Cloneable {
@@ -141,6 +142,22 @@ public class Land implements Cloneable {
     }
 
     @Nullable
+    public LandMember getLandMember(@NotNull UUID uuid) {
+
+        LandMember landMember = null;
+
+        for (int i = 0; i < this.getLandMembers().size() && landMember == null; i++) {
+            LandMember member = this.getLandMembers().get(i);
+            if (member.getMember().getUniqueId().equals(uuid)) {
+                landMember = member;
+            }
+        }
+
+        return landMember;
+
+    }
+
+    @Nullable
     public LandFlagEntity getFlag(@NotNull LandFlag landFlag) {
 
         LandFlagEntity landFlagEntity = null;
@@ -153,8 +170,19 @@ public class Land implements Cloneable {
         return landFlagEntity;
     }
 
+    public boolean hasAccess(@NotNull UUID uuid) {
+        LandMember landMember = getLandMember(uuid);
+        if (landMember == null) return false;
+        return landMember.getRole().hasAccess();
+    }
+
+    @NotNull
     public LandFlagHandler getFlagHandler() {
         return flagHandler;
+    }
+
+    public boolean isOwner(@NotNull UUID uniqueId) {
+        return this.getOwner().getUniqueId().compareTo(uniqueId) > 0;
     }
 
     @Override
@@ -176,5 +204,4 @@ public class Land implements Cloneable {
             throw new Error(e);
         }
     }
-
 }
