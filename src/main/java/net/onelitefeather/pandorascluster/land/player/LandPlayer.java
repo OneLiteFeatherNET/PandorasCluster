@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 @Entity
-public final class LandPlayer {
+public final class LandPlayer implements Comparable<LandPlayer> {
 
     @Id
     private String uuid;
@@ -67,6 +67,11 @@ public final class LandPlayer {
                 "uuid=" + uuid +
                 ", name='" + getName() + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(@NotNull LandPlayer o) {
+        return this.getUniqueId().compareTo(o.getUniqueId());
     }
 }
 
