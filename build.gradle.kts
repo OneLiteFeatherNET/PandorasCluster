@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    `java-library`
 //    checkstyle
     // FIXME
     // Bukkit
@@ -9,23 +8,19 @@ plugins {
 
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.liquibase.gradle") version "2.1.0"
+    id("org.sonarqube") version "3.4.0.2513"
 }
 
 group = "net.onelitefeather"
 version = "1.0.0-SNAPSHOT"
 
-val cloudNetVersion = "3.4.4-RELEASE"
-
 repositories {
     mavenCentral()
-    maven(url = uri("https://papermc.io/repo/repository/maven-public/"))
-    maven(url = uri("https://maven.enginehub.org/repo/"))
-    maven(url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/"))
-    maven(url = uri("https://oss.sonatype.org/content/groups/public/"))
-    maven(url = uri("https://libraries.minecraft.net"))
-    maven(url = uri("https://repo.cloudnetservice.eu/repository/releases/"))
-    maven(url = uri("https://repo.dmulloy2.net/repository/public/"))
-    maven(url = uri("https://jitpack.io"))
+    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://oss.sonatype.org/content/groups/public/")
+    maven("https://libraries.minecraft.net")
+    maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -90,4 +85,9 @@ bukkit {
     authors = listOf("UniqueGame", "OneLiteFeather")
 
     depend = listOf("ProtocolLib")
+}
+sonarqube {
+    properties {
+        property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYImhlbRTSfGYIFfefLS")
+    }
 }
