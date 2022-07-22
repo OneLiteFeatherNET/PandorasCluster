@@ -7,6 +7,10 @@ import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.service.*;
+import net.onelitefeather.pandorascluster.service.services.DatabaseService;
+import net.onelitefeather.pandorascluster.service.services.EntityDataStoreService;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
+import net.onelitefeather.pandorascluster.service.services.LandPlayerService;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -116,7 +120,7 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
 
     @Override
     public boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
-        return land.getOwner().compareTo(other.getOwner()) > 0;
+        return this.landService.hasSameOwner(land, other);
     }
 
     @Override
