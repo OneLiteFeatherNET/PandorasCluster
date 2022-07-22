@@ -11,9 +11,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.plugin.PluginManager;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +24,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
-public class LandService implements Listener {
+public class LandService {
 
     private final PandorasClusterApi pandorasClusterApi;
     private final Map<OfflinePlayer, Land> playerLands;
@@ -38,6 +36,13 @@ public class LandService implements Listener {
         this.pandorasClusterApi = pandorasClusterApi;
         this.playerLands = new HashMap<>();
         this.claimedChunks = new HashMap<>();
+
+        PluginManager pluginManager = pandorasClusterApi.getPlugin().getServer().getPluginManager();
+
+        pluginManager.registerEvents(new LandBlockListener(this), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandEntityListener(this), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandPlayerListener(this), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandWorldListener(this), pandorasClusterApi.getPlugin());
     }
 
     public void load() {
@@ -74,7 +79,7 @@ public class LandService implements Listener {
 
     public boolean hasPlayerLand(@NotNull UUID playerId) {
         OfflinePlayer offlinePlayer = this.pandorasClusterApi.getPlugin().getServer().getOfflinePlayer(playerId);
-        if(!offlinePlayer.hasPlayedBefore()) return false;
+        if (!offlinePlayer.hasPlayedBefore()) return false;
         return this.playerLands.containsKey(offlinePlayer);
     }
 
@@ -130,12 +135,6 @@ public class LandService implements Listener {
 
     public boolean isChunkClaimed(@NotNull Chunk chunk) {
         return this.claimedChunks.containsKey(chunk);
-    }
-
-    @EventHandler
-    public void handleEntityChangeBlock(EntityChangeBlockEvent event) {
-        var land = this.claimedChunks.get(event.getBlock().getChunk());
-        if (land != null) land.getFlagHandler().handleEntityChangeBlock(event);
     }
 
     public void findConnectedChunk(@NotNull Player player, @NotNull Consumer<Land> consumer) {
@@ -212,6 +211,10 @@ public class LandService implements Listener {
         }
 
         return chunks;
+    }
+
+    public boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
+        return land.getOwner().compareTo(other.getOwner()) > 0;
     }
 }
 
