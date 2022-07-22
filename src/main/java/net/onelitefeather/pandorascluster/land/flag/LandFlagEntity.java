@@ -23,9 +23,10 @@ public class LandFlagEntity {
     public LandFlagEntity() {
     }
 
-    public LandFlagEntity(@NotNull String name, @NotNull String value, @NotNull LandFlagType flagType) {
+    public LandFlagEntity(@NotNull String name, @NotNull String value, byte type, @NotNull LandFlagType flagType) {
         this.name = name;
         this.value = value;
+        this.type = type;
         this.flagType = flagType;
     }
 
@@ -52,6 +53,14 @@ public class LandFlagEntity {
         return (T) value;
     }
 
+    public byte getType() {
+        return type;
+    }
+
+    public void setType(byte type) {
+        this.type = type;
+    }
+
     @Nullable
     public LandFlag getFlag() {
         return LandFlag.findByName(this.name);
@@ -74,6 +83,7 @@ public class LandFlagEntity {
 
         private String name, value;
         private LandFlagType flagType;
+        private byte type;
 
         public LandFlagEntity.Builder name(@NotNull String name) {
             this.name = name;
@@ -85,13 +95,18 @@ public class LandFlagEntity {
             return this;
         }
 
+        public LandFlagEntity.Builder type(byte type) {
+            this.type = type;
+            return this;
+        }
+
         public LandFlagEntity.Builder value(@NotNull String value) {
             this.value = value.trim();
             return this;
         }
 
         public LandFlagEntity build() {
-            return new LandFlagEntity(this.name, this.value, this.flagType);
+            return new LandFlagEntity(this.name, this.value, this.type, this.flagType);
         }
     }
 
