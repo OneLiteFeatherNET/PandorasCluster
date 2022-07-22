@@ -19,18 +19,20 @@ public enum LandFlag {
     REDSTONE("redstone", true, LandFlagType.WORLD_TICK, (byte) 2),
     POTION_SPLASH("potion-splash", false, LandFlagType.ENTITY, (byte) 2),
 
+    HANGING_BREAK("hanging-break", false, LandFlagType.ENTITY, (byte) 2),
+
+
     VEHICLE_USE("vehicle-use", false, LandFlagType.ENTITY, (byte) 2),
-    VEHICLE_PLACE("vehicle-place", false, LandFlagType.ENTITY, (byte) 2),
-    VEHICLE_BREAK("vehicle-break", false, LandFlagType.ENTITY, (byte) 2),
     VEHICLE_CREATE("vehicle-create", false, LandFlagType.ENTITY, (byte) 2),
+    VEHICLE_DAMAGE("vehicle-create", false, LandFlagType.ENTITY, (byte) 2),
 
     INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, (byte) 2),
-    LEAVES_DECAY("leaves-decay", true, LandFlagType.WORLD_TICK, (byte) 2),
+    LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, (byte) 2),
     EXPLOSIONS("explosions", true, LandFlagType.EXPLOSION, (byte) 2),
     FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, (byte) 2),
     MOB_GRIEFING("mob-griefing", true, LandFlagType.ENTITY, (byte) 2),
-    ICE_FORM("ice-form", true, LandFlagType.WORLD_TICK, (byte) 2),
-    BLOCK_FORM("block-form", true, LandFlagType.ENTITY, (byte) 2);
+    ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, (byte) 2),
+    BLOCK_FORM("block-form", false, LandFlagType.ENTITY, (byte) 2);
 
     private final String name;
     private final Object defaultValue;
