@@ -1,10 +1,10 @@
 include:
   - project: onelitefeather/ci-template
     ref: main
-    file: s3-upload.yml
+    file: s3-upload.yaml
   - project: onelitefeather/ci-template
     ref: main
-    file: sonarqube.yml
+    file: sonarqube.yaml
 
 variables:
   JAR_FILE: "PandorasCluster.jar"
