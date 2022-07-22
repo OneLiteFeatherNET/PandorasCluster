@@ -1,9 +1,9 @@
 package net.onelitefeather.pandorascluster.land;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.enums.LandRole;
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
-import net.onelitefeather.pandorascluster.land.flag.LandFlagHandler;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
@@ -44,10 +44,7 @@ public class Land implements Cloneable {
     @Column
     private int z;
 
-    private transient final LandFlagHandler flagHandler;
-
     public Land() {
-        this.flagHandler = new LandFlagHandler(this);
     }
 
     public Land(@NotNull LandPlayer owner, @NotNull HomePosition homePosition, @NotNull String world, int x, int z) {
@@ -56,7 +53,6 @@ public class Land implements Cloneable {
         this.world = world;
         this.x = x;
         this.z = z;
-        this.flagHandler = new LandFlagHandler(this);
     }
 
     public long getId() {
@@ -176,11 +172,6 @@ public class Land implements Cloneable {
         return landMember.getRole().hasAccess();
     }
 
-    @NotNull
-    public LandFlagHandler getFlagHandler() {
-        return flagHandler;
-    }
-
     public boolean isOwner(@NotNull UUID uniqueId) {
         return this.getOwner().getUniqueId().compareTo(uniqueId) > 0;
     }
@@ -203,5 +194,14 @@ public class Land implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new Error(e);
         }
+    }
+
+    public boolean isMerged() {
+        return this.getMergedChunks().size() > 0;
+    }
+
+    public boolean isBanned(UUID uniqueId) {
+        LandMember landMember = getLandMember(uniqueId);
+        return landMember != null && landMember.getRole() == LandRole.BANNED;
     }
 }
