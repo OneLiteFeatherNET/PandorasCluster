@@ -22,7 +22,7 @@ public class LandBuilder {
     }
 
     public LandBuilder() {
-        this.land = new Land(flagHandler);
+        this.land = new Land();
     }
 
     public LandBuilder owner(@NotNull LandPlayer owner) {
