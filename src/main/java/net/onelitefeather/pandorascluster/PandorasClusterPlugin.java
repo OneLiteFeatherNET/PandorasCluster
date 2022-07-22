@@ -41,11 +41,6 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerConnectionListener(this.api), this);
-        pluginManager.registerEvents(new BlockProtectionListener(this), this);
-        pluginManager.registerEvents(new EntityProtectionListener(this, this.api.getLandFlagService()), this);
-        pluginManager.registerEvents(new PlayerListener(this), this);
-        pluginManager.registerEvents(new VehicleProtectionListener(this.api.getLandService(), this.api.getLandFlagService()), this);
-        pluginManager.registerEvents(new ContainerProtectionListener(this), this);
 
         buildCommandSystem();
     }
