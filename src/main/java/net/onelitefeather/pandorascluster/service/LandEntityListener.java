@@ -1,0 +1,459 @@
+package net.onelitefeather.pandorascluster.service;
+
+import com.destroystokyo.paper.event.block.TNTPrimeEvent;
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import net.onelitefeather.pandorascluster.enums.Permission;
+import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Campfire;
+import org.bukkit.block.Container;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Powerable;
+import org.bukkit.block.data.type.Farmland;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.EntityBlockFormEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.vehicle.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.projectiles.ProjectileSource;
+import org.spigotmc.event.entity.EntityMountEvent;
+
+import java.util.Iterator;
+import java.util.List;
+
+record LandEntityListener(LandService landService) implements Listener {
+
+    @EventHandler
+    public void theConfuser(EntityDamageByEntityEvent event) {
+
+        var target = event.getEntity();
+        var attacker = event.getDamager();
+
+        var land = this.landService.getLand(target.getChunk());
+
+        if (land == null) land = this.landService.getLand(attacker.getChunk());
+
+        if (land == null) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleEntityExplode(TNTPrimeEvent event) {
+
+        var block = event.getBlock();
+        var land = this.landService.getLand(block.getChunk());
+        var primerEntity = event.getPrimerEntity();
+
+        if (land != null) {
+
+            LandFlagEntity landFlag = land.getFlag(LandFlag.EXPLOSIONS);
+            var cancel = landFlag != null && !landFlag.<Boolean>getValue();
+
+            if (primerEntity != null) {
+                if (land.hasAccess(primerEntity.getUniqueId())) return;
+                if (Permission.EXPLOSION.hasPermission(primerEntity)) return;
+                cancel = true;
+            }
+
+            event.setCancelled(cancel);
+        }
+    }
+
+    @EventHandler
+    public void handleEntityExplode(EntityExplodeEvent event) {
+
+        var entity = event.getEntity();
+        var land = this.landService.getLand(entity.getChunk());
+
+        if (land != null) {
+
+            Iterator<Block> iterator = event.blockList().iterator();
+            while (iterator.hasNext()) {
+
+                var next = iterator.next();
+                var nextLand = this.landService.getLand(next.getChunk());
+
+                if (nextLand != null) {
+                    if (!this.landService.hasSameOwner(land, nextLand)) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void handleEntityMount(EntityMountEvent event) {
+
+        var mount = event.getMount();
+        var entity = event.getEntity();
+
+        if (!(mount instanceof Vehicle)) return;
+
+        if (mount instanceof Tameable tameable) {
+            if (tameable.isTamed()) {
+                var tamer = tameable.getOwner();
+                if (tamer != null && tamer.getUniqueId().equals(entity.getUniqueId())) return;
+            }
+        }
+
+        var land = this.landService.getLand(mount.getChunk());
+        if (land == null) return;
+
+        if (land.hasAccess(entity.getUniqueId())) return;
+        if (Permission.ENTITY_MOUNT.hasPermission(entity)) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleEntityChangeBlock(EntityChangeBlockEvent event) {
+        var land = this.landService.getLand(event.getBlock().getChunk());
+
+        if (land == null) return;
+
+        var landFlag = land.getFlag(LandFlag.BLOCK_FORM);
+        if (landFlag != null && landFlag.<Boolean>getValue()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleEntityBlockForm(EntityBlockFormEvent event) {
+
+        var land = this.landService.getLand(event.getBlock().getChunk());
+        if (land == null) return;
+
+        var landFlag = land.getFlag(LandFlag.BLOCK_FORM);
+        if (landFlag != null) {
+            if (land.hasAccess(event.getEntity().getUniqueId())) return;
+            if (landFlag.<Boolean>getValue()) return;
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void handleHangingBreak(HangingBreakEvent event) {
+
+        var entity = event.getEntity();
+
+        var land = this.landService.getLand(entity.getChunk());
+        if (land == null) return;
+
+        var landFlag = land.getFlag(LandFlag.HANGING_BREAK);
+        if (landFlag != null && landFlag.<Boolean>getValue()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleEntityInteract(EntityInteractEvent event) {
+
+        var entity = event.getEntity();
+        var block = event.getBlock();
+
+        var land = this.landService.getLand(block.getChunk());
+        if (land == null) return;
+
+        var data = block.getBlockData();
+
+        var cancel = false;
+
+        if (data instanceof Farmland) {
+            var landFlag = land.getFlag(LandFlag.FARMLAND_DESTROY);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+            cancel = true;
+        }
+
+        if (data instanceof Powerable) {
+            var landFlag = land.getFlag(LandFlag.REDSTONE);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+            cancel = true;
+        }
+
+        if (entity instanceof LivingEntity) {
+            if (block.getState() instanceof Container) {
+                var landFlag = land.getFlag(LandFlag.INTERACT_CONTAINERS);
+                if (landFlag != null && landFlag.<Boolean>getValue()) return;
+                cancel = true;
+            }
+        }
+
+        event.setCancelled(cancel);
+    }
+
+    @EventHandler
+    public void handleEntityPathfinding(EntityPathfindEvent event) {
+
+        var entity = event.getEntity();
+
+        var location = event.getLoc();
+        var land = this.landService.getLand(location.getChunk());
+        var entityLand = this.landService.getLand(entity.getChunk());
+
+        var cancel = false;
+
+        if (entityLand != null) {
+            if (land != null) {
+                if (!this.landService.hasSameOwner(entityLand, land)) {
+                    cancel = true;
+                }
+            } else {
+                cancel = true;
+            }
+        } else {
+            if (land != null) {
+                cancel = true;
+            }
+        }
+
+        event.setCancelled(cancel);
+    }
+
+    @EventHandler
+    public void handleEntityTargetLivingEntity(EntityTargetLivingEntityEvent event) {
+
+        var entity = event.getEntity();
+        var target = event.getTarget();
+
+        var land = this.landService.getLand(entity.getChunk());
+        if (target != null) {
+            if (land == null) {
+                land = this.landService.getLand(target.getChunk());
+            }
+        }
+
+        if (land == null) return;
+
+        var landFlag = land.getFlag(LandFlag.PVE);
+        if (landFlag != null && landFlag.<Boolean>getValue()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void handleVehicleEnter(VehicleEnterEvent event) {
+
+        var vehicle = event.getVehicle();
+        var entered = event.getEntered();
+
+        var land = this.landService.getLand(vehicle.getChunk());
+
+        if (land != null) {
+
+            LandFlagEntity landFlag = land.getFlag(LandFlag.VEHICLE_USE);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+
+            if (land.hasAccess(entered.getUniqueId())) return;
+
+            if (Permission.VEHICLE_ENTER.hasPermission(entered)) return;
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void handleVehicleDestroy(VehicleDestroyEvent event) {
+
+        var vehicle = event.getVehicle();
+        var attacker = event.getAttacker();
+
+        var land = this.landService.getLand(vehicle.getChunk());
+
+        if (land != null) {
+
+            var landFlag = land.getFlag(LandFlag.VEHICLE_DAMAGE);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+
+            if (attacker != null) {
+                if (land.hasAccess(attacker.getUniqueId())) return;
+                if (Permission.VEHICLE_DESTROY.hasPermission(attacker)) return;
+                event.setCancelled(true);
+                return;
+            }
+
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void handleVehicleDamage(VehicleDamageEvent event) {
+
+        var vehicle = event.getVehicle();
+        var attacker = event.getAttacker();
+
+        var land = this.landService.getLand(vehicle.getChunk());
+        if (land != null) {
+
+            if (attacker != null) {
+                if (land.hasAccess(attacker.getUniqueId())) return;
+                if (Permission.VEHICLE_DAMAGE.hasPermission(attacker)) return;
+            }
+
+            var landFlag = land.getFlag(LandFlag.VEHICLE_DAMAGE);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void handleVehicleCreation(VehicleCreateEvent event) {
+
+        var vehicle = event.getVehicle();
+        var land = this.landService.getLand(vehicle.getChunk());
+        if (land != null) {
+            var landFlag = land.getFlag(LandFlag.VEHICLE_CREATE);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void handleVehicleMovement(VehicleMoveEvent event) {
+
+        var vehicle = event.getVehicle();
+
+        var to = event.getTo();
+        var from = event.getFrom();
+
+        var toLand = this.landService.getLand(to.getChunk());
+        var fromLand = this.landService.getLand(from.getChunk());
+
+        if (toLand != null) {
+
+            for (var entity : vehicle.getPassengers()) {
+                if (toLand.isBanned(entity.getUniqueId())) {
+                    vehicle.removePassenger(entity);
+                }
+            }
+
+            if (fromLand != null) {
+                if (!this.landService.hasSameOwner(toLand, fromLand)) {
+                    removeVehicle(vehicle, to);
+                }
+            }
+        } else {
+            if (fromLand != null) {
+                removeVehicle(vehicle, to);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handlePotionSplash(ProjectileLaunchEvent event) {
+
+        var projectile = event.getEntity();
+
+        if (projectile instanceof ThrownPotion thrownPotion) {
+
+            var source = thrownPotion.getShooter();
+
+            if (source != null) {
+                if (source instanceof Entity entity) {
+
+                    var land = this.landService.getLand(entity.getChunk());
+                    if (land != null) {
+
+                        var landFlag = land.getFlag(LandFlag.POTION_SPLASH);
+                        if (landFlag != null && landFlag.<Boolean>getValue()) return;
+
+                        if (land.hasAccess(entity.getUniqueId())) return;
+                        if (Permission.POTION_SPLASH.hasPermission(entity)) return;
+
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void handleProjectileHit(ProjectileHitEvent event) {
+
+        var entity = event.getEntity();
+        ProjectileSource shooter = null;
+
+        if (entity.getShooter() instanceof Entity) {
+            shooter = entity.getShooter();
+        }
+
+        var hitEntity = event.getHitEntity();
+        if (hitEntity != null) {
+
+            var land = this.landService.getLand(hitEntity.getChunk());
+            if (land == null) return;
+
+            if (shooter != null) {
+                if (shooter instanceof Entity shooterEntity) {
+                    if (land.hasAccess(shooterEntity.getUniqueId())) return;
+                    if (Permission.PROJECTILE_HIT_ENTITY.hasPermission(shooterEntity)) return;
+                    event.setCancelled(true);
+                }
+            }
+        }
+
+        var hitBlock = event.getHitBlock();
+        if (hitBlock != null) {
+
+            var land = this.landService.getLand(hitBlock.getChunk());
+
+            if (land != null) {
+
+                var cancel = hitBlock.getState() instanceof Campfire;
+
+                var blockData = hitBlock.getBlockData();
+                if (blockData instanceof Powerable) {
+
+                    var landFlag = land.getFlag(LandFlag.REDSTONE);
+                    if (landFlag != null && landFlag.<Boolean>getValue()) return;
+
+                    if(shooter != null) {
+                        if(shooter instanceof Permissible permissible) {
+                            if (Permission.PROJECTILE_HIT_ENTITY.hasPermission(permissible)) {
+                                cancel = false;
+                            }
+                        }
+                    }
+
+                    cancel = true;
+                }
+
+                event.setCancelled(cancel);
+            }
+        }
+    }
+
+    private void removeVehicle(Vehicle vehicle, Location location) {
+        List<Entity> passengers = vehicle.getPassengers();
+
+        boolean cancelDrop = false;
+        if (!passengers.isEmpty()) {
+            for (int i = 0; i < passengers.size() && !cancelDrop; i++) {
+                var passenger = passengers.get(i);
+                if (passenger instanceof Player player && player.getGameMode() == GameMode.CREATIVE) {
+                    cancelDrop = true;
+                }
+            }
+        }
+
+        if (!cancelDrop) {
+
+            ItemStack dropItem = null;
+            if (vehicle instanceof Minecart minecart) {
+                dropItem = new ItemStack(minecart.getMinecartMaterial());
+            } else if (vehicle instanceof Boat boat) {
+                dropItem = new ItemStack(boat.getBoatType().getMaterial());
+            }
+
+            if (dropItem != null) {
+                location.getWorld().dropItemNaturally(location, dropItem);
+            }
+        }
+
+        vehicle.remove();
+    }
+
+}
