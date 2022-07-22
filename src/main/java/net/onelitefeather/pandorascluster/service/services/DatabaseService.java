@@ -1,6 +1,7 @@
-package net.onelitefeather.pandorascluster.service;
+package net.onelitefeather.pandorascluster.service.services;
 
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
@@ -66,9 +67,10 @@ public final class DatabaseService {
         properties.put(Environment.HBM2DDL_AUTO, Action.UPDATE);
 
         configuration.setProperties(properties);
+        configuration.addAnnotatedClass(LandFlagEntity.class);
+        configuration.addAnnotatedClass(LandMember.class);
         configuration.addAnnotatedClass(LandPlayer.class);
         configuration.addAnnotatedClass(HomePosition.class);
-        configuration.addAnnotatedClass(LandMember.class);
         configuration.addAnnotatedClass(LandFlag.class);
 
         var registry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();

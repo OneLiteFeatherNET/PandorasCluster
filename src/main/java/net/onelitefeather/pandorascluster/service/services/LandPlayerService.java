@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.service;
+package net.onelitefeather.pandorascluster.service.services;
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
