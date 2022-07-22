@@ -35,13 +35,18 @@ public record ClaimCommand(PandorasClusterApi api) {
         this.api.getLandService().findConnectedChunk(player, land -> {
             if (land != null) {
 
-                this.api.getLandService().merge(land, playerChunk);
-                player.sendMessage(Component.text("The Chunk was successfully merged with the chunk x: "
-                        + land.getX() + " z: " + land.getZ()));
+                if (!land.isOwner(player.getUniqueId())) {
+                    player.sendMessage(Component.text("You´re not the Owner from this Land!"));
+                    return;
+                }
 
+                this.api.getLandService().merge(land, playerChunk);
+                player.sendMessage(Component.text("You´ve successfully merged this land!"));
+                player.sendMessage(String.format("DEBUG: Connected with Land X: %d Z: %d", land.getX(), land.getZ()));
+                
             } else {
                 this.api.getLandService().createLand(landPlayer, player, playerChunk);
-                player.sendMessage(Component.text("created!"));
+                player.sendMessage(Component.text("You´ve successfully claimed this land!"));
             }
         });
     }
