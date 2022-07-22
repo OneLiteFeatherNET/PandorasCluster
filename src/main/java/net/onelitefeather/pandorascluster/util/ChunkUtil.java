@@ -3,6 +3,9 @@ package net.onelitefeather.pandorascluster.util;
 import org.bukkit.Chunk;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <a href="https://github.com/Minestom/Minestom/blob/master/src/main/java/net/minestom/server/utils/chunk/ChunkUtils.java">Util Class from Minestom</a>
+ */
 public class ChunkUtil {
 
     /**
