@@ -2,7 +2,11 @@ package net.onelitefeather.pandorascluster.util;
 
 import java.util.UUID;
 
-public class Constants {
+public final class Constants {
+    private Constants() {
+        throw new IllegalStateException("Utility class");
+    }
+
 
     public static final String PREFIX = "[§aPandorasLand§r]";
     public static final String PLUGIN_NAME = "PandorasCluster";
