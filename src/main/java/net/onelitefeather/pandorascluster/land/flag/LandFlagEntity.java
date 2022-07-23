@@ -40,7 +40,7 @@ public class LandFlagEntity {
     }
 
     public <T> T getValue() {
-        var value = switch(this.type) {
+        var result = switch(this.type) {
             case 0 -> this.value;
             case 1 -> Integer.getInteger(this.value);
             case 2 -> Boolean.getBoolean(this.value);
@@ -50,7 +50,7 @@ public class LandFlagEntity {
             case 6 -> Byte.parseByte(this.value);
             default -> null;
         };
-        return (T) value;
+        return (T) result;
     }
 
     public byte getType() {
@@ -81,7 +81,9 @@ public class LandFlagEntity {
 
     public static final class Builder {
 
-        private String name, value;
+        private String name;
+        private String value;
+        
         private LandFlagType flagType;
         private byte type;
 
