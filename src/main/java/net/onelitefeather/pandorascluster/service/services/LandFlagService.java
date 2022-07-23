@@ -14,25 +14,27 @@ public class LandFlagService {
     public LandFlagService() {
         this.landFlags = new ArrayList<>();
 
-        this.addLandFlag("pvp", "false", LandFlagType.PLAYER);
-        this.addLandFlag("pve", "false", LandFlagType.PLAYER);
+        String value = "false";
 
-        this.addLandFlag("redstone", "false", LandFlagType.POWERED);
-        this.addLandFlag("potion-splash", "false", LandFlagType.ENTITY);
+        this.addLandFlag("pvp", value, LandFlagType.PLAYER);
+        this.addLandFlag("pve", value, LandFlagType.PLAYER);
 
-        this.addLandFlag("vehicle-use", "false", LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-place", "false", LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-break", "false", LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-create", "false", LandFlagType.ENTITY);
+        this.addLandFlag("redstone", value, LandFlagType.POWERED);
+        this.addLandFlag("potion-splash", value, LandFlagType.ENTITY);
 
-        this.addLandFlag("interact-containers", "false", LandFlagType.PLAYER);
+        this.addLandFlag("vehicle-use", value, LandFlagType.ENTITY);
+        this.addLandFlag("vehicle-place", value, LandFlagType.ENTITY);
+        this.addLandFlag("vehicle-break", value, LandFlagType.ENTITY);
+        this.addLandFlag("vehicle-create", value, LandFlagType.ENTITY);
+
+        this.addLandFlag("interact-containers", value, LandFlagType.PLAYER);
         this.addLandFlag("leaves-decay", "true", LandFlagType.WORLD_TICK);
-        this.addLandFlag("explosions", "false", LandFlagType.EXPLOSION);
-        this.addLandFlag("farmland-destroy", "false", LandFlagType.ENTITY);
-        this.addLandFlag("mob-griefing", "false", LandFlagType.ENTITY);
+        this.addLandFlag("explosions", value, LandFlagType.EXPLOSION);
+        this.addLandFlag("farmland-destroy", value, LandFlagType.ENTITY);
+        this.addLandFlag("mob-griefing", value, LandFlagType.ENTITY);
 
-        this.addLandFlag("ice-form", "false", LandFlagType.WORLD_TICK);
-        this.addLandFlag("block-form", "false", LandFlagType.WORLD_TICK);
+        this.addLandFlag("ice-form", value, LandFlagType.WORLD_TICK);
+        this.addLandFlag("block-form", value, LandFlagType.WORLD_TICK);
     }
 
     public List<LandFlagEntity> getLandFlags() {
