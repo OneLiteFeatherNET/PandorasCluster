@@ -11,10 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 public record LandCommand(PandorasClusterApi api) {
 
-    public LandCommand(@NotNull PandorasClusterApi api) {
-        this.api = api;
-    }
-
     @CommandMethod("land")
     @CommandDescription("Open the land gui")
     public void execute(@NotNull Player player) {
