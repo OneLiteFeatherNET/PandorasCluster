@@ -20,7 +20,7 @@ public enum ChunkRotation {
     WEST(-1, 0),
     NORTH_WEST(-1, -1);
 
-    public static final Map<String, BlockFace> BLOCK_FACE_NAMES = Maps.newHashMap();
+    private static final Map<String, BlockFace> BLOCK_FACE_NAMES = Maps.newHashMap();
     public static final Map<String, ChunkRotation> BY_NAME = Maps.newHashMap();
     private final int x;
     private final int z;
