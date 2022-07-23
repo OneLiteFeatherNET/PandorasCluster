@@ -16,15 +16,18 @@ import java.util.logging.Level;
 
 public class ProtocolLibHook {
 
-    private static final String PLUGIN_NAME = "ProtocolLib";
+    private ProtocolLibHook() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void openSignEditor(@NotNull Player player) {
 
+        String pluginName = "ProtocolLib";
         PluginManager pluginManager = player.getServer().getPluginManager();
         PandorasClusterPlugin plugin = JavaPlugin.getPlugin(PandorasClusterPlugin.class);
 
-        if (!plugin.getDescription().getDepend().contains(PLUGIN_NAME)) return;
-        if (pluginManager.isPluginEnabled(PLUGIN_NAME)) {
+        if (!plugin.getDescription().getDepend().contains(pluginName)) return;
+        if (pluginManager.isPluginEnabled(pluginName)) {
             try {
                 Location location = player.getLocation();
 
