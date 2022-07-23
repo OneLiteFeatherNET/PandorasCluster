@@ -46,16 +46,13 @@ public record LandPlayerListener(LandService landService) implements Listener {
         var blockData = clickedBlock.getBlockData();
         boolean cancel = false;
 
-        if (blockData instanceof Farmland) {
-            if (event.getAction() == Action.PHYSICAL) {
+        if (blockData instanceof Farmland && event.getAction() == Action.PHYSICAL) {
+            var landFlag = land.getFlag(LandFlag.FARMLAND_DESTROY);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
-                var landFlag = land.getFlag(LandFlag.FARMLAND_DESTROY);
-                if (landFlag != null && landFlag.<Boolean>getValue()) return;
-
-                if (land.hasAccess(player.getUniqueId())) return;
-                if (Permission.INTERACT_FARMLAND.hasPermission(player)) return;
-                cancel = true;
-            }
+            if (land.hasAccess(player.getUniqueId())) return;
+            if (Permission.INTERACT_FARMLAND.hasPermission(player)) return;
+            cancel = true;
         }
 
         if (blockData instanceof Powerable) {
@@ -74,16 +71,14 @@ public record LandPlayerListener(LandService landService) implements Listener {
             cancel = true;
         }
 
-        if (blockData instanceof RespawnAnchor respawnAnchor) {
-            if (respawnAnchor.getCharges() == respawnAnchor.getMaximumCharges()) {
-
-                var landFlag = land.getFlag(LandFlag.EXPLOSIONS);
-                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                    if (landFlag != null && landFlag.<Boolean>getValue()) return;
-                    if (Permission.EXPLOSION.hasPermission(player)) return;
-                    cancel = true;
-                }
-            }
+        if (blockData instanceof RespawnAnchor respawnAnchor &&
+                respawnAnchor.getCharges() == respawnAnchor.getMaximumCharges() &&
+                event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            
+            var landFlag = land.getFlag(LandFlag.EXPLOSIONS);
+            if (landFlag != null && landFlag.<Boolean>getValue()) return;
+            if (Permission.EXPLOSION.hasPermission(player)) return;
+            cancel = true;
         }
 
         event.setCancelled(cancel);
