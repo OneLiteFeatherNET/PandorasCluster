@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,8 +57,7 @@ public class LandService {
             for (Land land : query.list()) {
 
                 OfflinePlayer offlinePlayer = server.getOfflinePlayer(land.getOwner().getUniqueId());
-                if (!offlinePlayer.hasPlayedBefore()) continue;
-                if (this.playerLands.containsKey(offlinePlayer)) continue;
+                if (!offlinePlayer.hasPlayedBefore() || this.playerLands.containsKey(offlinePlayer)) continue;
                 this.playerLands.put(offlinePlayer, land);
 
                 for (int i = 0; i < land.getMergedChunks().size(); i++) {
@@ -130,7 +130,47 @@ public class LandService {
 
         Chunk chunk = world.getChunkAt(land.getX(), land.getZ());
         this.claimedChunks.remove(chunk);
-        //TODO: Delete from database
+
+        if (exists(land)) {
+            Transaction transaction = null;
+            try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+                transaction = session.beginTransaction();
+                session.remove(land);
+                transaction.commit();
+
+                this.playerLands.remove(player);
+
+                Map<Chunk, Land> toRemove = new HashMap<>();
+                for (Map.Entry<Chunk, Land> landEntry : this.claimedChunks.entrySet()) {
+                    if (landEntry.getValue().equals(land)) {
+                        toRemove.put(landEntry.getKey(), land);
+                    }
+                }
+
+                toRemove.forEach(this.claimedChunks::remove);
+
+            } catch (HibernateException e) {
+
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the land from the database.", e);
+            }
+        }
+    }
+
+    public boolean exists(@NotNull Land land) {
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            var kitCooldown = session.createQuery("SELECT kdc FROM Land kdc WHERE playerId = :playerId AND id = :id", Land.class);
+            kitCooldown.setMaxResults(1);
+            kitCooldown.setParameter("playerId", land.getOwner().getUniqueId().toString());
+            kitCooldown.setParameter("id", land.getId());
+            return kitCooldown.uniqueResult() != null;
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e);
+            return false;
+        }
     }
 
     public boolean isChunkClaimed(@NotNull Chunk chunk) {
@@ -139,40 +179,18 @@ public class LandService {
 
     public void findConnectedChunk(@NotNull Player player, @NotNull Consumer<Land> consumer) {
 
-        Land connectedChunk = null;
-        Land result = null;
 
         ChunkRotation chunkRotation = ChunkRotation.getChunkRotation(player.getFacing().name());
-
         if (chunkRotation != null) {
-            for (Chunk chunk : nearbyChunks(player.getChunk(), chunkRotation)) {
 
-                Land worldChunk = getLand(chunk);
-                if (worldChunk != null) {
-                    if (worldChunk.getOwner().getUniqueId().equals(player.getUniqueId())) {
-                        if (connectedChunk == null) {
-                            connectedChunk = worldChunk;
-                            continue;
-                        }
-                    }
-                }
+            Chunk chunk = player.getChunk();
+            Chunk connectedChunk = player.getWorld().getChunkAt(
+                    chunk.getX() + chunkRotation.getX(),
+                    chunk.getZ() + chunkRotation.getZ());
 
-                if (connectedChunk != null) {
-
-                    Land playerChunk = getPlayerLand(player.getUniqueId());
-
-                    if (playerChunk != null) {
-                        result = playerChunk;
-                    } else {
-                        result = connectedChunk;
-                    }
-
-                    break;
-                }
-            }
+            Land land = this.getLand(connectedChunk);
+            consumer.accept(land);
         }
-
-        consumer.accept(result);
     }
 
     public boolean isChunkMerged(@NotNull Chunk chunk) {
@@ -199,22 +217,8 @@ public class LandService {
         }
     }
 
-    @NotNull
-    public Chunk[] nearbyChunks(@NotNull Chunk chunk, ChunkRotation... rotations) {
-
-        Chunk[] chunks = new Chunk[rotations.length];
-
-        for (int i = 0; i < rotations.length; i++) {
-            chunks[i] = chunk.getWorld().getChunkAt(
-                    chunk.getX() + rotations[i].getX(),
-                    chunk.getZ() + rotations[i].getZ());
-        }
-
-        return chunks;
-    }
-
     public boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
-        return land.getOwner().compareTo(other.getOwner()) > 0;
+        return land.getOwner().equals(other.getOwner());
     }
 }
 
