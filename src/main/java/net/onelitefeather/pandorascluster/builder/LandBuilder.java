@@ -15,10 +15,14 @@ import java.util.List;
 
 public class LandBuilder {
 
-    private final Land land;
+    private Land land;
 
     public LandBuilder(@NotNull Land origin) {
-        this.land = origin.clone();
+        try {
+            this.land = origin.clone();
+        } catch (CloneNotSupportedException e) {
+            this.land = new Land();
+        }
     }
 
     public LandBuilder() {

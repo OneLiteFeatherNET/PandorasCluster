@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -43,6 +44,7 @@ public class Land implements Cloneable {
 
     @Column
     private int z;
+
 
     public Land() {
     }
@@ -188,16 +190,28 @@ public class Land implements Cloneable {
 
     @Override
     @NotNull
-    public Land clone() {
-        try {
-            return (Land) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error(e);
-        }
+    public Land clone() throws CloneNotSupportedException {
+        return (Land) super.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Land land)) return false;
+
+        if (id != land.id) return false;
+        if (x != land.x) return false;
+        if (z != land.z) return false;
+        if (!owner.equals(land.getOwner())) return false;
+        if (!Objects.equals(homePosition, land.homePosition)) return false;
+        if (!Objects.equals(landMembers, land.landMembers)) return false;
+        if (!Objects.equals(landFlags, land.landFlags)) return false;
+        if (!Objects.equals(chunks, land.chunks)) return false;
+        return Objects.equals(world, land.world);
     }
 
     public boolean isMerged() {
-        return this.getMergedChunks().size() > 0;
+        return !this.getMergedChunks().isEmpty();
     }
 
     public boolean isBanned(UUID uniqueId) {
