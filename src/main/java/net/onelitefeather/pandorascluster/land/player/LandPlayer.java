@@ -11,10 +11,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public final class LandPlayer implements Comparable<LandPlayer> {
+public final class LandPlayer {
 
     @Id
     private String uuid;
@@ -70,8 +71,11 @@ public final class LandPlayer implements Comparable<LandPlayer> {
     }
 
     @Override
-    public int compareTo(@NotNull LandPlayer o) {
-        return this.getUniqueId().compareTo(o.getUniqueId());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LandPlayer that)) return false;
+        if (!Objects.equals(uuid, that.uuid)) return false;
+        return Objects.equals(name, that.name);
     }
 }
 
