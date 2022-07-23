@@ -1,12 +1,21 @@
 package net.onelitefeather.pandorascluster.util;
 
 import org.bukkit.Chunk;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <a href="https://github.com/Minestom/Minestom/blob/master/src/main/java/net/minestom/server/utils/chunk/ChunkUtils.java">Util Class from Minestom</a>
  */
 public class ChunkUtil {
+
+    private ChunkUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Gets the chunk index of chunk coordinates.
@@ -44,6 +53,19 @@ public class ChunkUtil {
      */
     public static int getChunkCoordZ(long index) {
         return (int) index;
+    }
+
+    @NotNull
+    public static List<Player> getPlayersInChunk(@NotNull Chunk chunk) {
+
+        List<Player> players = new ArrayList<>();
+        for (Entity entity : chunk.getEntities()) {
+            if (entity instanceof Player player) {
+                players.add(player);
+            }
+        }
+
+        return players;
     }
 
 }
