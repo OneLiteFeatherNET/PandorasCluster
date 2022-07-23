@@ -17,21 +17,21 @@ import java.util.logging.Level;
 public final class LandPlayerService {
 
     private final PandorasClusterApi pandorasClusterApi;
-    private final List<LandPlayer> chunkPlayers;
+    private final List<LandPlayer> landPlayers;
 
     public LandPlayerService(@NotNull PandorasClusterApi pandorasClusterApi) {
         this.pandorasClusterApi = pandorasClusterApi;
-        this.chunkPlayers = new ArrayList<>();
+        this.landPlayers = new ArrayList<>();
     }
 
     public List<LandPlayer> getPlayers() {
-        return this.chunkPlayers;
+        return this.landPlayers;
     }
 
     @Nullable
     public LandPlayer getLandPlayer(@NotNull UUID uuid) {
-        for (int i = 0; i < this.chunkPlayers.size(); i++) {
-            LandPlayer player = this.chunkPlayers.get(i);
+        for (int i = 0; i < this.landPlayers.size(); i++) {
+            LandPlayer player = this.landPlayers.get(i);
             if (player.getUniqueId().equals(uuid)) {
                 return player;
             }
@@ -43,7 +43,7 @@ public final class LandPlayerService {
     @Nullable
     public LandPlayer getLandPlayer(@NotNull String name) {
         LandPlayer landPlayer = null;
-        List<LandPlayer> players = this.chunkPlayers;
+        List<LandPlayer> players = this.landPlayers;
         for (int i = 0; i < players.size() && landPlayer == null; i++) {
             LandPlayer player = players.get(i);
             if (player.getName().equalsIgnoreCase(name)) {
@@ -55,15 +55,20 @@ public final class LandPlayerService {
     }
 
     public void load() {
-
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            var query = session.createQuery("SELECT lp FROM LandPlayer lp", LandPlayer.class);
+            this.landPlayers.addAll(query.list());
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e);
+        }
     }
 
     public void createPlayer(@NotNull UUID uuid, @NotNull String name, Consumer<Boolean> consumer) {
         playerExists(uuid, exists -> {
-
-            if (!exists) {
+            if (Boolean.FALSE.equals(exists)) {
                 LandPlayer landPlayer = new LandPlayer(uuid, name);
-                this.chunkPlayers.add(landPlayer);
+                this.landPlayers.add(landPlayer);
                 updateLandPlayer(landPlayer);
             }
 
@@ -79,7 +84,7 @@ public final class LandPlayerService {
             session.beginTransaction();
             session.remove(landPlayer);
             session.getTransaction().commit();
-            this.chunkPlayers.remove(landPlayer);
+            this.landPlayers.remove(landPlayer);
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not delete player data for %s", uuid), e);
         }
@@ -108,7 +113,7 @@ public final class LandPlayerService {
             var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE uuid = :uuid", LandPlayer.class);
             chunkPlayerQuery.setMaxResults(1);
             chunkPlayerQuery.setParameter("uuid", uuid.toString());
-            exists = chunkPlayerQuery.list().size() > 0;
+            exists = !chunkPlayerQuery.list().isEmpty();
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not load player data for %s", uuid), e);
         }
@@ -123,15 +128,6 @@ public final class LandPlayerService {
             session.getTransaction().commit();
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not update player data %s", chunkPlayer.getUniqueId()), e);
-        }
-    }
-
-
-
-    public void removeOnlinePlayer(@NotNull Player player) {
-        LandPlayer landPlayer = getLandPlayer(player.getUniqueId());
-        if (landPlayer != null) {
-            this.chunkPlayers.remove(landPlayer);
         }
     }
 }
