@@ -21,18 +21,18 @@ public enum Permission {
     POTION_SPLASH("%s.admin.potion.splash"),
     PROJECTILE_HIT_ENTITY("%s.admin.projectile.hit");
 
-    private final String permission;
+    private final String permissionNode;
 
-    Permission(@NotNull String permission) {
-        this.permission = permission;
+    Permission(@NotNull String permissionNode) {
+        this.permissionNode = permissionNode;
     }
 
     @NotNull
-    public String getPermission() {
-        return String.format(permission, Constants.PLUGIN_NAME);
+    public String getPermissionNode() {
+        return String.format(permissionNode, Constants.PLUGIN_NAME);
     }
 
     public boolean hasPermission(@NotNull Permissible permissible) {
-       return permissible.hasPermission(getPermission());
+       return permissible.hasPermission(getPermissionNode());
     }
 }
