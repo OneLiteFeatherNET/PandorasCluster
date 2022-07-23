@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * case 0 -> this.value;
@@ -39,7 +40,7 @@ public enum LandFlag {
     private final LandFlagType flagType;
     private final byte type;
 
-    private final static HashMap<String, LandFlag> FLAG_HASHMAP = new HashMap<>();
+    private static final HashMap<String, LandFlag> FLAG_HASHMAP = new HashMap<>();
 
     LandFlag(@NotNull String name, @NotNull Object defaultValue, @NotNull LandFlagType flagType, byte type) {
         this.name = name;
@@ -72,7 +73,7 @@ public enum LandFlag {
         return FLAG_HASHMAP.getOrDefault(name, null);
     }
 
-    public static HashMap<String, LandFlag> getFlagHashmap() {
+    public static Map<String, LandFlag> getFlagHashmap() {
         return FLAG_HASHMAP;
     }
 
