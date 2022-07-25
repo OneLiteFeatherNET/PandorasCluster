@@ -5,7 +5,10 @@ import net.onelitefeather.pandorascluster.land.Land;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
+
 @Entity
+@SuppressWarnings("unused")
 public class LandFlagEntity {
 
     @Id

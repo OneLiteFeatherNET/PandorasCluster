@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.service.services;
 
 import net.onelitefeather.pandorascluster.land.Land;
-import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.land.ChunkPlaceholder;
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
@@ -73,6 +73,7 @@ public final class DatabaseService {
         configuration.addAnnotatedClass(LandMember.class);
         configuration.addAnnotatedClass(LandFlagEntity.class);
         configuration.addAnnotatedClass(HomePosition.class);
+        configuration.addAnnotatedClass(ChunkPlaceholder.class);
 
         var registry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
         this.sessionFactory = configuration.buildSessionFactory(registry);

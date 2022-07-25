@@ -69,8 +69,12 @@ public record ClaimCommand(PandorasClusterApi api) {
                 player.sendMessage(String.format("DEBUG: Connected with Land X: %d Z: %d", land.getX(), land.getZ()));
 
             } else {
-                this.api.getLandService().createLand(landPlayer, player, playerChunk);
-                player.sendMessage(Component.text("You´ve successfully claimed this land!"));
+                if (this.api.hasPlayerLand(player)) {
+                    player.sendMessage(Component.text("Du besitzt bereits schon ein Land."));
+                } else {
+                    this.api.getLandService().createLand(landPlayer, player, playerChunk);
+                    player.sendMessage(Component.text("You´ve successfully claimed this land."));
+                }
             }
         });
     }

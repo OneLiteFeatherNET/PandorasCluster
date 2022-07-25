@@ -7,9 +7,12 @@ import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
+import net.onelitefeather.pandorascluster.util.ChunkUtil;
+import org.bukkit.Chunk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -21,10 +24,10 @@ public class Land implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
+    @OneToOne
     private LandPlayer owner;
 
-    @OneToOne(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
+    @OneToOne
     private HomePosition homePosition;
 
     @OneToMany
@@ -33,8 +36,8 @@ public class Land implements Cloneable {
     @OneToMany
     private List<LandFlagEntity> landFlags;
 
-    @ElementCollection
-    private List<Long> chunks;
+    @OneToMany
+    private List<ChunkPlaceholder> chunks;
 
     @Column
     private String world;
@@ -46,9 +49,13 @@ public class Land implements Cloneable {
     private int z;
 
     public Land() {
+        this.landMembers = new ArrayList<>();
+        this.chunks = new ArrayList<>();
+        this.landFlags = new ArrayList<>();
     }
 
     public Land(@NotNull LandPlayer owner, @NotNull HomePosition homePosition, @NotNull String world, int x, int z) {
+        this();
         this.owner = owner;
         this.homePosition = homePosition;
         this.world = world;
@@ -101,12 +108,31 @@ public class Land implements Cloneable {
     }
 
     @NotNull
-    public List<Long> getMergedChunks() {
+    public List<ChunkPlaceholder> getMergedChunks() {
         return chunks;
     }
 
-    public void setMergedChunks(@NotNull List<Long> chunks) {
+    public boolean isChunkConnected(@NotNull Chunk chunk) {
+
+        boolean connected = false;
+        for (int i = 0; i < this.chunks.size() && !connected; i++) {
+            ChunkPlaceholder mergedChunk = this.chunks.get(i);
+            connected = ChunkUtil.getChunkIndex(chunk) == mergedChunk.getChunkIndex();
+        }
+
+        return connected;
+    }
+
+    public void setMergedChunks(@NotNull List<ChunkPlaceholder> chunks) {
         this.chunks = chunks;
+    }
+
+    public void mergeChunk(@NotNull Chunk chunk) {
+        mergeChunk(chunk.getX(), chunk.getZ());
+    }
+
+    public void mergeChunk(int chunkX, int chunkZ) {
+        this.chunks.add(new ChunkPlaceholder(ChunkUtil.getChunkIndex(chunkX, chunkZ)));
     }
 
     @NotNull
@@ -174,7 +200,7 @@ public class Land implements Cloneable {
     }
 
     public boolean isOwner(@NotNull UUID uniqueId) {
-        return this.getOwner().getUniqueId().compareTo(uniqueId) > 0;
+        return this.getOwner().getUniqueId().equals(uniqueId);
     }
 
     @Override
