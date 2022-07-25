@@ -21,19 +21,19 @@ public class Land implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
+    @OneToOne(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
     private LandPlayer owner;
 
-    @OneToOne(mappedBy = "land")
+    @OneToOne(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
     private HomePosition homePosition;
 
-    @ElementCollection(targetClass = LandMember.class)
+    @OneToMany
     private List<LandMember> landMembers;
 
-    @ElementCollection(targetClass = LandFlagEntity.class)
+    @OneToMany
     private List<LandFlagEntity> landFlags;
 
-    @ElementCollection(targetClass = Long.class)
+    @ElementCollection
     private List<Long> chunks;
 
     @Column
@@ -44,7 +44,6 @@ public class Land implements Cloneable {
 
     @Column
     private int z;
-
 
     public Land() {
     }

@@ -16,9 +16,6 @@ public class HomePosition {
     private Long id;
 
     @Column
-    private LandPlayer owner;
-
-    @Column
     private double x;
 
     @Column
@@ -33,7 +30,7 @@ public class HomePosition {
     @Column
     private float pitch;
 
-    @OneToOne(mappedBy = "homePosition")
+    @OneToOne(cascade = {CascadeType.ALL}, fetch= FetchType.EAGER)
     private Land land;
 
     public HomePosition() {
@@ -53,24 +50,6 @@ public class HomePosition {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    @NotNull
-    public LandPlayer getOwner() {
-        return owner;
-    }
-
-    public void setOwner(@NotNull LandPlayer owner) {
-        this.owner = owner;
-    }
-
-    @NotNull
-    public Land getLand() {
-        return land;
-    }
-
-    public void setLand(@NotNull Land land) {
-        this.land = land;
     }
 
     public double getX() {

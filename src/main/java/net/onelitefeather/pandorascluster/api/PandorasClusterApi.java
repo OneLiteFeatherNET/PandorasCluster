@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
-import net.onelitefeather.pandorascluster.service.*;
+import net.onelitefeather.pandorascluster.service.LandService;
 import net.onelitefeather.pandorascluster.service.services.DatabaseService;
 import net.onelitefeather.pandorascluster.service.services.EntityDataStoreService;
 import net.onelitefeather.pandorascluster.service.services.LandFlagService;
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public interface PandorasClusterApi {
@@ -81,4 +82,6 @@ public interface PandorasClusterApi {
 
     @Nullable
     Land getLand(@NotNull Chunk chunk);
+
+    void registerPlayer(@NotNull UUID uuid, @NotNull String name, Consumer<Boolean> consumer);
 }

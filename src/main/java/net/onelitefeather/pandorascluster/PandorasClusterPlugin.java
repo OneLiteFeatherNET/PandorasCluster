@@ -13,7 +13,7 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl;
 import net.onelitefeather.pandorascluster.commands.ClaimCommand;
 import net.onelitefeather.pandorascluster.commands.LandCommand;
-import net.onelitefeather.pandorascluster.listener.*;
+import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -47,8 +47,10 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        this.api.getDatabaseService().shutdown();
-        this.getServer().getServicesManager().unregisterAll(this);
+        if (this.api != null) {
+            this.api.getDatabaseService().shutdown();
+            this.getServer().getServicesManager().unregisterAll(this);
+        }
     }
 
     public PaperCommandManager<CommandSender> getPaperCommandManager() {
