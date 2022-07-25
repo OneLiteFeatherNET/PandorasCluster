@@ -1,10 +1,9 @@
 package net.onelitefeather.pandorascluster.land.player;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.onelitefeather.pandorascluster.land.Land;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,13 +14,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-public final class LandPlayer {
+public class LandPlayer {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column
     private String uuid;
 
     @Column
     private String name;
+
+    @OneToOne(cascade = {CascadeType.ALL}, fetch= FetchType.EAGER)
+    private Land land;
 
     public LandPlayer() {
     }
@@ -29,6 +35,14 @@ public final class LandPlayer {
     public LandPlayer(@NotNull UUID uuid, @NotNull String name) {
         this.uuid = uuid.toString();
         this.name = name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @NotNull

@@ -60,7 +60,7 @@ public final class LandPlayerService {
             var query = session.createQuery("SELECT lp FROM LandPlayer lp", LandPlayer.class);
             this.landPlayers.addAll(query.list());
         } catch (HibernateException e) {
-            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e);
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load players.", e);
         }
     }
 
@@ -95,7 +95,7 @@ public final class LandPlayerService {
     @Nullable
     public LandPlayer fromDatabase(@NotNull UUID uuid) {
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-            var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE uuid = :uuid", LandPlayer.class);
+            var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE lp.uuid = :uuid", LandPlayer.class);
             chunkPlayerQuery.setMaxResults(1);
             chunkPlayerQuery.setParameter("uuid", uuid.toString());
             return chunkPlayerQuery.getSingleResult();
@@ -110,10 +110,9 @@ public final class LandPlayerService {
 
         boolean exists = false;
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-            var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE uuid = :uuid", LandPlayer.class);
-            chunkPlayerQuery.setMaxResults(1);
+            var chunkPlayerQuery = session.createQuery("SELECT 1 FROM LandPlayer lp WHERE lp.uuid = :uuid", LandPlayer.class);
             chunkPlayerQuery.setParameter("uuid", uuid.toString());
-            exists = !chunkPlayerQuery.list().isEmpty();
+            exists = chunkPlayerQuery.uniqueResult() != null;
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not load player data for %s", uuid), e);
         }

@@ -2,6 +2,7 @@ package net.onelitefeather.pandorascluster.land.player;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.enums.LandRole;
+import net.onelitefeather.pandorascluster.land.Land;
 import org.jetbrains.annotations.NotNull;
 
 @Entity
@@ -11,11 +12,15 @@ public class LandMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column
+    @OneToOne
     private LandPlayer member;
 
     @Enumerated(EnumType.STRING)
     private LandRole role;
+
+    @ManyToOne
+    @JoinColumn(name="land_owner", nullable=false)
+    private Land land;
 
     public LandMember() {
     }

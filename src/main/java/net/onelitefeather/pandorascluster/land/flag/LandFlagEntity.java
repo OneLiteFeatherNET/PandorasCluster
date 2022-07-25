@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.land.flag;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.land.Land;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +20,10 @@ public class LandFlagEntity {
 
     @Enumerated(EnumType.STRING)
     private LandFlagType flagType;
+
+    @ManyToOne
+    @JoinColumn(name="land_owner", nullable=false)
+    private Land land;
 
     public LandFlagEntity() {
     }

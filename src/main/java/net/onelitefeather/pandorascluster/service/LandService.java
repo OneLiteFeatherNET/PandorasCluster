@@ -5,6 +5,7 @@ import net.onelitefeather.pandorascluster.builder.LandBuilder;
 import net.onelitefeather.pandorascluster.enums.ChunkRotation;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
+import net.onelitefeather.pandorascluster.land.position.HomePosition;
 import net.onelitefeather.pandorascluster.util.ChunkUtil;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
@@ -18,10 +19,7 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -97,26 +95,44 @@ public class LandService {
 
     public void createLand(@NotNull LandPlayer owner, @NotNull Player player, @NotNull Chunk chunk) {
 
-        Land land = new LandBuilder().
-                owner(owner).
-                home(player.getLocation()).
-                world(player.getWorld()).
-                chunkX(chunk.getX()).
-                chunkZ(chunk.getZ()).
-                members(List.of()).
-                mergedChunks(List.of()).
-                withFlags(List.of()).
-                build();
-
         if (!this.getPlayerLands().containsKey(player)) {
+
+            Transaction transaction = null;
+
             try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-                session.beginTransaction();
+                transaction = session.beginTransaction();
+
+                this.pandorasClusterApi.getLandPlayerService().playerExists(player.getUniqueId(), exists -> {
+                    if (!exists) {
+                        session.persist(owner);
+                        session.flush();
+                    }
+                });
+
+                HomePosition homePosition = HomePosition.of(player.getLocation());
+                session.persist(homePosition);
+
+                Land land = new LandBuilder().
+                        owner(owner).
+                        home(homePosition).
+                        world(player.getWorld()).
+                        chunkX(chunk.getX()).
+                        chunkZ(chunk.getZ()).
+                        members(List.of()).
+                        mergedChunks(List.of()).
+                        withFlags(List.of()).
+                        build();
+
                 session.persist(land);
-                session.getTransaction().commit();
+                transaction.commit();
+
                 this.playerLands.put(player, land);
                 this.claimedChunks.put(chunk, land);
             } catch (HibernateException e) {
-                this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Cannot update worldchunk %s", land.toString()), e);
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e);
             }
         }
     }
@@ -194,7 +210,13 @@ public class LandService {
     }
 
     public boolean isChunkMerged(@NotNull Chunk chunk) {
-        return false;
+        boolean merged = false;
+        Iterator<Chunk> iterator = this.claimedChunks.keySet().iterator();
+        while (iterator.hasNext() && !merged) {
+            merged = this.claimedChunks.get(iterator.next()).getMergedChunks().contains(ChunkUtil.getChunkIndex(chunk));
+        }
+
+        return merged;
     }
 
     @Nullable
@@ -204,6 +226,7 @@ public class LandService {
 
     public void merge(@NotNull Land base, @NotNull Chunk chunk) {
         base.getMergedChunks().add(ChunkUtil.getChunkIndex(chunk));
+        this.claimedChunks.put(chunk, base);
         updatePlayerLand(base);
     }
 
