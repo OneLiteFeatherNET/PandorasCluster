@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.service;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.builder.LandBuilder;
 import net.onelitefeather.pandorascluster.enums.ChunkRotation;
+import net.onelitefeather.pandorascluster.land.ChunkPlaceholder;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
@@ -58,16 +59,19 @@ public class LandService {
                 if (!offlinePlayer.hasPlayedBefore() || this.playerLands.containsKey(offlinePlayer)) continue;
                 this.playerLands.put(offlinePlayer, land);
 
+                World world = server.getWorld(land.getWorld());
+                if (world == null) continue;
+
                 for (int i = 0; i < land.getMergedChunks().size(); i++) {
-                    long chunkIndex = land.getMergedChunks().get(i);
+                    ChunkPlaceholder mergedChunk = land.getMergedChunks().get(i);
 
-                    int chunkX = ChunkUtil.getChunkCoordX(chunkIndex);
-                    int chunkZ = ChunkUtil.getChunkCoordZ(chunkIndex);
-
-                    World world = server.getWorld(land.getWorld());
-                    if (world == null) continue;
+                    int chunkX = ChunkUtil.getChunkCoordX(mergedChunk.getChunkIndex());
+                    int chunkZ = ChunkUtil.getChunkCoordZ(mergedChunk.getChunkIndex());
                     this.claimedChunks.put(world.getChunkAt(chunkX, chunkZ), land);
                 }
+
+                Chunk chunk = world.getChunkAt(land.getX(), land.getZ());
+                this.claimedChunks.put(chunk, land);
             }
 
         } catch (HibernateException e) {
@@ -93,6 +97,33 @@ public class LandService {
         return playerLands;
     }
 
+    @Nullable
+    public Land getLand(@NotNull LandPlayer owner) {
+
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            var landOfOwner = session.createQuery("SELECT l FROM Land l JOIN l.owner o WHERE o.uuid = :uuid", Land.class);
+            landOfOwner.setParameter("uuid", owner.getUniqueId().toString());
+            return landOfOwner.getSingleResult();
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public HomePosition getHome(@NotNull UUID uuid) {
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            var landOfOwner = session.createQuery("SELECT h FROM Land l JOIN l.homePosition h JOIN l.owner p WHERE p.uuid = :uuid", HomePosition.class);
+            landOfOwner.setParameter("uuid", uuid.toString());
+            return landOfOwner.getSingleResult();
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e);
+        }
+
+        return null;
+    }
+
     public void createLand(@NotNull LandPlayer owner, @NotNull Player player, @NotNull Chunk chunk) {
 
         if (!this.getPlayerLands().containsKey(player)) {
@@ -105,7 +136,6 @@ public class LandService {
                 this.pandorasClusterApi.getLandPlayerService().playerExists(player.getUniqueId(), exists -> {
                     if (!exists) {
                         session.persist(owner);
-                        session.flush();
                     }
                 });
 
@@ -124,6 +154,7 @@ public class LandService {
                         build();
 
                 session.persist(land);
+
                 transaction.commit();
 
                 this.playerLands.put(player, land);
@@ -225,7 +256,7 @@ public class LandService {
     }
 
     public void merge(@NotNull Land base, @NotNull Chunk chunk) {
-        base.getMergedChunks().add(ChunkUtil.getChunkIndex(chunk));
+        base.mergeChunk(chunk);
         this.claimedChunks.put(chunk, base);
         updatePlayerLand(base);
     }

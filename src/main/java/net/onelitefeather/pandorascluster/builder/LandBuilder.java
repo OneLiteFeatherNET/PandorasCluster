@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.builder;
 
 import net.onelitefeather.pandorascluster.land.Land;
+import net.onelitefeather.pandorascluster.land.ChunkPlaceholder;
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
@@ -59,7 +60,7 @@ public class LandBuilder {
         return this;
     }
 
-    public LandBuilder mergedChunks(@NotNull List<Long> mergedChunks) {
+    public LandBuilder mergedChunks(@NotNull List<ChunkPlaceholder> mergedChunks) {
         this.land.setMergedChunks(mergedChunks);
         return this;
     }

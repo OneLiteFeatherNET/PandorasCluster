@@ -26,9 +26,6 @@ public class LandPlayer {
     @Column
     private String name;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch= FetchType.EAGER)
-    private Land land;
-
     public LandPlayer() {
     }
 

@@ -13,6 +13,7 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl;
 import net.onelitefeather.pandorascluster.commands.ClaimCommand;
 import net.onelitefeather.pandorascluster.commands.LandCommand;
+import net.onelitefeather.pandorascluster.commands.TestCommand;
 import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
@@ -90,5 +91,6 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
         this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.AQUA));
         annotationParser.parse(new ClaimCommand(this.api));
         annotationParser.parse(new LandCommand(this.api));
+        annotationParser.parse(new TestCommand(this.api));
     }
 }

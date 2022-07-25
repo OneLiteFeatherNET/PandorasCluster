@@ -30,7 +30,7 @@ public class HomePosition {
     @Column
     private float pitch;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch= FetchType.EAGER)
+    @OneToOne
     private Land land;
 
     public HomePosition() {
