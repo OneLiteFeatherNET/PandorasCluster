@@ -18,10 +18,6 @@ public class LandMember {
     @Enumerated(EnumType.STRING)
     private LandRole role;
 
-    @ManyToOne
-    @JoinColumn(name="land_owner", nullable=false)
-    private Land land;
-
     public LandMember() {
     }
 
