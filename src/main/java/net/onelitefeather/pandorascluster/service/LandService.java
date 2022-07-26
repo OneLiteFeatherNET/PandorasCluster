@@ -7,6 +7,7 @@ import net.onelitefeather.pandorascluster.land.ChunkPlaceholder;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
 import net.onelitefeather.pandorascluster.util.ChunkUtil;
 import org.bukkit.Chunk;
 import org.bukkit.OfflinePlayer;
@@ -39,10 +40,11 @@ public class LandService {
 
         PluginManager pluginManager = pandorasClusterApi.getPlugin().getServer().getPluginManager();
 
-        pluginManager.registerEvents(new LandBlockListener(this), pandorasClusterApi.getPlugin());
-        pluginManager.registerEvents(new LandEntityListener(this), pandorasClusterApi.getPlugin());
-        pluginManager.registerEvents(new LandPlayerListener(this), pandorasClusterApi.getPlugin());
-        pluginManager.registerEvents(new LandWorldListener(this), pandorasClusterApi.getPlugin());
+        LandFlagService landFlagService = this.pandorasClusterApi.getLandFlagService();
+        pluginManager.registerEvents(new LandBlockListener(this, landFlagService), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandEntityListener(this, landFlagService), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandPlayerListener(this, landFlagService), pandorasClusterApi.getPlugin());
+        pluginManager.registerEvents(new LandWorldListener(this, landFlagService), pandorasClusterApi.getPlugin());
     }
 
     public void load() {
@@ -128,16 +130,15 @@ public class LandService {
 
         if (!this.getPlayerLands().containsKey(player)) {
 
+            LandPlayer fromDatabase = this.pandorasClusterApi.getLandPlayerService().fromDatabase(player.getUniqueId());
+            if (fromDatabase != null) {
+                owner = fromDatabase;
+            }
+
             Transaction transaction = null;
 
             try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
                 transaction = session.beginTransaction();
-
-                this.pandorasClusterApi.getLandPlayerService().playerExists(player.getUniqueId(), exists -> {
-                    if (!exists) {
-                        session.persist(owner);
-                    }
-                });
 
                 HomePosition homePosition = HomePosition.of(player.getLocation());
                 session.persist(homePosition);
@@ -150,10 +151,11 @@ public class LandService {
                         chunkZ(chunk.getZ()).
                         members(List.of()).
                         mergedChunks(List.of()).
-                        withFlags(List.of()).
                         build();
 
                 session.persist(land);
+
+                this.pandorasClusterApi.getLandFlagService().addFlags(land);
 
                 transaction.commit();
 
@@ -244,7 +246,8 @@ public class LandService {
         boolean merged = false;
         Iterator<Chunk> iterator = this.claimedChunks.keySet().iterator();
         while (iterator.hasNext() && !merged) {
-            merged = this.claimedChunks.get(iterator.next()).getMergedChunks().contains(ChunkUtil.getChunkIndex(chunk));
+            Land land = this.claimedChunks.get(iterator.next());
+            merged = land.getMergedChunk(ChunkUtil.getChunkIndex(chunk)) != null;
         }
 
         return merged;
@@ -262,17 +265,47 @@ public class LandService {
     }
 
     public void updatePlayerLand(@NotNull Land land) {
+        Transaction transaction = null;
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
+
+            for (ChunkPlaceholder chunkPlaceholder : land.getMergedChunks()) {
+                if (!isMergedChunkStored(land, chunkPlaceholder)) {
+                    session.persist(chunkPlaceholder);
+                }
+            }
+
             session.merge(land);
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Cannot update worldchunk %s", land), e);
         }
     }
 
     public boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
         return land.getOwner().equals(other.getOwner());
+    }
+
+    private boolean isMergedChunkStored(Land land, ChunkPlaceholder chunkPlaceholder) {
+
+        boolean stored = false;
+
+        // SELECT h FROM Land l JOIN l.homePosition h JOIN l.owner p WHERE p.uuid = :uuid
+
+
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            var query = session.createQuery("SELECT * FROM Land_ChunkPlaceholder JOIN cph ON lcph.chunks_id = cph.id WHERE Land_id = :landId AND chunks_id = :chunkId", ChunkPlaceholder.class);
+            query.setParameter("landId", land.getId());
+            query.setParameter("chunkId", chunkPlaceholder.getId());
+            stored = !query.list().isEmpty();
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e);
+        }
+
+        return stored;
     }
 }
 

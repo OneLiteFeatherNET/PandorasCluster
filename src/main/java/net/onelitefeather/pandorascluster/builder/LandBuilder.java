@@ -70,16 +70,6 @@ public class LandBuilder {
         return this;
     }
 
-    public LandBuilder withFlag(@NotNull LandFlagEntity chunkFlag) {
-        this.land.addFlag(chunkFlag);
-        return this;
-    }
-
-    public LandBuilder withFlags(@NotNull List<LandFlagEntity> landFlags) {
-        this.land.setLandFlags(landFlags);
-        return this;
-    }
-
     public Land build() {
         return this.land;
     }

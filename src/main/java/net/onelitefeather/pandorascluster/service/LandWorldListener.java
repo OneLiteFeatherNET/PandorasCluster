@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.service;
 
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -12,7 +13,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import java.util.List;
 import java.util.Objects;
 
-record LandWorldListener(LandService landService) implements Listener {
+record LandWorldListener(LandService landService, LandFlagService landFlagService) implements Listener {
 
     @EventHandler
     public void handleLeavesDecay(LeavesDecayEvent event) {
@@ -20,7 +21,7 @@ record LandWorldListener(LandService landService) implements Listener {
         var land = this.landService.getLand(event.getBlock().getChunk());
         if (land == null) return;
 
-        var landFlag = land.getFlag(LandFlag.LEAVES_DECAY);
+        var landFlag = this.landFlagService.getFlag(LandFlag.LEAVES_DECAY, land);
         if(landFlag != null && landFlag.<Boolean>getValue()) return;
         event.setCancelled(true);
     }

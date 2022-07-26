@@ -2,6 +2,7 @@ package net.onelitefeather.pandorascluster.service;
 
 import net.onelitefeather.pandorascluster.enums.Permission;
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Powerable;
 import org.bukkit.block.data.type.Farmland;
@@ -14,7 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public record LandPlayerListener(LandService landService) implements Listener {
+public record LandPlayerListener(LandService landService, LandFlagService landFlagService) implements Listener {
 
     @EventHandler
     public void handlePlayerMovement(PlayerMoveEvent event) {
@@ -47,7 +48,7 @@ public record LandPlayerListener(LandService landService) implements Listener {
         boolean cancel = false;
 
         if (blockData instanceof Farmland && event.getAction() == Action.PHYSICAL) {
-            var landFlag = land.getFlag(LandFlag.FARMLAND_DESTROY);
+            var landFlag = this.landFlagService.getFlag(LandFlag.FARMLAND_DESTROY, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
             if (land.hasAccess(player.getUniqueId())) return;
@@ -57,7 +58,7 @@ public record LandPlayerListener(LandService landService) implements Listener {
 
         if (blockData instanceof Powerable) {
 
-            var landFlag= land.getFlag(LandFlag.REDSTONE);
+            var landFlag= this.landFlagService.getFlag(LandFlag.REDSTONE, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
             if (land.hasAccess(player.getUniqueId())) return;
@@ -75,7 +76,7 @@ public record LandPlayerListener(LandService landService) implements Listener {
                 respawnAnchor.getCharges() == respawnAnchor.getMaximumCharges() &&
                 event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             
-            var landFlag = land.getFlag(LandFlag.EXPLOSIONS);
+            var landFlag = this.landFlagService.getFlag(LandFlag.EXPLOSIONS, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
             if (Permission.EXPLOSION.hasPermission(player)) return;
             cancel = true;
