@@ -1,12 +1,9 @@
 package net.onelitefeather.pandorascluster.land.position;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.land.Land;
-import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class HomePosition {
@@ -29,9 +26,6 @@ public class HomePosition {
 
     @Column
     private float pitch;
-
-    @OneToOne
-    private Land land;
 
     public HomePosition() {
     }
