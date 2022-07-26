@@ -49,7 +49,7 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
         this.landPlayerService = new LandPlayerService(this);
         this.landPlayerService.load();
 
-        this.landFlagService = new LandFlagService();
+        this.landFlagService = new LandFlagService(this);
 
         this.landService = new LandService(this);
         this.landService.load();
