@@ -1,66 +1,85 @@
 package net.onelitefeather.pandorascluster.service.services;
 
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
+import net.onelitefeather.pandorascluster.land.Land;
+import net.onelitefeather.pandorascluster.land.flag.LandFlag;
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
-import net.onelitefeather.pandorascluster.land.flag.LandFlagType;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class LandFlagService {
 
-    private final List<LandFlagEntity> landFlags;
+    private final PandorasClusterApi pandorasClusterApi;
 
-    public LandFlagService() {
-        this.landFlags = new ArrayList<>();
-
-        String value = "false";
-
-        this.addLandFlag("pvp", value, LandFlagType.PLAYER);
-        this.addLandFlag("pve", value, LandFlagType.PLAYER);
-
-        this.addLandFlag("redstone", value, LandFlagType.POWERED);
-        this.addLandFlag("potion-splash", value, LandFlagType.ENTITY);
-
-        this.addLandFlag("vehicle-use", value, LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-place", value, LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-break", value, LandFlagType.ENTITY);
-        this.addLandFlag("vehicle-create", value, LandFlagType.ENTITY);
-
-        this.addLandFlag("interact-containers", value, LandFlagType.PLAYER);
-        this.addLandFlag("leaves-decay", "true", LandFlagType.WORLD_TICK);
-        this.addLandFlag("explosions", value, LandFlagType.EXPLOSION);
-        this.addLandFlag("farmland-destroy", value, LandFlagType.ENTITY);
-        this.addLandFlag("mob-griefing", value, LandFlagType.ENTITY);
-
-        this.addLandFlag("ice-form", value, LandFlagType.WORLD_TICK);
-        this.addLandFlag("block-form", value, LandFlagType.WORLD_TICK);
+    public LandFlagService(PandorasClusterApi pandorasClusterApi) {
+        this.pandorasClusterApi = pandorasClusterApi;
     }
 
-    public List<LandFlagEntity> getLandFlags() {
-        return landFlags;
+    public LandFlagEntity getFlag(LandFlag landFlag, Land land) {
+
+        LandFlagEntity flag = null;
+
+        //        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+//            var flagsOfLand = session.createQuery("SELECT f FROM LandFlagEntity l JOIN Land_LandFlagEntity h ON l.id = h.landFlags_id", LandFlagEntity.class);
+//            flagsOfLand.setParameter("uuid", uuid.toString());
+//            return landOfOwner.list();
+//        } catch (HibernateException e) {
+//            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load flags by land", e);
+//        }
+
+        return flag;
+
     }
 
-    public void addLandFlag(@NotNull String name, @NotNull String value, @NotNull LandFlagType flagType) {
+//    public List<LandFlagEntity> getFlagsByLand(@NotNull Land land) {
+//        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+//            var flagsOfLand = session.createQuery("SELECT f FROM LandFlagEntity l JOIN Land_LandFlagEntity h ON l.id = h.landFlags_id", LandFlagEntity.class);
+//            flagsOfLand.setParameter("uuid", uuid.toString());
+//            return landOfOwner.list();
+//        } catch (HibernateException e) {
+//            this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load flags by land", e);
+//        }
+//
+//        return List.of();
+//    }
 
-        this.landFlags.add(new LandFlagEntity.Builder().
-                name(name).
-                withType(flagType).
-                value(value).
-                build());
-    }
+    public void addFlags(@NotNull Land land) {
+        CompletableFuture.runAsync(() -> {
 
-    public LandFlagEntity getFlag(@NotNull String name) {
-
-        LandFlagEntity landFlag = null;
-
-        for (int i = 0; i < this.landFlags.size() && landFlag == null; i++) {
-            LandFlagEntity flag = this.landFlags.get(i);
-            if (flag.getName().equalsIgnoreCase(name)) {
-                landFlag = flag;
+            List<LandFlagEntity> flagEntities = new ArrayList<>();
+            for (LandFlag landFlag : LandFlag.getFlagHashmap().values()) {
+                flagEntities.add(new LandFlagEntity.Builder().
+                        land(land).
+                        name(landFlag.name()).
+                        withType(landFlag.getFlagType()).
+                        value(landFlag.getDefaultValue().toString()).
+                        type(landFlag.getType()).
+                        build());
             }
-        }
 
-        return landFlag;
+            Transaction transaction = null;
+            try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+                transaction = session.beginTransaction();
+
+                for (LandFlagEntity landFlag : flagEntities) {
+                    session.persist(landFlag);
+                }
+
+                transaction.commit();
+            } catch (HibernateException e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+                this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e);
+            }
+        });
     }
 }

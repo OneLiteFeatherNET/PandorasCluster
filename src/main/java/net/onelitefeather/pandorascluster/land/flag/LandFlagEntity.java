@@ -5,13 +5,16 @@ import net.onelitefeather.pandorascluster.land.Land;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
-
 @Entity
-@SuppressWarnings("unused")
 public class LandFlagEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    private Land land;
+
     @Column
     private String name;
 
@@ -24,18 +27,31 @@ public class LandFlagEntity {
     @Enumerated(EnumType.STRING)
     private LandFlagType flagType;
 
-    @ManyToOne
-    @JoinColumn(name="land_owner", nullable=false)
-    private Land land;
-
     public LandFlagEntity() {
     }
 
-    public LandFlagEntity(@NotNull String name, @NotNull String value, byte type, @NotNull LandFlagType flagType) {
+    public LandFlagEntity(@NotNull Land land, @NotNull String name, @NotNull String value, byte type, @NotNull LandFlagType flagType) {
+        this.land = land;
         this.name = name;
         this.value = value;
         this.type = type;
         this.flagType = flagType;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Land getLand() {
+        return land;
+    }
+
+    public void setLand(Land land) {
+        this.land = land;
     }
 
     @NotNull
@@ -91,12 +107,18 @@ public class LandFlagEntity {
 
         private String name;
         private String value;
-        
+
+        private Land land;
         private LandFlagType flagType;
         private byte type;
 
         public LandFlagEntity.Builder name(@NotNull String name) {
             this.name = name;
+            return this;
+        }
+
+        public LandFlagEntity.Builder land(@NotNull Land land) {
+            this.land = land;
             return this;
         }
 
@@ -116,7 +138,7 @@ public class LandFlagEntity {
         }
 
         public LandFlagEntity build() {
-            return new LandFlagEntity(this.name, this.value, this.type, this.flagType);
+            return new LandFlagEntity(this.land, this.name, this.value, this.type, this.flagType);
         }
     }
 

@@ -6,6 +6,7 @@ import net.onelitefeather.pandorascluster.enums.Permission;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,7 +29,7 @@ import org.spigotmc.event.entity.EntityMountEvent;
 import java.util.Iterator;
 import java.util.List;
 
-record LandEntityListener(LandService landService) implements Listener {
+record LandEntityListener(LandService landService, LandFlagService landFlagService) implements Listener {
 
     @EventHandler
     public void theConfuser(EntityDamageByEntityEvent event) {
@@ -53,7 +54,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
         if (land != null) {
 
-            LandFlagEntity landFlag = land.getFlag(LandFlag.EXPLOSIONS);
+            LandFlagEntity landFlag = this.landFlagService.getFlag(LandFlag.EXPLOSIONS, land);
             var cancel = landFlag != null && !landFlag.<Boolean>getValue();
 
             if (primerEntity != null) {
@@ -114,7 +115,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
         if (land == null) return;
 
-        var landFlag = land.getFlag(LandFlag.BLOCK_FORM);
+        var landFlag = this.landFlagService.getFlag(LandFlag.BLOCK_FORM, land);
         if (landFlag != null && landFlag.<Boolean>getValue()) return;
         event.setCancelled(true);
     }
@@ -125,7 +126,7 @@ record LandEntityListener(LandService landService) implements Listener {
         var land = this.landService.getLand(event.getBlock().getChunk());
         if (land == null) return;
 
-        var landFlag = land.getFlag(LandFlag.BLOCK_FORM);
+        var landFlag = this.landFlagService.getFlag(LandFlag.BLOCK_FORM, land);
         if (landFlag != null) {
             if (land.hasAccess(event.getEntity().getUniqueId())) return;
 
@@ -144,7 +145,7 @@ record LandEntityListener(LandService landService) implements Listener {
         var land = this.landService.getLand(entity.getChunk());
         if (land == null) return;
 
-        var landFlag = land.getFlag(LandFlag.HANGING_BREAK);
+        var landFlag = this.landFlagService.getFlag(LandFlag.HANGING_BREAK, land);
         if (landFlag != null && landFlag.<Boolean>getValue()) return;
         event.setCancelled(true);
     }
@@ -160,8 +161,8 @@ record LandEntityListener(LandService landService) implements Listener {
 
         var data = block.getBlockData();
 
-        var farmLandDestroyFlag = land.getFlag(LandFlag.FARMLAND_DESTROY);
-        var redstoneFlag = land.getFlag(LandFlag.REDSTONE);
+        var farmLandDestroyFlag = this.landFlagService.getFlag(LandFlag.FARMLAND_DESTROY, land);
+        var redstoneFlag = this.landFlagService.getFlag(LandFlag.REDSTONE, land);
 
         if (data instanceof Farmland && farmLandDestroyFlag != null && !farmLandDestroyFlag.<Boolean>getValue() ||
                 data instanceof Powerable && redstoneFlag != null && !redstoneFlag.<Boolean>getValue()) {
@@ -211,7 +212,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
         if (land == null) return;
 
-        var landFlag = land.getFlag(LandFlag.PVE);
+        var landFlag = this.landFlagService.getFlag(LandFlag.PVE, land);
         if (landFlag != null && landFlag.<Boolean>getValue()) return;
         event.setCancelled(true);
     }
@@ -226,7 +227,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
         if (land != null) {
 
-            LandFlagEntity landFlag = land.getFlag(LandFlag.VEHICLE_USE);
+            LandFlagEntity landFlag = this.landFlagService.getFlag(LandFlag.VEHICLE_USE, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
             if (land.hasAccess(entered.getUniqueId())) return;
@@ -246,7 +247,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
         if (land != null) {
 
-            var landFlag = land.getFlag(LandFlag.VEHICLE_DAMAGE);
+            var landFlag = this.landFlagService.getFlag(LandFlag.VEHICLE_DAMAGE, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
             if (attacker != null) {
@@ -274,7 +275,7 @@ record LandEntityListener(LandService landService) implements Listener {
                 if (Permission.VEHICLE_DAMAGE.hasPermission(attacker)) return;
             }
 
-            var landFlag = land.getFlag(LandFlag.VEHICLE_DAMAGE);
+            var landFlag = this.landFlagService.getFlag(LandFlag.VEHICLE_DAMAGE, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
             event.setCancelled(true);
         }
@@ -286,7 +287,7 @@ record LandEntityListener(LandService landService) implements Listener {
         var vehicle = event.getVehicle();
         var land = this.landService.getLand(vehicle.getChunk());
         if (land != null) {
-            var landFlag = land.getFlag(LandFlag.VEHICLE_CREATE);
+            var landFlag = this.landFlagService.getFlag(LandFlag.VEHICLE_CREATE, land);
             if (landFlag != null && landFlag.<Boolean>getValue()) return;
             event.setCancelled(true);
         }
@@ -330,7 +331,7 @@ record LandEntityListener(LandService landService) implements Listener {
 
                 if (land != null) {
 
-                    var landFlag = land.getFlag(LandFlag.POTION_SPLASH);
+                    var landFlag = this.landFlagService.getFlag(LandFlag.POTION_SPLASH, land);
                     if (landFlag != null && landFlag.<Boolean>getValue()) return;
 
                     if (land.hasAccess(entity.getUniqueId())) return;
@@ -377,7 +378,7 @@ record LandEntityListener(LandService landService) implements Listener {
             if (hitBlock != null) {
                 var blockData = hitBlock.getBlockData();
                 if (blockData instanceof Powerable) {
-                    var landFlag = land.getFlag(LandFlag.REDSTONE);
+                    var landFlag = this.landFlagService.getFlag(LandFlag.REDSTONE, land);
                     cancel = landFlag != null && !landFlag.<Boolean>getValue();
                 }
             }

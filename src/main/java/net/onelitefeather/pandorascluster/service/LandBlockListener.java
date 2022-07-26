@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.service;
 import net.onelitefeather.pandorascluster.enums.ChunkRotation;
 import net.onelitefeather.pandorascluster.enums.Permission;
 import net.onelitefeather.pandorascluster.land.flag.LandFlag;
+import net.onelitefeather.pandorascluster.service.services.LandFlagService;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,7 +12,7 @@ import org.bukkit.event.block.*;
 
 import java.util.Iterator;
 
-record LandBlockListener(LandService landService) implements Listener {
+record LandBlockListener(LandService landService, LandFlagService landFlagService) implements Listener {
 
     @EventHandler
     public void handleBlockExplode(BlockExplodeEvent event) {
@@ -24,7 +25,7 @@ record LandBlockListener(LandService landService) implements Listener {
 
             if (nextLand != null) {
 
-                var landFlag = nextLand.getFlag(LandFlag.EXPLOSIONS);
+                var landFlag = this.landFlagService.getFlag(LandFlag.EXPLOSIONS, nextLand);
                 if (landFlag != null && !landFlag.<Boolean>getValue()) {
                     iterator.remove();
                 }
@@ -53,7 +54,7 @@ record LandBlockListener(LandService landService) implements Listener {
         var land = this.landService.getLand(block.getChunk());
 
         if (land != null) {
-            var landFlag = land.getFlag(LandFlag.REDSTONE);
+            var landFlag = this.landFlagService.getFlag(LandFlag.REDSTONE, land);
             event.setNewCurrent(landFlag != null && landFlag.<Boolean>getValue() ? 0 : event.getOldCurrent());
         }
     }
