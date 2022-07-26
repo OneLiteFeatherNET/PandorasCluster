@@ -19,14 +19,10 @@ public enum LandFlag {
     PVE("pve", false, LandFlagType.PLAYER, (byte) 2),
     REDSTONE("redstone", true, LandFlagType.WORLD_TICK, (byte) 2),
     POTION_SPLASH("potion-splash", false, LandFlagType.ENTITY, (byte) 2),
-
     HANGING_BREAK("hanging-break", false, LandFlagType.ENTITY, (byte) 2),
-
-
     VEHICLE_USE("vehicle-use", false, LandFlagType.ENTITY, (byte) 2),
     VEHICLE_CREATE("vehicle-create", false, LandFlagType.ENTITY, (byte) 2),
     VEHICLE_DAMAGE("vehicle-create", false, LandFlagType.ENTITY, (byte) 2),
-
     INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, (byte) 2),
     LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, (byte) 2),
     EXPLOSIONS("explosions", true, LandFlagType.EXPLOSION, (byte) 2),
