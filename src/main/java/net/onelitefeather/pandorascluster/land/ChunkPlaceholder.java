@@ -13,11 +13,20 @@ public class ChunkPlaceholder {
     @Column
     private Long chunkIndex;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "land_id")
+    private Land land;
+
     public ChunkPlaceholder() {
     }
 
     public ChunkPlaceholder(@NotNull Long chunkIndex) {
         this.chunkIndex = chunkIndex;
+    }
+
+    public ChunkPlaceholder(Long chunkIndex, Land land) {
+        this.chunkIndex = chunkIndex;
+        this.land = land;
     }
 
     @NotNull
@@ -44,5 +53,13 @@ public class ChunkPlaceholder {
                 "id=" + id +
                 ", chunkIndex=" + chunkIndex +
                 '}';
+    }
+
+    public void setLand(Land land) {
+        this.land = land;
+    }
+
+    public Land getLand() {
+        return land;
     }
 }
