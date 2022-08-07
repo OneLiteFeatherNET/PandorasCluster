@@ -27,6 +27,11 @@ public class LandMember {
         this.role = role;
     }
 
+    public LandMember(@NotNull LandPlayer member, @NotNull LandRole role) {
+        this.member = member;
+        this.role = role;
+    }
+
     public long getId() {
         return id;
     }
