@@ -1,10 +1,10 @@
-package net.onelitefeather.pandorascluster.service.services;
+package net.onelitefeather.pandorascluster.service;
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
-import org.bukkit.entity.Player;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,58 +17,27 @@ import java.util.logging.Level;
 public final class LandPlayerService {
 
     private final PandorasClusterApi pandorasClusterApi;
-    private final List<LandPlayer> landPlayers;
 
     public LandPlayerService(@NotNull PandorasClusterApi pandorasClusterApi) {
         this.pandorasClusterApi = pandorasClusterApi;
-        this.landPlayers = new ArrayList<>();
     }
 
     public List<LandPlayer> getPlayers() {
-        return this.landPlayers;
-    }
-
-    @Nullable
-    public LandPlayer getLandPlayer(@NotNull UUID uuid) {
-        for (int i = 0; i < this.landPlayers.size(); i++) {
-            LandPlayer player = this.landPlayers.get(i);
-            if (player.getUniqueId().equals(uuid)) {
-                return player;
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public LandPlayer getLandPlayer(@NotNull String name) {
-        LandPlayer landPlayer = null;
-        List<LandPlayer> players = this.landPlayers;
-        for (int i = 0; i < players.size() && landPlayer == null; i++) {
-            LandPlayer player = players.get(i);
-            if (player.getName().equalsIgnoreCase(name)) {
-                landPlayer = player;
-            }
-        }
-
-        return null;
-    }
-
-    public void load() {
+        List<LandPlayer> landPlayers = new ArrayList<>();
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-            session.beginTransaction();
             var query = session.createQuery("SELECT lp FROM LandPlayer lp", LandPlayer.class);
-            this.landPlayers.addAll(query.list());
+            landPlayers.addAll(query.list());
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load players.", e);
         }
+
+        return landPlayers;
     }
 
     public void createPlayer(@NotNull UUID uuid, @NotNull String name, Consumer<Boolean> consumer) {
         playerExists(uuid, exists -> {
             if (Boolean.FALSE.equals(exists)) {
                 LandPlayer landPlayer = new LandPlayer(uuid, name);
-                this.landPlayers.add(landPlayer);
                 updateLandPlayer(landPlayer);
             }
 
@@ -80,27 +49,47 @@ public final class LandPlayerService {
 
         LandPlayer landPlayer = getLandPlayer(uuid);
         if (landPlayer == null) return false;
+
+        Transaction transaction = null;
+
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
             session.remove(landPlayer);
-            session.getTransaction().commit();
-            this.landPlayers.remove(landPlayer);
+            transaction.commit();
         } catch (HibernateException e) {
-            this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not delete player data for %s", uuid), e);
+
+            if (transaction != null) {
+                transaction.rollback();
+                this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not delete player data for %s", uuid), e);
+            }
         }
 
         return true;
     }
 
     @Nullable
-    public LandPlayer fromDatabase(@NotNull UUID uuid) {
+    public LandPlayer getLandPlayer(@NotNull UUID uuid) {
         try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
             var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE lp.uuid = :uuid", LandPlayer.class);
             chunkPlayerQuery.setMaxResults(1);
             chunkPlayerQuery.setParameter("uuid", uuid.toString());
-            return chunkPlayerQuery.getSingleResult();
+            return chunkPlayerQuery.uniqueResult();
         } catch (HibernateException e) {
             this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not load player data for %s", uuid), e);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public LandPlayer getLandPlayer(@NotNull String name) {
+        try (Session session = this.pandorasClusterApi.getSessionFactory().openSession()) {
+            var chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayer lp WHERE lp.name = :name", LandPlayer.class);
+            chunkPlayerQuery.setMaxResults(1);
+            chunkPlayerQuery.setParameter("name", name);
+            return chunkPlayerQuery.uniqueResult();
+        } catch (HibernateException e) {
+            this.pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Could not load player data for %s", name), e);
         }
 
         return null;
