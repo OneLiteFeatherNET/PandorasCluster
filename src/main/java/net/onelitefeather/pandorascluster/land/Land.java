@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,10 +28,10 @@ public class Land implements Cloneable {
     @OneToOne
     private HomePosition homePosition;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<LandMember> landMembers;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
     private List<ChunkPlaceholder> chunks;
 
     @Column
@@ -52,6 +53,8 @@ public class Land implements Cloneable {
         this.world = world;
         this.x = x;
         this.z = z;
+        this.chunks = new ArrayList<>();
+        this.landMembers = new ArrayList<>();
     }
 
     public long getId() {
@@ -94,6 +97,10 @@ public class Land implements Cloneable {
         return chunks;
     }
 
+    public void setMergedChunks(@NotNull List<ChunkPlaceholder> chunks) {
+        this.chunks = chunks;
+    }
+
     public boolean isChunkConnected(@NotNull Chunk chunk) {
 
         boolean connected = false;
@@ -103,10 +110,6 @@ public class Land implements Cloneable {
         }
 
         return connected;
-    }
-
-    public void setMergedChunks(@NotNull List<ChunkPlaceholder> chunks) {
-        this.chunks = chunks;
     }
 
     @Nullable
@@ -122,15 +125,6 @@ public class Land implements Cloneable {
         }
 
         return chunkPlaceholder;
-
-    }
-
-    public void mergeChunk(@NotNull Chunk chunk) {
-        mergeChunk(chunk.getX(), chunk.getZ());
-    }
-
-    public void mergeChunk(int chunkX, int chunkZ) {
-        this.chunks.add(new ChunkPlaceholder(ChunkUtil.getChunkIndex(chunkX, chunkZ)));
     }
 
     @NotNull
