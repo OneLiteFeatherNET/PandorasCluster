@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    kotlin("jvm") version "1.7.10"
 //    checkstyle
     // FIXME
     // Bukkit
@@ -37,19 +38,24 @@ dependencies {
 
     // Database
     implementation("org.hibernate:hibernate-core:6.1.1.Final")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.0.5")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.0.Final")
-
-    implementation("me.lucko:helper:5.6.10")
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 tasks {
@@ -57,6 +63,12 @@ tasks {
     compileJava {
         options.release.set(17)
         options.encoding = "UTF-8"
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
     }
 
     test {
@@ -68,7 +80,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19")
+        minecraftVersion("1.19.1")
     }
 
     shadowJar {
