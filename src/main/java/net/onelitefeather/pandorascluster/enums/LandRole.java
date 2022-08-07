@@ -7,23 +7,24 @@ import java.util.Map;
 
 public enum LandRole {
 
-    OWNER("owner", "64Owner", true),
-    ADMIN("admin", "&cAdmin", true),
-    TRUSTED("trusted", "&aTrusted", true),
-    MEMBER("member", "&eMember", true),
-    BANNED("banned", "&c&oBanned", false),
-    VISITOR("visitor", "&7Visitor", false);
+    OWNER("owner", "64Owner", true, false),
+    ADMIN("admin", "&cAdmin", true, true),
+    TRUSTED("trusted", "&aTrusted", true, true),
+    MEMBER("member", "&eMember", true, true),
+    BANNED("banned", "&c&oBanned", false, true),
+    VISITOR("visitor", "&7Visitor", false, false);
 
     private final String name;
     private final String display;
-    private final boolean access;
+    private final boolean access, grantAble;
 
-    private static final Map<String, LandRole> BY_NAME = Maps.newHashMap();
+    public static final Map<String, LandRole> BY_NAME = Maps.newHashMap();
 
-    LandRole(String name, String display, boolean access) {
+    LandRole(String name, String display, boolean access, boolean grantAble) {
         this.name = name;
         this.display = display;
         this.access = access;
+        this.grantAble = grantAble;
     }
 
     @NotNull
@@ -38,6 +39,10 @@ public enum LandRole {
 
     public boolean hasAccess() {
         return access;
+    }
+
+    public boolean isGrantAble() {
+        return grantAble;
     }
 
     public static LandRole getChunkRole(String name) {
