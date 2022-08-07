@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.service.services;
+package net.onelitefeather.pandorascluster.service;
 
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder;
