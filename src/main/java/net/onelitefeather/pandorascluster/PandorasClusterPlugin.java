@@ -11,8 +11,10 @@ import cloud.commandframework.paper.PaperCommandManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl;
+import net.onelitefeather.pandorascluster.command.commands.SetOwnerCommand;
+import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser;
 import net.onelitefeather.pandorascluster.commands.ClaimCommand;
-import net.onelitefeather.pandorascluster.commands.LandCommand;
+import net.onelitefeather.pandorascluster.command.commands.SetRoleCommand;
 import net.onelitefeather.pandorascluster.commands.TestCommand;
 import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener;
 import org.bukkit.command.CommandSender;
@@ -89,8 +91,11 @@ public class PandorasClusterPlugin extends JavaPlugin implements Listener {
 
         this.minecraftHelp = MinecraftHelp.createNative("/pandorascluster help", this.paperCommandManager);
         this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, NamedTextColor.BLUE, NamedTextColor.DARK_BLUE, NamedTextColor.AQUA));
+
+        annotationParser.parse(new LandPlayerParser(this.api));
         annotationParser.parse(new ClaimCommand(this.api));
-        annotationParser.parse(new LandCommand(this.api));
+        annotationParser.parse(new SetOwnerCommand(this.api));
+        annotationParser.parse(new SetRoleCommand(this.api));
         annotationParser.parse(new TestCommand(this.api));
     }
 }
