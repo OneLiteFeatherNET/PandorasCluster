@@ -7,19 +7,20 @@ import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.service.LandService;
-import net.onelitefeather.pandorascluster.service.services.DatabaseService;
-import net.onelitefeather.pandorascluster.service.services.EntityDataStoreService;
-import net.onelitefeather.pandorascluster.service.services.LandFlagService;
-import net.onelitefeather.pandorascluster.service.services.LandPlayerService;
+import net.onelitefeather.pandorascluster.service.DatabaseService;
+import net.onelitefeather.pandorascluster.service.EntityDataStoreService;
+import net.onelitefeather.pandorascluster.service.LandFlagService;
+import net.onelitefeather.pandorascluster.service.LandPlayerService;
 import org.bukkit.Chunk;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.hibernate.SessionFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -47,12 +48,8 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
         this.databaseService.init();
 
         this.landPlayerService = new LandPlayerService(this);
-        this.landPlayerService.load();
-
         this.landFlagService = new LandFlagService(this);
-
         this.landService = new LandService(this);
-        this.landService.load();
     }
 
     @Override
@@ -81,8 +78,8 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
     }
 
     @Override
-    public @NotNull Map<OfflinePlayer, Land> getLands() {
-        return this.landService.getPlayerLands();
+    public @NotNull List<Land> getLands() {
+        return this.landService.getLands();
     }
 
     @Override
@@ -96,7 +93,7 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
     }
 
     @Override
-    public LandPlayer getLandPlayer(@NotNull String name) {
+    public @Nullable LandPlayer getLandPlayer(@NotNull String name) {
         return this.landPlayerService.getLandPlayer(name);
     }
 
@@ -104,21 +101,13 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
     public @NotNull List<Land> getLands(@NotNull Player player) {
 
         List<Land> lands = new ArrayList<>();
-
-        for (Map.Entry<OfflinePlayer, Land> landEntry : getLands().entrySet()) {
-            OfflinePlayer offlinePlayer = landEntry.getKey();
-            Land land = landEntry.getValue();
-            if (offlinePlayer.equals(player) || land.hasAccess(player.getUniqueId())) {
-                lands.add(land);
+        for (Land landEntry : getLands()) {
+            if (landEntry.getOwner().getUniqueId().equals(player.getUniqueId()) || landEntry.hasAccess(player.getUniqueId())) {
+                lands.add(landEntry);
             }
         }
 
         return lands;
-    }
-
-    @Override
-    public boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
-        return this.landService.hasSameOwner(land, other);
     }
 
     @Override
@@ -153,12 +142,13 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
 
     @Override
     public @NotNull Component translateLegacyCodes(@NotNull String text) {
-        return MiniMessage.miniMessage().deserialize(MiniMessage.miniMessage().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize("&c")));
+        return MiniMessage.miniMessage().deserialize(
+                MiniMessage.miniMessage().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text)));
     }
 
     @Override
     public @Nullable Land getLand(@NotNull Chunk chunk) {
-        return this.landService.getLand(chunk);
+        return this.landService.getFullLand(chunk);
     }
 
     @Override
