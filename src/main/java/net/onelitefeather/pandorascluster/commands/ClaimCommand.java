@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
+import net.onelitefeather.pandorascluster.util.ChunkUtil;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +54,7 @@ public record ClaimCommand(PandorasClusterApi api) {
 
                 if (claimedChunk != null) {
                     Land claimedLand = this.api.getLand(claimedChunk);
-                    if (claimedLand != null && !this.api.hasSameOwner(land, claimedLand)) {
+                    if (claimedLand != null && !ChunkUtil.hasSameOwner(land, claimedLand)) {
                         player.sendMessage(Component.text("distance"));
                         return;
                     }
@@ -64,7 +65,7 @@ public record ClaimCommand(PandorasClusterApi api) {
                     return;
                 }
 
-                this.api.getLandService().merge(land, playerChunk);
+                this.api.getLandService().addChunkPlaceholder(playerChunk, land);
                 player.sendMessage(Component.text("You´ve successfully merged this land!"));
                 player.sendMessage(String.format("DEBUG: Connected with Land X: %d Z: %d", land.getX(), land.getZ()));
 
@@ -78,4 +79,6 @@ public record ClaimCommand(PandorasClusterApi api) {
             }
         });
     }
+
+
 }
