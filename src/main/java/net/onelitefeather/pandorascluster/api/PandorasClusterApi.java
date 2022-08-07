@@ -5,19 +5,17 @@ import net.onelitefeather.pandorascluster.PandorasClusterPlugin;
 import net.onelitefeather.pandorascluster.land.Land;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.service.LandService;
-import net.onelitefeather.pandorascluster.service.services.DatabaseService;
-import net.onelitefeather.pandorascluster.service.services.EntityDataStoreService;
-import net.onelitefeather.pandorascluster.service.services.LandFlagService;
-import net.onelitefeather.pandorascluster.service.services.LandPlayerService;
+import net.onelitefeather.pandorascluster.service.DatabaseService;
+import net.onelitefeather.pandorascluster.service.EntityDataStoreService;
+import net.onelitefeather.pandorascluster.service.LandFlagService;
+import net.onelitefeather.pandorascluster.service.LandPlayerService;
 import org.bukkit.Chunk;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.hibernate.SessionFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -40,7 +38,7 @@ public interface PandorasClusterApi {
      * @return A list of all {@link Land}'s
      */
     @NotNull
-    Map<OfflinePlayer, Land> getLands();
+    List<Land> getLands();
 
     @Nullable
     LandPlayer getLandPlayer(@NotNull Player player);
@@ -57,8 +55,6 @@ public interface PandorasClusterApi {
      */
     @NotNull
     List<Land> getLands(Player player);
-
-    boolean hasSameOwner(@NotNull Land land, @NotNull Land other);
 
     @NotNull
     SessionFactory getSessionFactory();
