@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.util;
 
+import net.onelitefeather.pandorascluster.land.Land;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -68,4 +69,7 @@ public class ChunkUtil {
         return players;
     }
 
+    public static boolean hasSameOwner(@NotNull Land land, @NotNull Land other) {
+        return land.getOwner().equals(other.getOwner());
+    }
 }
