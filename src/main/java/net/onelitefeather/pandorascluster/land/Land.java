@@ -2,6 +2,7 @@ package net.onelitefeather.pandorascluster.land;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.enums.LandRole;
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity;
 import net.onelitefeather.pandorascluster.land.player.LandMember;
 import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.land.position.HomePosition;
@@ -28,11 +29,14 @@ public class Land implements Cloneable {
     @OneToOne
     private HomePosition homePosition;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "land")
     private List<LandMember> landMembers;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
     private List<ChunkPlaceholder> chunks;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
+    private List<LandFlagEntity> flags;
 
     @Column
     private String world;
@@ -55,6 +59,7 @@ public class Land implements Cloneable {
         this.z = z;
         this.chunks = new ArrayList<>();
         this.landMembers = new ArrayList<>();
+        this.flags = new ArrayList<>();
     }
 
     public long getId() {
@@ -99,6 +104,15 @@ public class Land implements Cloneable {
 
     public void setMergedChunks(@NotNull List<ChunkPlaceholder> chunks) {
         this.chunks = chunks;
+    }
+
+    public void setFlags(@NotNull List<LandFlagEntity> flags) {
+        this.flags = flags;
+    }
+
+    @NotNull
+    public List<LandFlagEntity> getFlags() {
+        return flags;
     }
 
     public boolean isChunkConnected(@NotNull Chunk chunk) {
@@ -169,6 +183,7 @@ public class Land implements Cloneable {
     }
 
     public boolean hasAccess(@NotNull UUID uuid) {
+        if (this.owner.getUniqueId().equals(uuid)) return true;
         LandMember landMember = getLandMember(uuid);
         if (landMember == null) return false;
         return landMember.getRole().hasAccess();
