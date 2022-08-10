@@ -2,22 +2,20 @@ package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.service.LandFlagService
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.event.world.StructureGrowEvent
 
-class LandWorldListener(private val landService: LandService, private val landFlagService: LandFlagService) : Listener {
+class LandWorldListener(private val landService: LandService) : Listener {
 
     @EventHandler
     fun handleLeavesDecay(event: LeavesDecayEvent) {
         val land: Land = landService.getFullLand(event.block.chunk) ?: return
-        val landFlag: LandFlagEntity = this.landFlagService.getFlag(LandFlag.LEAVES_DECAY, land)
-        if (landFlag.getValue()) return
+        val landFlag = landService.getLandFlag(LandFlag.LEAVES_DECAY, land)?: return
+        if (landFlag.getValue()!!) return
         event.isCancelled = true
     }
 

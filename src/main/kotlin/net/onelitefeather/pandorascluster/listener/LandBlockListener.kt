@@ -4,7 +4,6 @@ import net.onelitefeather.pandorascluster.enums.ChunkRotation
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.service.LandFlagService
 import net.onelitefeather.pandorascluster.service.LandService
 import net.onelitefeather.pandorascluster.util.ChunkUtil
 import org.bukkit.event.EventHandler
@@ -12,7 +11,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 
-class LandBlockListener(private val landService: LandService, private val landFlagService: LandFlagService) : Listener {
+class LandBlockListener(private val landService: LandService) : Listener {
 
     @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
@@ -47,8 +46,8 @@ class LandBlockListener(private val landService: LandService, private val landFl
             val next = iterator.next()
             val nextLand = landService.getFullLand(next.chunk)
             if (nextLand != null) {
-                val landFlag = landFlagService.getFlag(LandFlag.EXPLOSIONS, nextLand)
-                if (landFlag != null && !landFlag.getValue<Boolean>()) {
+                val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, nextLand)
+                if (landFlag != null && !landFlag.getValue<Boolean>()!!) {
                     iterator.remove()
                 }
             }
@@ -71,8 +70,8 @@ class LandBlockListener(private val landService: LandService, private val landFl
         val block = event.block
         val land = landService.getFullLand(block.chunk)
         if (land != null) {
-            val landFlag = landFlagService.getFlag(LandFlag.REDSTONE, land)
-            event.newCurrent = if (landFlag != null && landFlag.getValue()) 0 else event.oldCurrent
+            val landFlag = landService.getLandFlag(LandFlag.REDSTONE, land)
+            event.newCurrent = if (landFlag != null && landFlag.getValue()!!) 0 else event.oldCurrent
         }
     }
 
