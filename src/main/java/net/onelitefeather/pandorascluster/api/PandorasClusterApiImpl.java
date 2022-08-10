@@ -9,7 +9,6 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.service.LandService;
 import net.onelitefeather.pandorascluster.service.DatabaseService;
 import net.onelitefeather.pandorascluster.service.EntityDataStoreService;
-import net.onelitefeather.pandorascluster.service.LandFlagService;
 import net.onelitefeather.pandorascluster.service.LandPlayerService;
 import org.bukkit.Chunk;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -30,7 +30,6 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
     private final EntityDataStoreService entityDataStoreService;
     private final DatabaseService databaseService;
     private final LandPlayerService landPlayerService;
-    private final LandFlagService landFlagService;
     private final LandService landService;
 
     public PandorasClusterApiImpl(@NotNull PandorasClusterPlugin plugin) {
@@ -48,7 +47,6 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
         this.databaseService.init();
 
         this.landPlayerService = new LandPlayerService(this);
-        this.landFlagService = new LandFlagService(this);
         this.landService = new LandService(this);
     }
 
@@ -79,7 +77,7 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
 
     @Override
     public @NotNull List<Land> getLands() {
-        return this.landService.getLands();
+        return Objects.requireNonNull(this.landService.getLands());
     }
 
     @Override
@@ -128,11 +126,6 @@ public final class PandorasClusterApiImpl implements PandorasClusterApi {
     @Override
     public @NotNull LandService getLandService() {
         return this.landService;
-    }
-
-    @Override
-    public @NotNull LandFlagService getLandFlagService() {
-        return landFlagService;
     }
 
     @Override
