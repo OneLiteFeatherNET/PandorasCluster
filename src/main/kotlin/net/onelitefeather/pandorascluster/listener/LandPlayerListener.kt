@@ -3,9 +3,7 @@ package net.onelitefeather.pandorascluster.listener
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.service.LandFlagService
 import org.bukkit.block.Container
-import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.RespawnAnchor
 import org.bukkit.event.EventHandler
@@ -15,7 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 
-class LandPlayerListener(private val landService: LandService, private val landFlagService: LandFlagService) :
+class LandPlayerListener(private val landService: LandService) :
     Listener {
 
     @EventHandler
@@ -57,40 +55,33 @@ class LandPlayerListener(private val landService: LandService, private val landF
         val blockData = clickedBlock.blockData
         var cancel = false
 
-        if (blockData is Farmland && event.action == Action.PHYSICAL) {
-            val landFlag = landFlagService.getFlag(LandFlag.FARMLAND_DESTROY, land)?: return
-            if (landFlag.getValue()) return
-            if (land.hasAccess(player.uniqueId)) return
+        if(event.material.isInteractable) {
+            if (Permission.INTERACT_USE.hasPermission(player)) return
+            cancel = true
+        }
 
+        if (blockData is Farmland && event.action == Action.PHYSICAL) {
+            val landFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
+            if (landFlag.getValue()!!) return
             if (Permission.INTERACT_FARMLAND.hasPermission(player)) return
             cancel = true
         }
 
-        if (blockData is Powerable) {
-
-            val landFlag = landFlagService.getFlag(LandFlag.REDSTONE, land)?: return
-            if (true && landFlag.getValue()) return
-
-            if (land.hasAccess(player.uniqueId)) return
-            if (Permission.USE_REDSTONE.hasPermission(player)) return
-            cancel = true
-        }
-
         if (clickedBlock.state is Container) {
-            if (land.hasAccess(player.uniqueId)) return
             if (Permission.INTERACT_CONTAINERS.hasPermission(player)) return
             cancel = true
         }
 
         if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK) {
-            if(blockData.charges == blockData.maximumCharges) {
-                val landFlag = landFlagService.getFlag(LandFlag.EXPLOSIONS, land)?: return
-                if (landFlag.getValue()) return
+            if (blockData.charges == blockData.maximumCharges) {
+                val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
+                if (landFlag.getValue()!!) return
                 if (Permission.EXPLOSION.hasPermission(player)) return
                 cancel = true
             }
         }
 
+        if (land.hasAccess(player.uniqueId)) return
         event.isCancelled = cancel
     }
 }
