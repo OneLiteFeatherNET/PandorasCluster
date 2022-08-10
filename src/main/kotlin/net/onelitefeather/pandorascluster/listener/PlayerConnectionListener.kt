@@ -16,6 +16,7 @@ class PlayerConnectionListener(private val api: PandorasClusterApi) : Listener {
             player.addAttachment(api.plugin, "minecraft.command.teleport", true)
             player.addAttachment(api.plugin, "minecraft.command.gamemode", true)
             player.addAttachment(api.plugin, "pandorascluster.command.land.setowner", true)
+            player.addAttachment(api.plugin, "pandorascluster.command.land.flag.set", true)
             player.recalculatePermissions()
         }
     }
