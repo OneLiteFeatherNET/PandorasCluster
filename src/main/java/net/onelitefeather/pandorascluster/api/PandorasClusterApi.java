@@ -7,7 +7,6 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer;
 import net.onelitefeather.pandorascluster.service.LandService;
 import net.onelitefeather.pandorascluster.service.DatabaseService;
 import net.onelitefeather.pandorascluster.service.EntityDataStoreService;
-import net.onelitefeather.pandorascluster.service.LandFlagService;
 import net.onelitefeather.pandorascluster.service.LandPlayerService;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -66,9 +65,6 @@ public interface PandorasClusterApi {
 
     @NotNull
     LandService getLandService();
-
-    @NotNull
-    LandFlagService getLandFlagService();
 
     @NotNull
     Logger getLogger();
