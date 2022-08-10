@@ -4,8 +4,6 @@ import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.toMM
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
@@ -20,7 +18,12 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
         val land = pandorasClusterApi.landService.getFullLand(player.chunk)
         if (land == null) {
-            player.sendMessage(Component.text("Nichts gefunden!"))
+            player.sendMessage("Nichts gefunden!".toMM())
+            return
+        }
+
+        if(land.isOwner(landPlayer.uniqueId)) {
+            player.sendMessage("Nothing changed player ${landPlayer.name} is already the land owner".toMM())
             return
         }
 
