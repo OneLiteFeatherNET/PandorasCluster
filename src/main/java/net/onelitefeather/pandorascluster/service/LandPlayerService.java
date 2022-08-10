@@ -16,6 +16,7 @@ import java.util.logging.Level;
 
 public final class LandPlayerService {
 
+    public static final LandPlayer DUMMY = new LandPlayer(UUID.randomUUID(), "Steve");
     private final PandorasClusterApi pandorasClusterApi;
 
     public LandPlayerService(@NotNull PandorasClusterApi pandorasClusterApi) {
