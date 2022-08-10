@@ -36,7 +36,7 @@ public enum LandFlag {
     private final LandFlagType flagType;
     private final byte type;
 
-    private static final HashMap<String, LandFlag> FLAG_HASHMAP = new HashMap<>();
+    public static final HashMap<String, LandFlag> FLAG_HASHMAP = new HashMap<>();
 
     LandFlag(@NotNull String name, @NotNull Object defaultValue, @NotNull LandFlagType flagType, byte type) {
         this.name = name;
@@ -66,16 +66,12 @@ public enum LandFlag {
 
     @Nullable
     public static LandFlag findByName(@NotNull String name) {
-        return FLAG_HASHMAP.getOrDefault(name, null);
-    }
-
-    public static Map<String, LandFlag> getFlagHashmap() {
-        return FLAG_HASHMAP;
+        return FLAG_HASHMAP.getOrDefault(name.toUpperCase(), null);
     }
 
     static {
         for (LandFlag value : LandFlag.values()) {
-            FLAG_HASHMAP.put(value.name, value);
+            FLAG_HASHMAP.put(value.name(), value);
         }
     }
 }
