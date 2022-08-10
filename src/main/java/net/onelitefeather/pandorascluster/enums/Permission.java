@@ -6,20 +6,23 @@ import org.jetbrains.annotations.NotNull;
 
 public enum Permission {
 
-    BLOCK_BREAK("%s.admin.block.break"),
-    BLOCK_PLACE("%s.admin.block.place"),
-    ENTITY_MOUNT("%s.admin.mount"),
-    LAND_ENTRY_DENIED("%s.admin.entry.denied"),
+    BLOCK_BREAK("%s.unowned.block.break"),
+    BLOCK_PLACE("%s.unowned.block.place"),
+    ENTITY_MOUNT("%s.unowned.mount"),
+    LAND_ENTRY_DENIED("%s.unowned.entry.denied"),
 
-    VEHICLE_ENTER("%s.admin.vehicle.use"),
-    VEHICLE_DAMAGE("%s.admin.vehicle.damage"),
-    VEHICLE_DESTROY("%s.admin.vehicle.destroy"),
-    EXPLOSION("%s.admin.explosion"),
-    USE_REDSTONE("%s.admin.redstone"),
-    INTERACT_CONTAINERS("%s.admin.interact.container"),
-    INTERACT_FARMLAND("%s.admin.interact.farmland"),
-    POTION_SPLASH("%s.admin.potion.splash"),
-    PROJECTILE_HIT_ENTITY("%s.admin.projectile.hit");
+    PVP("%s.unowned.attack.player"),
+    PVE("%s.unowned.attack.entity"),
+
+    VEHICLE_ENTER("%s.unowned.vehicle.use"),
+    VEHICLE_DAMAGE("%s.unowned.vehicle.damage"),
+    VEHICLE_DESTROY("%s.unowned.vehicle.destroy"),
+    EXPLOSION("%s.unowned.explosion"),
+    INTERACT_CONTAINERS("%s.unowned.interact.container"),
+    INTERACT_FARMLAND("%s.unowned.interact.farmland"),
+    INTERACT_USE("%s.unowned.interact.use"),
+    POTION_SPLASH("%s.unowned.potion.splash"),
+    PROJECTILE_HIT_ENTITY("%s.unowned.projectile.hit");
 
     private final String permissionNode;
 
