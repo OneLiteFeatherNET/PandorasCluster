@@ -18,6 +18,18 @@ public class LandMember {
     @Enumerated(EnumType.STRING)
     private LandRole role;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "land_id")
+    private Land land;
+
+    public Land getLand() {
+        return land;
+    }
+
+    public void setLand(Land land) {
+        this.land = land;
+    }
+
     public LandMember() {
     }
 
@@ -27,9 +39,10 @@ public class LandMember {
         this.role = role;
     }
 
-    public LandMember(@NotNull LandPlayer member, @NotNull LandRole role) {
+    public LandMember(LandPlayer member, LandRole role, Land land) {
         this.member = member;
         this.role = role;
+        this.land = land;
     }
 
     public long getId() {
