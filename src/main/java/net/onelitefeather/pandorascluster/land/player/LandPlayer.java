@@ -3,7 +3,6 @@ package net.onelitefeather.pandorascluster.land.player;
 import jakarta.persistence.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.onelitefeather.pandorascluster.land.Land;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
