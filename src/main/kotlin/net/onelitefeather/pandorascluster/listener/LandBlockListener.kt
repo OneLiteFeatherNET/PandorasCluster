@@ -1,11 +1,11 @@
 package net.onelitefeather.pandorascluster.listener
 
-import net.onelitefeather.pandorascluster.enums.ChunkRotation
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import net.onelitefeather.pandorascluster.util.ChunkUtil
+import net.onelitefeather.pandorascluster.util.Constants
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -16,9 +16,10 @@ class LandBlockListener(private val landService: LandService) : Listener {
     @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
 
+        if(event.player.hasPermission(Permission.BLOCK_PLACE)) return
         val land = landService.getFullLand(event.block.chunk)
         if (land == null) {
-            event.isCancelled = !event.player.hasPermission(Permission.BLOCK_BREAK)
+            event.isCancelled = true
             return
         }
 
@@ -28,11 +29,10 @@ class LandBlockListener(private val landService: LandService) : Listener {
     @EventHandler
     fun handleBlockPlace(event: BlockPlaceEvent) {
 
-        val hasPermission = event.player.hasPermission(Permission.BLOCK_PLACE)
-
+        if(event.player.hasPermission(Permission.BLOCK_PLACE)) return
         val land = landService.getFullLand(event.block.chunk)
         if (land == null) {
-            event.isCancelled = !hasPermission
+            event.isCancelled = true
             return
         }
 
@@ -70,8 +70,8 @@ class LandBlockListener(private val landService: LandService) : Listener {
         val block = event.block
         val land = landService.getFullLand(block.chunk)
         if (land != null) {
-            val landFlag = landService.getLandFlag(LandFlag.REDSTONE, land)
-            event.newCurrent = if (landFlag != null && landFlag.getValue()!!) 0 else event.oldCurrent
+            val landFlag = landService.getLandFlag(LandFlag.REDSTONE, land)?: return
+            event.newCurrent = if (!landFlag.getValue<Boolean>()!!) 0 else event.oldCurrent
         }
     }
 
@@ -126,7 +126,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
         val blockState = event.newState
         val land = landService.getFullLand(block.chunk)
         if (land != null) {
-            val blockFace = ChunkRotation.getBlockFace(block.location)
+            val blockFace = Constants.getBlockFace(block.location)
             val faceLocation = blockState.location.subtract(blockFace.direction)
             val blockFaceLand = landService.getFullLand(faceLocation.chunk)
             if (blockFaceLand != null && !ChunkUtil.hasSameOwner(blockFaceLand, land)) {
