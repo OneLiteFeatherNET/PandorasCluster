@@ -10,13 +10,8 @@ enum class LandRole(val roleName: String, val display: String, val access: Boole
 
 
     fun isGrantAble() = this != OWNER
-
-    companion object {
-        @JvmStatic
-        val landRoles = values()
-
-        @JvmStatic
-        fun getLandRole(name: String): LandRole? =
-            landRoles.firstOrNull { landRole ->  landRole.name == name.uppercase() }
-    }
 }
+
+val LAND_ROLES = LandRole.values()
+fun getLandRole(name: String): LandRole? =
+    LAND_ROLES.firstOrNull { landRole ->  landRole.name == name.uppercase() }

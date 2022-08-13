@@ -4,7 +4,7 @@ import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
-import net.onelitefeather.pandorascluster.util.ChunkUtil
+import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 
@@ -33,24 +33,22 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
             val chunkZ = playerChunk.z
             var claimedChunk: Chunk? = null
 
-            var x = -2
-            while (x < 2 && claimedChunk == null) {
-                var z = -2
-                while (z < 2 && claimedChunk == null) {
+
+            for (x in -2..2) {
+                for (z in -2..2) {
+                    if (claimedChunk != null) continue
                     val chunk = player.world.getChunkAt(x + chunkX, z + chunkZ)
                     if (pandorasClusterApi.isChunkClaimed(chunk)) {
                         claimedChunk = chunk
                     }
-                    z++
                 }
-                x++
             }
 
             if(it != null) {
 
                 if (claimedChunk != null) {
                     val claimedLand = pandorasClusterApi.getLand(claimedChunk)
-                    if (claimedLand != null && !ChunkUtil.hasSameOwner(it, claimedLand)) {
+                    if (claimedLand != null && !hasSameOwner(it, claimedLand)) {
                         player.sendMessage(miniMessage { "This is not allowed to claim!" })
                         return@findConnectedChunk
                     }

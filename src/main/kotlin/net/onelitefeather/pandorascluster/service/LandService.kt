@@ -12,7 +12,6 @@ import net.onelitefeather.pandorascluster.listener.LandBlockListener
 import net.onelitefeather.pandorascluster.listener.LandEntityListener
 import net.onelitefeather.pandorascluster.listener.LandPlayerListener
 import net.onelitefeather.pandorascluster.listener.LandWorldListener
-import net.onelitefeather.pandorascluster.util.ChunkUtil
 import net.onelitefeather.pandorascluster.util.Constants
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
@@ -20,9 +19,9 @@ import org.hibernate.HibernateException
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Level
+import net.onelitefeather.pandorascluster.util.getChunkIndex
 
 class LandService(
-    private val databaseStorageService: DatabaseStorageService,
     private val pandorasClusterApi: PandorasClusterApi
 ) {
 
@@ -75,7 +74,9 @@ class LandService(
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val query = session.createQuery(
-                    "SELECT kdc FROM Land kdc WHERE playerId = :playerId AND id = :id", Land::class.java)
+                    "SELECT kdc FROM Land kdc JOIN FETCH kdc.owner o WHERE o.uuid = :playerId AND kdc.id = :id",
+                    Land::class.java
+                )
                 query.maxResults = 1
                 query.setParameter("playerId", owner.uuid)
                 query.setParameter("id", land.id)
@@ -131,7 +132,7 @@ class LandService(
                     "SELECT ch FROM ChunkPlaceholder ch JOIN FETCH ch.land WHERE ch.chunkIndex = :chunkIndex",
                     ChunkPlaceholder::class.java
                 )
-                query.setParameter("chunkIndex", ChunkUtil.getChunkIndex(chunk))
+                query.setParameter("chunkIndex", getChunkIndex(chunk))
                 val chunkHolder = query.uniqueResult()
                 if (chunkHolder != null) {
                     land = chunkHolder.land

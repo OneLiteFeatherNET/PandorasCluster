@@ -7,7 +7,7 @@ import org.bukkit.World
 import org.hibernate.Hibernate
 
 @Entity
-data class HomePosition (
+data class HomePosition(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,8 @@ data class HomePosition (
     val yaw: Float = 1.0F,
 
     @Column
-    val pitch: Float = 1.0F) {
+    val pitch: Float = 1.0F
+) {
 
 
     override fun equals(other: Any?): Boolean {

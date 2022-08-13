@@ -29,7 +29,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
 
     fun createPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>) {
         playerExists(uuid) { exists: Boolean ->
-            if (java.lang.Boolean.FALSE == exists) {
+            if (!exists) {
                 val landPlayer = LandPlayer(null, uuid.toString(), name)
                 updateLandPlayer(landPlayer)
             }

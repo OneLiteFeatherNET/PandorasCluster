@@ -16,10 +16,12 @@ import org.hibernate.hikaricp.internal.HikariCPConnectionProvider
 import org.hibernate.tool.schema.Action
 import java.util.*
 
-class DatabaseService(var jdbcUrl: String,
-                      var username: String,
-                      var password: String,
-                      var driver: String) {
+class DatabaseService(
+    jdbcUrl: String,
+    username: String,
+    password: String,
+    driver: String
+) {
 
     var sessionFactory: SessionFactory
 

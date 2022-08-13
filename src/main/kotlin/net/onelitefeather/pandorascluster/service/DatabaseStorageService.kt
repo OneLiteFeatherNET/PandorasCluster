@@ -5,13 +5,11 @@ import net.onelitefeather.pandorascluster.builder.landBuilder
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.flag.LandFlagType
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
-import net.onelitefeather.pandorascluster.util.ChunkUtil
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
@@ -19,6 +17,8 @@ import org.hibernate.Transaction
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
+import net.onelitefeather.pandorascluster.land.flag.LAND_FLAGS
+import net.onelitefeather.pandorascluster.util.getChunkIndex
 
 class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi) {
 
@@ -117,7 +117,7 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
 
     fun addChunkPlaceholder(chunk: Chunk?, land: Land?) {
         var transaction: Transaction? = null
-        val chunkPlaceholder = ChunkPlaceholder(null, ChunkUtil.getChunkIndex(chunk!!), land)
+        val chunkPlaceholder = ChunkPlaceholder(null, getChunkIndex(chunk!!), land)
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
@@ -137,7 +137,7 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
     private fun addFlags(land: Land) {
         CompletableFuture.runAsync {
             val flagEntities: MutableList<LandFlagEntity> = ArrayList()
-            for (landFlag in LandFlag.landFlags) {
+            for (landFlag in LAND_FLAGS) {
 
                 if (landFlag.landFlagType == LandFlagType.UNKNOWN) continue
                 flagEntities.add(

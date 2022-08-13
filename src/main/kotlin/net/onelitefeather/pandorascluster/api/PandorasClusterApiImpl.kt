@@ -35,7 +35,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
             databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
             databaseStorageService = DatabaseStorageService(this)
-            landService = LandService(databaseStorageService, this)
+            landService = LandService(this)
             landPlayerService = LandPlayerService(this)
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
