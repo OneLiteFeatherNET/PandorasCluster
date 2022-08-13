@@ -1,14 +1,10 @@
 package net.onelitefeather.pandorascluster.service
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.builder.LandBuilder
-import net.onelitefeather.pandorascluster.enums.ChunkRotation
-import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import net.onelitefeather.pandorascluster.land.flag.LandFlagType
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
@@ -17,40 +13,42 @@ import net.onelitefeather.pandorascluster.listener.LandEntityListener
 import net.onelitefeather.pandorascluster.listener.LandPlayerListener
 import net.onelitefeather.pandorascluster.listener.LandWorldListener
 import net.onelitefeather.pandorascluster.util.ChunkUtil
+import net.onelitefeather.pandorascluster.util.Constants
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
-import org.hibernate.Transaction
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 import java.util.logging.Level
 
-class LandService(private val pandorasClusterApi: PandorasClusterApi) {
+class LandService(
+    private val databaseStorageService: DatabaseStorageService,
+    private val pandorasClusterApi: PandorasClusterApi
+) {
 
     init {
-        val pluginManager = pandorasClusterApi.plugin.server.pluginManager
-        pluginManager.registerEvents(LandBlockListener(this), pandorasClusterApi.plugin)
-        pluginManager.registerEvents(LandEntityListener(this), pandorasClusterApi.plugin)
-        pluginManager.registerEvents(LandPlayerListener(this), pandorasClusterApi.plugin)
-        pluginManager.registerEvents(LandWorldListener(this), pandorasClusterApi.plugin)
+        val pluginManager = pandorasClusterApi.getPlugin().server.pluginManager
+        pluginManager.registerEvents(LandBlockListener(this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandEntityListener(this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandPlayerListener(this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandWorldListener(this), pandorasClusterApi.getPlugin())
     }
 
-    fun getLands(): List<Land>? {
+    fun getLands(): List<Land> {
         val lands: MutableList<Land> = ArrayList()
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val query = session.createQuery("SELECT l FROM Land l", Land::class.java)
                 lands.addAll(query.list())
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Could not load lands.", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e)
         }
         return lands
     }
 
     fun hasPlayerLand(playerId: UUID): Boolean {
-        val offlinePlayer = pandorasClusterApi.plugin.server.getOfflinePlayer(playerId)
+        val offlinePlayer = pandorasClusterApi.getPlugin().server.getOfflinePlayer(playerId)
         if (!offlinePlayer.hasPlayedBefore()) return false
         val landPlayer = pandorasClusterApi.getLandPlayer(playerId) ?: return false
         return getLand(landPlayer) != null
@@ -58,7 +56,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
 
     fun getHome(uuid: UUID): HomePosition? {
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val landOfOwner = session.createQuery(
                     "SELECT h FROM Land l JOIN l.homePosition h JOIN l.owner p WHERE p.uuid = :uuid",
                     HomePosition::class.java
@@ -67,67 +65,24 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 return landOfOwner.singleResult
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Cannot update land", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
         }
         return null
     }
 
-    fun createLand(owner: LandPlayer, player: Player, chunk: Chunk) {
-        if (!hasPlayerLand(owner.uniqueId)) {
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.sessionFactory.openSession().use { session ->
-                    transaction = session.beginTransaction()
-                    val homePosition = HomePosition.of(player.location)
-                    session.persist(homePosition)
-                    val land =
-                        LandBuilder().owner(owner).home(homePosition).world(player.world).chunkX(chunk.x)
-                            .chunkZ(chunk.z).members(listOf()).mergedChunks(listOf()).build()
-                    session.persist(land)
-                    addFlags(land)
-                    transaction?.commit()
-                    addChunkPlaceholder(chunk, land)
-                }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.logger.log(Level.SEVERE, "Cannot update land", e)
-            }
-        }
-    }
-
-    fun deletePlayerLand(player: Player) {
-        val landPlayer = pandorasClusterApi.getLandPlayer(player.uniqueId) ?: return
-        val land: Land = getLand(landPlayer) ?: return
-        val world = player.server.getWorld(land.world) ?: return
-        if (exists(land)) {
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.sessionFactory.openSession().use { session ->
-                    transaction = session.beginTransaction()
-                    session.remove(land)
-                    transaction?.commit()
-                }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.logger.log(Level.SEVERE, "Cannot remove the land from the database.", e)
-            }
-        }
-    }
-
-    private fun exists(land: Land): Boolean {
+    fun exists(land: Land): Boolean {
+        val owner = land.owner ?: return false
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                val kitCooldown = session.createQuery(
-                    "SELECT kdc FROM Land kdc WHERE playerId = :playerId AND id = :id",
-                    Land::class.java
-                )
-                kitCooldown.maxResults = 1
-                kitCooldown.setParameter("playerId", land.owner.uniqueId.toString())
-                kitCooldown.setParameter("id", land.id)
-                return kitCooldown.uniqueResult() != null
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val query = session.createQuery(
+                    "SELECT kdc FROM Land kdc WHERE playerId = :playerId AND id = :id", Land::class.java)
+                query.maxResults = 1
+                query.setParameter("playerId", owner.uuid)
+                query.setParameter("id", land.id)
+                return query.uniqueResult() != null
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Something went wrong!", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e)
             return false
         }
     }
@@ -139,7 +94,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
     fun findConnectedChunk(player: Player, consumer: Consumer<Land?>) {
         val chunk = player.chunk
         var land: Land? = null
-        for (chunkRotation in ChunkRotation.BY_NAME.values) {
+        for (chunkRotation in Constants.CHUNK_ROTATIONS) {
             val connectedChunk = player.world.getChunkAt(
                 chunk.x + chunkRotation.x,
                 chunk.z + chunkRotation.z
@@ -154,16 +109,16 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
 
     fun getLand(owner: LandPlayer): Land? {
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val landOfOwner = session.createQuery(
                     "SELECT l FROM Land l JOIN l.owner o JOIN FETCH l.chunks WHERE o.uuid = :uuid",
                     Land::class.java
                 )
-                landOfOwner.setParameter("uuid", owner.uniqueId.toString())
+                landOfOwner.setParameter("uuid", owner.uuid)
                 return landOfOwner.uniqueResult()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Cannot update land", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
         }
         return null
     }
@@ -171,7 +126,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
     fun getFullLand(chunk: Chunk): Land? {
         var land: Land? = null
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val query = session.createQuery(
                     "SELECT ch FROM ChunkPlaceholder ch JOIN FETCH ch.land WHERE ch.chunkIndex = :chunkIndex",
                     ChunkPlaceholder::class.java
@@ -183,85 +138,30 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 }
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Cannot update land", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not found land", e)
         }
         return land
     }
 
-    fun setLandOwner(land: Land, landPlayer: LandPlayer) {
-        land.owner = landPlayer
-        updateLand(land)
-    }
-
-    fun addLandMember(land: Land, member: LandPlayer, landRole: LandRole?) {
-        val landMember = LandMember(member, landRole ?: LandRole.MEMBER, land)
-        var transaction: Transaction? = null
+    fun getFlagsByLand(land: Land): List<LandFlagEntity> {
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                transaction = session.beginTransaction()
-                session.persist(landMember)
-                transaction?.commit()
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagsOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId",
+                    LandFlagEntity::class.java
+                )
+                flagsOfLand.setParameter("landId", land.id)
+                return flagsOfLand.list()
             }
         } catch (e: HibernateException) {
-            transaction?.rollback()
-            pandorasClusterApi.logger.log(
-                Level.SEVERE,
-                "Cannot save land member $landMember",
-                e
-            )
+            pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
         }
-    }
-
-    fun addChunkPlaceholder(chunk: Chunk?, land: Land?) {
-        var transaction: Transaction? = null
-        val chunkPlaceholder = ChunkPlaceholder(ChunkUtil.getChunkIndex(chunk!!), land)
-        try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                transaction = session.beginTransaction()
-                session.persist(chunkPlaceholder)
-                transaction?.commit()
-            }
-        } catch (e: HibernateException) {
-            transaction?.rollback()
-            pandorasClusterApi.logger.log(
-                Level.SEVERE,
-                "Cannot save chunk placeholder $chunkPlaceholder",
-                e
-            )
-        }
-    }
-
-    private fun updateLand(land: Land) {
-        var transaction: Transaction? = null
-        try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                transaction = session.beginTransaction()
-                session.merge(land)
-                transaction?.commit()
-            }
-        } catch (e: HibernateException) {
-            transaction?.rollback()
-            pandorasClusterApi.logger.log(Level.SEVERE, String.format("Cannot update land %s", land), e)
-        }
-    }
-
-    fun updateLandFlag(landFlagEntity: LandFlagEntity) {
-        var transaction: Transaction? = null
-        try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                transaction = session.beginTransaction()
-                session.merge(landFlagEntity)
-                transaction?.commit()
-            }
-        } catch (e: HibernateException) {
-            transaction?.rollback()
-            pandorasClusterApi.logger.log(Level.SEVERE, String.format("Cannot update landflag %s", landFlagEntity), e)
-        }
+        return listOf()
     }
 
     fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val flagOfLand = session.createQuery(
                     "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId AND f.name = :name",
                     LandFlagEntity::class.java
@@ -271,60 +171,29 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 return flagOfLand.uniqueResult()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Cannot load flags by land", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
         }
         return null
     }
 
-    fun getFlagsByLand(land: Land): List<LandFlagEntity> {
+    fun getLandMember(land: Land, landPlayer: LandPlayer): LandMember? {
         try {
-            pandorasClusterApi.sessionFactory.openSession().use { session ->
-                val flagsOfLand = session.createQuery(
-                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId",
-                    LandFlagEntity::class.java
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val landMemberQuery = session.createQuery(
+                    "SELECT m FROM LandMember m JOIN FETCH m.land l JOIN FETCH m.member lm WHERE l.id = :landId AND lm.id = :memberId",
+                    LandMember::class.java
                 )
-                flagsOfLand.setParameter("landId", land.id)
-                return flagsOfLand.list()
+                landMemberQuery.setParameter("memberId", landPlayer.id)
+                landMemberQuery.setParameter("landId", land.id)
+                return landMemberQuery.uniqueResult()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.logger.log(Level.SEVERE, "Cannot load flags by land", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
         }
-        return listOf()
+
+        return null
     }
-
-    private fun addFlags(land: Land) {
-        CompletableFuture.runAsync {
-            val flagEntities: MutableList<LandFlagEntity> = ArrayList()
-            for (landFlag in LandFlag.FLAG_HASHMAP.values) {
-
-                if (landFlag.flagType == LandFlagType.UNKNOWN) continue
-                flagEntities.add(
-                    LandFlagEntity(
-                        null,
-                        landFlag.name,
-                        landFlag.defaultValue.toString(),
-                        landFlag.type,
-                        landFlag.flagType,
-                        land
-                    )
-                )
-            }
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.sessionFactory.openSession().use { session ->
-
-                    transaction = session.beginTransaction()
-                    for (landFlag in flagEntities) {
-                        session.persist(landFlag)
-                    }
-
-                    transaction?.commit()
-                }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.logger.log(Level.SEVERE, "Cannot add flags to land $land", e)
-            }
-        }
-    }
-
 }
+
+private const val cannotLoadFlags = "Cannot load flags by land"
+private const val cannotUpdateLand = "Cannot update land"
