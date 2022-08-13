@@ -10,3 +10,7 @@ variables:
   JAR_FILE: "PandorasCluster.jar"
   BUCKET: "olf-dev"
   TEMPLATE: "default"
+
+deploy:
+  script:
+    - gradle shadowJar
