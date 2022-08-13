@@ -45,6 +45,7 @@ class LandPlayerListener(private val landService: LandService) :
         }
     }
 
+    @Suppress("kotlin:S3776")
     @EventHandler
     fun handlePlayerInteract(event: PlayerInteractEvent) {
 
@@ -52,17 +53,19 @@ class LandPlayerListener(private val landService: LandService) :
         val player = event.player
 
         val land = landService.getFullLand(clickedBlock.chunk) ?: return
+        if (land.hasAccess(player.uniqueId)) return
+
         val blockData = clickedBlock.blockData
         var cancel = false
 
-        if(event.material.isInteractable) {
+        if (event.material.isInteractable) {
             if (Permission.INTERACT_USE.hasPermission(player)) return
             cancel = true
         }
 
         if (blockData is Farmland && event.action == Action.PHYSICAL) {
             val landFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
-            if (landFlag.getValue()!!) return
+            if (landFlag.getValue<Boolean>() == true) return
             if (Permission.INTERACT_FARMLAND.hasPermission(player)) return
             cancel = true
         }
@@ -72,16 +75,13 @@ class LandPlayerListener(private val landService: LandService) :
             cancel = true
         }
 
-        if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK) {
-            if (blockData.charges == blockData.maximumCharges) {
-                val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
-                if (landFlag.getValue()!!) return
-                if (Permission.EXPLOSION.hasPermission(player)) return
-                cancel = true
-            }
+        if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK && blockData.charges == blockData.maximumCharges) {
+            val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
+            if (landFlag.getValue<Boolean>() == true) return
+            if (Permission.EXPLOSION.hasPermission(player)) return
+            cancel = true
         }
 
-        if (land.hasAccess(player.uniqueId)) return
         event.isCancelled = cancel
     }
 }
