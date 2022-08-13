@@ -17,11 +17,11 @@ class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
         val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
         if (land == null) {
-            player.sendMessage("Nichts gefunden!".toMM())
+            player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 
-        player.sendMessage("Home position was successfully set to your current position".toMM())
         pandorasClusterApi.getDatabaseStorageService().updateLandHome(HomePosition.of(player.location), player.uniqueId)
+        player.sendMessage(miniMessage { "Home position was successfully set to your current position" })
     }
 }

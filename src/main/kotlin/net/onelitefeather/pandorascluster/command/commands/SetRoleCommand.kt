@@ -31,27 +31,26 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val playerId = landPlayer.getUniqueId()
 
         if (land == null || playerId == null) {
-            player.sendMessage(Component.text("Nichts gefunden!"))
+            player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 
         if (!landRole.isGrantAble()) {
-            player.sendMessage(MiniMessage.miniMessage().deserialize("Die Rolle ${landRole.name} ist nicht vergebbar"))
+            player.sendMessage(miniMessage { "Die Rolle ${landRole.name} ist nicht vergebbar" })
             return
         }
 
         if (land.isOwner(playerId)) {
             player.sendMessage(
-                MiniMessage.miniMessage().deserialize("Die Rolle des Land Besitzers kann nicht geändert werden.")
+                miniMessage { "Die Rolle des Land Besitzers kann nicht geändert werden." }
             )
             return
         }
 
-        if (land.isOwner(player.uniqueId) || player.hasPermission("pandorascluster.settings.others")) {
+        if (land.isOwner(player.uniqueId)) {
             pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
             player.sendMessage(
-                MiniMessage.miniMessage()
-                    .deserialize("Der Spieler ${landPlayer.name} hat nun die Rolle ${landRole.name} auf deinem Land")
+                miniMessage { "Der Spieler ${landPlayer.name} hat nun die Rolle ${landRole.name} auf deinem Land" }
             )
         }
     }

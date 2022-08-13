@@ -25,7 +25,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
         val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
         if (land == null) {
-            player.sendMessage("Nichts gefunden!".toMM())
+            player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 

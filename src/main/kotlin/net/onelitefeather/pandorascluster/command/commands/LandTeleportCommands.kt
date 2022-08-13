@@ -25,22 +25,22 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
     ) {
 
         if (landOwner.uuid == null) {
-            player.sendMessage("Nichts gefunden".toMM())
+            player.sendMessage(miniMessage { "Nichts gefunden" })
             return
         }
 
         val land = pandorasClusterApi.getLandService().getLand(landOwner)
         if (land == null) {
-            player.sendMessage("Nichts gefunden".toMM())
+            player.sendMessage(miniMessage { "Nichts gefunden" })
             return
         }
 
         if(land.isBanned(player.uniqueId)) {
-            player.sendMessage("Du bist auf diesem Land gebannt!".toMM())
+            player.sendMessage(miniMessage { "Du bist auf diesem Land gebannt!" })
             return
         }
 
         player.teleport(HomePosition.fromHomePosition(player.world, land.homePosition))
-        player.sendMessage("Du bist nun auf dem Land von ${land.owner?.name}".toMM())
+        player.sendMessage(miniMessage { "Du bist nun auf dem Land von ${land.owner?.name}" })
     }
 }
