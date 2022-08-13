@@ -1,5 +1,4 @@
 plugins {
-    id("java")
     kotlin("jvm") version "1.7.10"
 //    checkstyle
     // FIXME
@@ -31,6 +30,7 @@ dependencies {
     implementation("cloud.commandframework", "cloud-paper", "1.7.0")
     implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
     implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
     implementation("me.lucko:commodore:2.0") {
         isTransitive = false
     }
@@ -60,11 +60,6 @@ kotlin {
 
 tasks {
 
-    compileJava {
-        options.release.set(17)
-        options.encoding = "UTF-8"
-    }
-
     compileKotlin {
         kotlinOptions {
             jvmTarget = "17"
@@ -90,7 +85,7 @@ tasks {
 
 bukkit {
     main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
-    apiVersion = "1.18"
+    apiVersion = "1.19"
     name = "PandorasCluster"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
