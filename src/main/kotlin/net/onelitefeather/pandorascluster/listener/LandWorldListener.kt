@@ -19,6 +19,7 @@ class LandWorldListener(private val landService: LandService) : Listener {
         event.isCancelled = true
     }
 
+    @Suppress("kotlin:S3776")
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleStructureGrow(event: StructureGrowEvent) {
 
@@ -62,7 +63,7 @@ class LandWorldListener(private val landService: LandService) : Listener {
         for (i in blocks.indices.reversed()) {
             location = blocks[i].location
             val land = landService.getFullLand(location.chunk)
-            if (land != null && land != origin && !land.isMerged && !origin.isMerged) {
+            if (land != null && land != origin && !land.isMerged() && !origin.isMerged()) {
                 event.blocks.removeAt(i)
             }
         }
