@@ -4,7 +4,7 @@ import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.toMM
+import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.entity.Player
 
@@ -16,18 +16,18 @@ class LandRemovePlayerCommand(val pandorasClusterApi: PandorasClusterApi) {
 
         val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
         if (land == null) {
-            player.sendMessage("Nichts gefunden".toMM())
+            player.sendMessage(miniMessage { "Nichts gefunden" })
             return
         }
 
         val playerId = landPlayer.getUniqueId();
         if (playerId == null) {
-            player.sendMessage("Der Spieler ${landPlayer.name} existiert nicht".toMM())
+            player.sendMessage(miniMessage { "Der Spieler ${landPlayer.name} existiert nicht" })
             return
         }
 
-        val member = land.getLandMember(playerId)?: return
+        val member = land.getLandMember(playerId) ?: return
         pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
-        player.sendMessage("Der Spieler ${landPlayer.name} wurde erfolgreich von deinem Land entfernt".toMM())
+        player.sendMessage(miniMessage { "Der Spieler ${landPlayer.name} wurde erfolgreich von deinem Land entfernt" })
     }
 }
