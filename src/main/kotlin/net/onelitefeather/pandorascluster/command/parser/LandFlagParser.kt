@@ -6,8 +6,7 @@ import cloud.commandframework.context.CommandContext
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.util.DUMMY_FLAG_ENTITY
+import net.onelitefeather.pandorascluster.util.Constants
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -18,18 +17,18 @@ class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
 
         val name = input.remove()
         val landPlayer =
-            pandorasClusterApi.getLandPlayer(commandContext.sender.uniqueId) ?: return DUMMY_FLAG_ENTITY
-        val land = pandorasClusterApi.landService.getLand(landPlayer) ?: return DUMMY_FLAG_ENTITY
+            pandorasClusterApi.getLandPlayer(commandContext.sender.uniqueId) ?: return Constants.DUMMY_FLAG_ENTITY
+        val land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return Constants.DUMMY_FLAG_ENTITY
 
-        val flag = LandFlag.findByName(name) ?: return DUMMY_FLAG_ENTITY
+        val flag = LandFlag.findByName(name) ?: return Constants.DUMMY_FLAG_ENTITY
 
-        return pandorasClusterApi.landService.getLandFlag(flag, land) ?: return DUMMY_FLAG_ENTITY
+        return pandorasClusterApi.getLandService().getLandFlag(flag, land) ?: return Constants.DUMMY_FLAG_ENTITY
     }
 
     @Suggestions("landFlags")
     fun landPlayers(commandContext: CommandContext<Player>, input: String): List<String> {
         val landPlayer = pandorasClusterApi.getLandPlayer(commandContext.sender.uniqueId) ?: return listOf()
-        val land = pandorasClusterApi.landService.getLand(landPlayer) ?: return listOf()
-        return pandorasClusterApi.landService.getFlagsByLand(land).map { it.name!! }
+        val land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return listOf()
+        return pandorasClusterApi.getLandService().getFlagsByLand(land).map { it.name }
     }
 }
