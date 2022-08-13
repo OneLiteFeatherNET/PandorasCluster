@@ -7,7 +7,6 @@ import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
-import net.onelitefeather.pandorascluster.service.LandPlayerService
 import org.hibernate.Hibernate
 import java.util.*
 
