@@ -4,8 +4,10 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.util.Constants
+import net.onelitefeather.pandorascluster.util.BLOCK_FACES
+import net.onelitefeather.pandorascluster.util.getBlockFace
 import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -126,8 +128,8 @@ class LandBlockListener(private val landService: LandService) : Listener {
         val blockState = event.newState
         val land = landService.getFullLand(block.chunk)
         if (land != null) {
-            val blockFace = Constants.getBlockFace(block.location)
-            val faceLocation = blockState.location.subtract(blockFace.direction)
+            val blockFace = getBlockFace(block.location)
+            val faceLocation = blockState.location.subtract(blockFace?.direction ?: BlockFace.SELF.direction)
             val blockFaceLand = landService.getFullLand(faceLocation.chunk)
             if (blockFaceLand != null && !hasSameOwner(blockFaceLand, land)) {
                 event.isCancelled = true

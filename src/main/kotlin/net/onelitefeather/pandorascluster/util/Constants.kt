@@ -9,58 +9,49 @@ import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import java.util.*
 
-class Constants {
+const val PREFIX = "[§aPandorasLand§r]"
+const val PLUGIN_NAME = "PandorasCluster"
 
+val SERVER_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
 
-    companion object {
+val DUMMY_LAND = Land(
+    -1,
+    null,
+    (HomePosition.dummyLocation()),
+    arrayListOf(),
+    arrayListOf(),
+    arrayListOf(),
+    "world",
+    -1, -1
+)
 
-        const val PREFIX = "[§aPandorasLand§r]"
-        const val PLUGIN_NAME = "PandorasCluster"
-
-        val SERVER_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
-        val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
-
-        val DUMMY_LAND = Land(
-            -1,
-            null,
-            (HomePosition.dummyLocation()),
-            arrayListOf(),
-            arrayListOf(),
-            arrayListOf(),
-            "world",
-            -1, -1
-        )
-
-        fun getChunkRotation(name: String): ChunkRotation? {
-            return Arrays.stream(CHUNK_ROTATIONS)
-                .filter { chunkRotation:
-                          ChunkRotation -> chunkRotation.name.equals(name, true) }.findFirst().orElse(null)
-        }
-
-        fun getBlockFace(name: String): BlockFace {
-            return Arrays.stream(BLOCK_FACES).
-            filter{ blockFace: BlockFace -> blockFace.name.equals(name, true) }.findFirst().orElse(null)
-        }
-
-        fun getBlockFace(location: Location): BlockFace {
-            return Arrays.stream(BLOCK_FACES).
-            filter{ blockFace: BlockFace -> blockFace.direction == location.direction }.findFirst().orElse(null)
-        }
-
-        val DUMMY_FLAG_ENTITY = LandFlagEntity(
-            -1,
-            "dummy",
-            "dummy",
-            0,
-            LandFlagType.UNKNOWN,
-            DUMMY_LAND
-        )
-
-
-        val BLOCK_FACES = BlockFace.values()
-
-        val CHUNK_ROTATIONS = ChunkRotation.values()
+fun getChunkRotation(name: String): ChunkRotation? {
+    return CHUNK_ROTATIONS.firstOrNull { chunkRotation:
+                                                  ChunkRotation ->
+        chunkRotation.name.equals(name, true)
     }
 }
 
+fun getBlockFace(name: String): BlockFace? {
+    return BLOCK_FACES.firstOrNull { blockFace -> blockFace.name.equals(name, true) }
+}
+
+fun getBlockFace(location: Location): BlockFace? {
+    return BLOCK_FACES.firstOrNull { blockFace ->  blockFace.direction == location.direction}
+}
+
+val DUMMY_FLAG_ENTITY = LandFlagEntity(
+    -1,
+    "dummy",
+    "dummy",
+    0,
+    LandFlagType.UNKNOWN,
+    DUMMY_LAND
+)
+
+
+val BLOCK_FACES = BlockFace.values()
+
+val CHUNK_ROTATIONS = ChunkRotation.values()
 

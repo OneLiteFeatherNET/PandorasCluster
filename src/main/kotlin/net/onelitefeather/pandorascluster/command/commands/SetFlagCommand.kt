@@ -8,7 +8,7 @@ import cloud.commandframework.annotations.specifier.Quoted
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import net.onelitefeather.pandorascluster.util.Constants
+import net.onelitefeather.pandorascluster.util.DUMMY_FLAG_ENTITY
 import org.bukkit.entity.Player
 
 class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
@@ -29,7 +29,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if(landFlagEntity == Constants.DUMMY_FLAG_ENTITY) {
+        if(landFlagEntity == DUMMY_FLAG_ENTITY) {
             player.sendMessage(miniMessage { "The flag not exists" })
             return
         }

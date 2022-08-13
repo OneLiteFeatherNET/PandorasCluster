@@ -12,13 +12,13 @@ import net.onelitefeather.pandorascluster.listener.LandBlockListener
 import net.onelitefeather.pandorascluster.listener.LandEntityListener
 import net.onelitefeather.pandorascluster.listener.LandPlayerListener
 import net.onelitefeather.pandorascluster.listener.LandWorldListener
-import net.onelitefeather.pandorascluster.util.Constants
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Level
+import net.onelitefeather.pandorascluster.util.CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.getChunkIndex
 
 class LandService(
@@ -95,7 +95,7 @@ class LandService(
     fun findConnectedChunk(player: Player, consumer: Consumer<Land?>) {
         val chunk = player.chunk
         var land: Land? = null
-        for (chunkRotation in Constants.CHUNK_ROTATIONS) {
+        for (chunkRotation in CHUNK_ROTATIONS) {
             val connectedChunk = player.world.getChunkAt(
                 chunk.x + chunkRotation.x,
                 chunk.z + chunkRotation.z
