@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
+import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.service.DatabaseService
@@ -19,10 +20,10 @@ import java.util.logging.Logger
 
 class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : PandorasClusterApi {
 
-    private var databaseService: DatabaseService? = null
-    private var landService: LandService? = null
-    private var databaseStorageService: DatabaseStorageService? = null
-    private var landPlayerService: LandPlayerService? = null
+    private lateinit var databaseService: DatabaseService
+    private lateinit var landService: LandService
+    private lateinit var databaseStorageService: DatabaseStorageService
+    private lateinit var landPlayerService: LandPlayerService
 
     init {
 
@@ -46,7 +47,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getDatabaseStorageService(): DatabaseStorageService {
-        return databaseStorageService!!
+        return databaseStorageService
     }
 
     override fun hasPlayerLand(player: Player): Boolean {
@@ -54,37 +55,31 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun hasPlayerLand(playerId: UUID): Boolean {
-        return landService?.hasPlayerLand(playerId) ?: false
+        return landService.hasPlayerLand(playerId)
     }
 
     override fun isChunkClaimed(chunk: Chunk): Boolean {
-        return landService?.isChunkClaimed(chunk) ?: false
+        return landService.isChunkClaimed(chunk)
     }
 
     override fun getLands(): List<Land> {
-        return landService?.getLands() ?: listOf()
+        return landService.getLands()
     }
 
     override fun getLands(player: Player): List<Land> {
-        val lands: MutableList<Land> = ArrayList()
-        for (landEntry in getLands()) {
-            if (landEntry.owner?.getUniqueId() == player.uniqueId || landEntry.hasAccess(player.uniqueId)) {
-                lands.add(landEntry)
-            }
-        }
-        return lands
+        return getLands().filter { it.owner?.getUniqueId() == player.uniqueId || it.hasAccess(player.uniqueId) }
     }
 
     override fun getLandPlayer(player: Player): LandPlayer? {
-        return landPlayerService?.getLandPlayer(player.uniqueId)
+        return landPlayerService.getLandPlayer(player.uniqueId)
     }
 
     override fun getLandPlayer(uuid: UUID): LandPlayer? {
-        return landPlayerService?.getLandPlayer(uuid)
+        return landPlayerService.getLandPlayer(uuid)
     }
 
     override fun getLandPlayer(name: String): LandPlayer? {
-        return landPlayerService?.getLandPlayer(name)
+        return landPlayerService.getLandPlayer(name)
     }
 
     override fun getSessionFactory(): SessionFactory {
@@ -92,15 +87,15 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getLandPlayerService(): LandPlayerService {
-        return landPlayerService!!
+        return landPlayerService
     }
 
     override fun getDatabaseService(): DatabaseService {
-        return databaseService!!
+        return databaseService
     }
 
     override fun getLandService(): LandService {
-        return landService!!
+        return landService
     }
 
     override fun getLogger(): Logger {
@@ -108,16 +103,16 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun translateLegacyCodes(text: String): Component {
-        return MiniMessage.miniMessage().deserialize(
+        return miniMessage {
             MiniMessage.miniMessage().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text))
-        )
+        }
     }
 
     override fun getLand(chunk: Chunk): Land? {
-        return landService?.getFullLand(chunk)
+        return landService.getFullLand(chunk)
     }
 
     override fun registerPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>) {
-        landPlayerService?.createPlayer(uuid, name, consumer)
+        landPlayerService.createPlayer(uuid, name, consumer)
     }
 }
