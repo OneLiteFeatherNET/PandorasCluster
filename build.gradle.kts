@@ -9,6 +9,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.liquibase.gradle") version "2.1.0"
     id("org.sonarqube") version "3.4.0.2513"
+    jacoco
 }
 
 group = "net.onelitefeather"
@@ -67,11 +68,21 @@ tasks {
     }
 
     test {
+        finalizedBy(rootProject.tasks.jacocoTestReport)
         useJUnitPlatform()
     }
 
     build {
         dependsOn(shadowJar)
+    }
+    jacocoTestReport {
+        dependsOn(rootProject.tasks.test)
+        reports {
+            xml.required.set(true)
+        }
+    }
+    getByName<org.sonarqube.gradle.SonarQubeTask>("sonarqube") {
+        dependsOn(rootProject.tasks.test)
     }
 
     runServer {
