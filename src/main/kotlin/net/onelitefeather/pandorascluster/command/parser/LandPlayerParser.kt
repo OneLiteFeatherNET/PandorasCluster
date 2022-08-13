@@ -13,11 +13,11 @@ class LandPlayerParser(private val pandorasClusterApi: PandorasClusterApi) {
     @Parser(name = "landPlayer", suggestions = "landPlayers")
     fun parseLandPlayer(commandSender: CommandContext<CommandSender>, input: Queue<String>): LandPlayer {
         val name = input.remove()
-        return pandorasClusterApi.getLandPlayer(name) ?: return LandPlayer(UUID.randomUUID(), name)
+        return pandorasClusterApi.getLandPlayer(name) ?: return LandPlayer(null, null, name)
     }
 
     @Suggestions("landPlayers")
     fun landPlayers(commandContext: CommandContext<CommandSender>, input: String): List<String> {
-        return pandorasClusterApi.landPlayerService.players.map { it.name }
+        return pandorasClusterApi.getLandPlayerService().getPlayers().mapNotNull { it.name }
     }
 }
