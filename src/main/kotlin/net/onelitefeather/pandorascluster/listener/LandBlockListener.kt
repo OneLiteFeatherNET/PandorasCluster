@@ -4,7 +4,6 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.util.BLOCK_FACES
 import net.onelitefeather.pandorascluster.util.getBlockFace
 import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.block.BlockFace
