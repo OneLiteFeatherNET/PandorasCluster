@@ -10,16 +10,7 @@ import org.bukkit.World
 
 class LandBuilder() {
 
-    private var landOwner: LandPlayer? = null
-    private var homePosition: HomePosition? = null
-    private var members: List<LandMember>? = null
-    private var chunks: List<ChunkPlaceholder>? = null
-    private var flags: List<LandFlagEntity>? = null
-    private var world: String? = null
-    private var chunkX: Int? = null
-    private var chunkZ: Int? = null
-
-    var land = Land()
+    private var land = Land()
 
     constructor(init: LandBuilder.() -> Unit) : this() {
         init()
