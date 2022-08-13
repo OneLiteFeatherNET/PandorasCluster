@@ -28,13 +28,13 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
     }
 
     fun createPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>) {
-        playerExists(uuid, Consumer { exists: Boolean ->
+        playerExists(uuid) { exists: Boolean ->
             if (java.lang.Boolean.FALSE == exists) {
                 val landPlayer = LandPlayer(null, uuid.toString(), name)
                 updateLandPlayer(landPlayer)
             }
             consumer.accept(!exists)
-        })
+        }
     }
 
     fun deletePlayer(uuid: UUID): Boolean {
