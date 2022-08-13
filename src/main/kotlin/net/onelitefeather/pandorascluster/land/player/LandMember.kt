@@ -3,7 +3,6 @@ package net.onelitefeather.pandorascluster.land.player
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.service.LandPlayerService
 import net.onelitefeather.pandorascluster.util.Constants
 import org.hibernate.Hibernate
 
