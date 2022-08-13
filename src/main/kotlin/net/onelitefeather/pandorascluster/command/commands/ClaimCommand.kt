@@ -18,17 +18,17 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
         val landPlayer = this.pandorasClusterApi.getLandPlayer(player.uniqueId)
         if (landPlayer == null) {
-            player.sendMessage("Could not find your player data.")
+            player.sendMessage(miniMessage { "Could not find your player data." })
             return
         }
 
         val playerChunk = player.chunk
-        if(pandorasClusterApi.isChunkClaimed(playerChunk)) {
-            player.sendMessage("This chunk was already claimed!".toMM())
+        if (pandorasClusterApi.isChunkClaimed(playerChunk)) {
+            player.sendMessage(miniMessage { "This chunk was already claimed!" })
             return
         }
 
-        pandorasClusterApi.getLandService().findConnectedChunk(player, consumer = {
+        pandorasClusterApi.getLandService().findConnectedChunk(player) {
 
             val chunkX = playerChunk.x
             val chunkZ = playerChunk.z
@@ -50,30 +50,29 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
             if(it != null) {
 
                 if (claimedChunk != null) {
-                    val claimedLand = pandorasClusterApi.getLand(claimedChunk!!)
+                    val claimedLand = pandorasClusterApi.getLand(claimedChunk)
                     if (claimedLand != null && !ChunkUtil.hasSameOwner(it, claimedLand)) {
-                        player.sendMessage(Component.text("distance"))
+                        player.sendMessage(miniMessage { "This is not allowed to claim!" })
                         return@findConnectedChunk
                     }
                 }
 
                 if (!it.isOwner(player.uniqueId)) {
-                    player.sendMessage(Component.text("You´re not the Owner from this Land!"))
+                    player.sendMessage(miniMessage { "You´re not the Owner from this Land!" })
                     return@findConnectedChunk
                 }
 
                 this.pandorasClusterApi.getDatabaseStorageService().addChunkPlaceholder(playerChunk, it)
-                player.sendMessage(Component.text("You´ve successfully merged this land!"))
-                player.sendMessage(String.format("DEBUG: Connected with Land X: %d Z: %d", it.x, it.z))
+                player.sendMessage(miniMessage { "You´ve successfully merged this land!" })
             } else {
                 if (pandorasClusterApi.hasPlayerLand(player)) {
-                    player.sendMessage(Component.text("Du besitzt bereits schon ein Land."))
+                    player.sendMessage(miniMessage { "Du besitzt bereits schon ein Land." })
                 } else {
                     pandorasClusterApi.getDatabaseStorageService().createLand(landPlayer, player, playerChunk)
-                    player.sendMessage(Component.text("You´ve successfully claimed this land."))
+                    player.sendMessage(miniMessage { "You´ve successfully claimed this land." })
                 }
             }
 
-        })
+        }
     }
 }
