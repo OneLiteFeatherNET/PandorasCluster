@@ -12,6 +12,7 @@ import net.onelitefeather.pandorascluster.command.commands.*
 import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
 import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
+import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
 import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
@@ -39,6 +40,7 @@ class PandorasClusterPlugin : JavaPlugin() {
 
         buildCommandSystem()
         registerCommands()
+        buildHelpSystem()
     }
 
     private fun registerCommands() {
@@ -58,9 +60,7 @@ class PandorasClusterPlugin : JavaPlugin() {
         paperCommandManager.command(builder.literal("confirm").
         meta(CommandMeta.DESCRIPTION, "Confirm").handler(confirmationManager.createConfirmationExecutionHandler()))
 
-        if (slF4JLogger.isDebugEnabled) {
-            annotationParser.parse(TestCommands(api))
-        }
+
     }
 
     override fun onDisable() {

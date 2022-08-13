@@ -33,55 +33,37 @@ class LandPlayerListener(private val landService: LandService) :
         val player = event.player
         val to = event.to
         val from = event.from
-        var land = landService.getFullLand(to.chunk)
-        if (land == null) {
-            land = landService.getFullLand(from.chunk)
-        }
-        if (land != null) {
-            if (Permission.LAND_ENTRY_DENIED.hasPermission(player)) return
-            if (land.isBanned(player.uniqueId)) {
-                event.to = event.from
-            }
+        val land = landService.getFullLand(to.chunk) ?: landService.getFullLand(from.chunk) ?: return
+        if (Permission.LAND_ENTRY_DENIED.hasPermission(player)) return
+        if (land.isBanned(player.uniqueId)) {
+            event.to = event.from
         }
     }
 
     @Suppress("kotlin:S3776")
     @EventHandler
     fun handlePlayerInteract(event: PlayerInteractEvent) {
-
         val clickedBlock = event.clickedBlock ?: return
-        val player = event.player
-
         val land = landService.getFullLand(clickedBlock.chunk) ?: return
-        if (land.hasAccess(player.uniqueId)) return
+        if (land.hasAccess(event.player.uniqueId)) return
 
         val blockData = clickedBlock.blockData
-        var cancel = false
-
-        if (event.material.isInteractable) {
-            if (Permission.INTERACT_USE.hasPermission(player)) return
-            cancel = true
-        }
-
-        if (blockData is Farmland && event.action == Action.PHYSICAL) {
+        event.isCancelled = if (event.material.isInteractable) {
+            if (Permission.INTERACT_USE.hasPermission(event.player)) return
+            true
+        } else if (blockData is Farmland && event.action == Action.PHYSICAL) {
             val landFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
             if (landFlag.getValue<Boolean>() == true) return
-            if (Permission.INTERACT_FARMLAND.hasPermission(player)) return
-            cancel = true
-        }
-
-        if (clickedBlock.state is Container) {
-            if (Permission.INTERACT_CONTAINERS.hasPermission(player)) return
-            cancel = true
-        }
-
-        if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK && blockData.charges == blockData.maximumCharges) {
+            if (Permission.INTERACT_FARMLAND.hasPermission(event.player)) return
+            true
+        } else if (clickedBlock.state is Container) {
+            if (Permission.INTERACT_CONTAINERS.hasPermission(event.player)) return
+            true
+        } else if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK && blockData.charges == blockData.maximumCharges) {
             val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
             if (landFlag.getValue<Boolean>() == true) return
-            if (Permission.EXPLOSION.hasPermission(player)) return
-            cancel = true
-        }
-
-        event.isCancelled = cancel
+            if (Permission.EXPLOSION.hasPermission(event.player)) return
+            true
+        } else false
     }
 }

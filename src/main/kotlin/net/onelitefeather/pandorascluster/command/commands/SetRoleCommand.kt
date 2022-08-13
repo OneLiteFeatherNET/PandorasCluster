@@ -15,6 +15,8 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
+import net.onelitefeather.pandorascluster.enums.LAND_ROLES
+import net.onelitefeather.pandorascluster.enums.getLandRole
 
 class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
@@ -57,11 +59,11 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
     @Parser(name = "landRole", suggestions = "landRoles")
     fun parseLandRole(commandSender: CommandContext<CommandSender>, input: Queue<String>): LandRole {
-        return LandRole.getLandRole(input.remove()) ?: return LandRole.MEMBER
+        return getLandRole(input.remove()) ?: return LandRole.MEMBER
     }
 
     @Suggestions("landRoles")
     fun landRoles(commandSender: CommandContext<CommandSender>, input: String): List<String> {
-        return LandRole.landRoles.filter { it.isGrantAble() }.map { it.name };
+        return LAND_ROLES.filter { it.isGrantAble() }.map { it.name };
     }
 }

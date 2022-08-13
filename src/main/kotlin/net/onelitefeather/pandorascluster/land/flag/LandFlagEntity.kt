@@ -24,7 +24,7 @@ data class LandFlagEntity(
 ) {
 
     fun <T : Any> getValue(): T? {
-        val result = when(this.type?.toInt()) {
+        val result = when (this.type?.toInt()) {
             0 -> this.value
             1 -> this.value?.toIntOrNull()
             2 -> this.value?.toBooleanStrictOrNull()

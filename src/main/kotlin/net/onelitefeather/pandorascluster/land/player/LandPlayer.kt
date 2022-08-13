@@ -19,14 +19,16 @@ data class LandPlayer(
     val uuid: String? = null,
 
     @Column
-    val name: String? = null) {
+    val name: String? = null
+) {
 
     fun getUniqueId(): UUID? = if (uuid == null) null else UUID.fromString(uuid)
 
     fun getDisplayName(): Component {
         val id = getUniqueId()
-        id ?:  return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
-        val player = Bukkit.getPlayer(id) ?: return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
+        id ?: return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
+        val player =
+            Bukkit.getPlayer(id) ?: return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
         return player.displayName()
     }
 
@@ -35,6 +37,7 @@ data class LandPlayer(
         id ?: return null
         return Bukkit.getPlayer(id)?.location
     }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -50,7 +53,7 @@ data class LandPlayer(
     }
 
     fun isOnline(): Boolean {
-        val playerId = getUniqueId()?: return false
+        val playerId = getUniqueId() ?: return false
         return Bukkit.getPlayer(playerId) != null
     }
 

@@ -48,7 +48,7 @@ class LandBuilder() {
         land = land.copy(z = attributes())
     }
 
-    fun build() : Land {
+    fun build(): Land {
         return land
     }
 }

@@ -14,7 +14,8 @@ data class ChunkPlaceholder(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "land_id")
-    val land: Land? = null) {
+    val land: Land? = null
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

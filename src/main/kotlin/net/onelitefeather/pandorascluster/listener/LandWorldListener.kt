@@ -15,7 +15,7 @@ class LandWorldListener(private val landService: LandService) : Listener {
     fun handleLeavesDecay(event: LeavesDecayEvent) {
         val land: Land = landService.getFullLand(event.block.chunk) ?: return
         val landFlag = landService.getLandFlag(LandFlag.LEAVES_DECAY, land)?: return
-        if (landFlag.getValue()!!) return
+        if (landFlag.getValue<Boolean>() == false) return
         event.isCancelled = true
     }
 
@@ -26,45 +26,44 @@ class LandWorldListener(private val landService: LandService) : Listener {
         val blocks = event.blocks
         if (blocks.isEmpty()) return
 
-        var location = blocks[0].location
-        val area = landService.getFullLand(location.chunk)
+        val originChunk = blocks.first().chunk
+        val area = landService.getFullLand(originChunk)
 
         if (area == null) {
-            for (i in blocks.indices.reversed()) {
-                location = blocks[i].location
-                if (landService.getFullLand(location.chunk) == null) {
-                    blocks.removeAt(i)
+            blocks.reversed().forEachIndexed index@{ index, blockState ->
+                val chunk = blockState.chunk
+                if (landService.getFullLand(chunk) == null) {
+                    blocks.removeAt(index)
                 }
             }
             return
         } else {
-            val origin = landService.getFullLand(location.chunk)
+            val origin = landService.getFullLand(originChunk)
             if (origin == null) {
                 event.isCancelled = true
                 return
             }
-            for (i in blocks.indices.reversed()) {
-                location = blocks[i].location
-                if (landService.getFullLand(location.chunk) == null) {
-                    blocks.removeAt(i)
-                    continue
+            blocks.reversed().forEachIndexed index@ { index, blockState ->
+                val chunk = blockState.chunk
+                if (landService.getFullLand(chunk) == null) {
+                    blocks.removeAt(index)
+                    return@index
                 }
-                val plot = landService.getFullLand(location.chunk)
+                val plot = landService.getFullLand(chunk)
                 if (plot != origin) {
-                    event.blocks.removeAt(i)
+                    event.blocks.removeAt(index)
                 }
             }
         }
-        val origin = landService.getFullLand(location.chunk)
+        val origin = landService.getFullLand(originChunk)
         if (origin == null) {
             event.isCancelled = true
             return
         }
-        for (i in blocks.indices.reversed()) {
-            location = blocks[i].location
-            val land = landService.getFullLand(location.chunk)
+        blocks.reversed().forEachIndexed { index, blockState ->
+            val land = landService.getFullLand(blockState.chunk)
             if (land != null && land != origin && !land.isMerged() && !origin.isMerged()) {
-                event.blocks.removeAt(i)
+                event.blocks.removeAt(index)
             }
         }
     }

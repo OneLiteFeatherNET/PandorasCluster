@@ -65,7 +65,7 @@ fun PandorasClusterPlugin.buildCommandSystem() {
         }
 
     annotationParser = AnnotationParser(
-        paperCommandManager as PaperCommandManager<CommandSender>,
+        paperCommandManager,
         CommandSender::class.java, commandMetaFunction
     )
 }
@@ -73,7 +73,7 @@ fun PandorasClusterPlugin.buildCommandSystem() {
 fun PandorasClusterPlugin.buildHelpSystem() {
     minecraftHelp = MinecraftHelp.createNative(
         "/pandorascluster help",
-        paperCommandManager as PaperCommandManager<CommandSender>
+        paperCommandManager
     )
 
     minecraftHelp.helpColors = MinecraftHelp.HelpColors.of(

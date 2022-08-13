@@ -4,8 +4,8 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.util.ChunkUtil
 import net.onelitefeather.pandorascluster.util.Constants
+import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -60,7 +60,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
         val toBlock = event.toBlock
         val blockChunk = landService.getFullLand(block.chunk)
         val toBlockChunk = landService.getFullLand(toBlock.chunk)
-        if (blockChunk != null && toBlockChunk != null && !ChunkUtil.hasSameOwner(blockChunk, toBlockChunk)) {
+        if (blockChunk != null && toBlockChunk != null && !hasSameOwner(blockChunk, toBlockChunk)) {
             event.isCancelled = true
         }
     }
@@ -85,7 +85,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
             for (currentBlock in event.blocks) {
                 val location1 = currentBlock.location.add(blockFace.direction)
                 val currentLand = landService.getFullLand(location1.chunk)
-                if (currentLand != null && !ChunkUtil.hasSameOwner(land, currentLand)) {
+                if (currentLand != null && !hasSameOwner(land, currentLand)) {
                     event.isCancelled = true
                 }
             }
@@ -102,7 +102,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
             for (currentBlock in event.blocks) {
                 val currentBlockLocation = currentBlock.location.add(blockFace.direction)
                 val currentLand = landService.getFullLand(currentBlockLocation.chunk)
-                if (currentLand != null && !ChunkUtil.hasSameOwner(land, currentLand)) {
+                if (currentLand != null && !hasSameOwner(land, currentLand)) {
                     event.isCancelled = true
                 }
             }
@@ -116,7 +116,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
         val sourceChunk = landService.getFullLand(source.chunk)
         val blockStateChunk = landService.getFullLand(blockState.chunk)
         if (sourceChunk != null && blockStateChunk != null) {
-            event.isCancelled = !ChunkUtil.hasSameOwner(sourceChunk, blockStateChunk)
+            event.isCancelled = !hasSameOwner(sourceChunk, blockStateChunk)
         }
     }
 
@@ -129,7 +129,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
             val blockFace = Constants.getBlockFace(block.location)
             val faceLocation = blockState.location.subtract(blockFace.direction)
             val blockFaceLand = landService.getFullLand(faceLocation.chunk)
-            if (blockFaceLand != null && !ChunkUtil.hasSameOwner(blockFaceLand, land)) {
+            if (blockFaceLand != null && !hasSameOwner(blockFaceLand, land)) {
                 event.isCancelled = true
             }
         }

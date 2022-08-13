@@ -38,14 +38,15 @@ data class Land(
     val x: Int = -1,
 
     @Column
-    val z: Int = -1) {
+    val z: Int = -1
+) {
 
     fun isOwner(uniqueId: UUID): Boolean {
         return owner?.getUniqueId() == uniqueId
     }
 
     fun getLandFlag(landFlag: LandFlag): LandFlagEntity? =
-        flags.firstOrNull { landFlagEntity -> landFlagEntity.name.uppercase() == landFlag.name.uppercase() }
+        flags.firstOrNull { landFlagEntity -> landFlagEntity.name?.uppercase() == landFlag.name.uppercase() }
 
     fun getMergedChunk(chunkIndex: Long): ChunkPlaceholder? =
         chunks.firstOrNull { chunkPlaceholder -> chunkPlaceholder.chunkIndex == chunkIndex }
@@ -55,9 +56,7 @@ data class Land(
 
     fun hasAccess(uuid: UUID): Boolean {
         if (owner?.getUniqueId() == uuid) return true
-        val landMember: LandMember = getLandMember(uuid) ?: return false
-
-        val role = landMember.role
+        val role = getLandMember(uuid)?.role ?: return false
         return role.access || role == LandRole.MEMBER && owner?.isOnline() == true
     }
 
@@ -82,5 +81,6 @@ data class Land(
         val member = getLandMember(uniqueId) ?: return false
         return member.role == LandRole.BANNED
     }
+
     fun isMerged() = chunks.isNotEmpty()
 }

@@ -30,12 +30,8 @@ enum class LandFlag(val flagName: String,
     MOB_GRIEFING("mob-griefing", true, LandFlagType.ENTITY, 2),
     ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
     BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2);
-
-    companion object {
-
-        @JvmStatic
-        var landFlags = values()
-        fun findByName(name: String): LandFlag? =
-            landFlags.firstOrNull { landFlag -> landFlag.name == name.uppercase()  }
-    }
 }
+
+val LAND_FLAGS = LandFlag.values()
+fun findByName(name: String): LandFlag? =
+    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase()  }
