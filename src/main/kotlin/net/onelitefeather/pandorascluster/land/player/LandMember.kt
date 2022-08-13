@@ -3,7 +3,7 @@ package net.onelitefeather.pandorascluster.land.player
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.util.Constants
+import net.onelitefeather.pandorascluster.util.DUMMY_LAND
 import org.hibernate.Hibernate
 
 @Entity
@@ -21,7 +21,7 @@ data class LandMember(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "land_id")
-    val land: Land = Constants.DUMMY_LAND
+    val land: Land = DUMMY_LAND
 
 ) {
     override fun equals(other: Any?): Boolean {
