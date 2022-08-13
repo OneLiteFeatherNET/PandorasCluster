@@ -8,9 +8,6 @@ import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import net.onelitefeather.pandorascluster.util.ChunkUtil
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
@@ -20,10 +17,8 @@ import org.bukkit.event.block.EntityBlockFormEvent
 import org.bukkit.event.entity.*
 import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.vehicle.*
-import org.bukkit.inventory.ItemStack
 import org.bukkit.permissions.Permissible
 import org.bukkit.projectiles.ProjectileSource
-import org.jetbrains.annotations.NotNull
 import org.spigotmc.event.entity.EntityMountEvent
 
 class LandEntityListener(private val landService: LandService) :
@@ -39,23 +34,21 @@ class LandEntityListener(private val landService: LandService) :
             shooter = entity.shooter
         }
 
-
-
-
         val land: Land?
         val hitEntity = event.hitEntity
         if (hitEntity != null) {
 
-            if(hitEntity == shooter) return
-            land = landService.getFullLand(hitEntity.chunk)?: return
+            land = landService.getFullLand(hitEntity.chunk) ?: return
+            if (shooter is Entity && land.hasAccess(shooter.uniqueId)) return
+
             val cancel = if (hitEntity !is Player) {
                 val flag = landService.getLandFlag(LandFlag.PVE, land) ?: return
                 val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && shooter.hasPermission(Permission.PVE) || !value
+                shooter is Permissible && shooter.hasPermission(Permission.PVE) || !value || shooter is Entity
             } else {
                 val flag = landService.getLandFlag(LandFlag.PVP, land) ?: return
                 val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && shooter.hasPermission(Permission.PVP) || !value
+                shooter is Permissible && shooter.hasPermission(Permission.PVP) || !value || shooter is Entity
             }
 
             event.isCancelled = cancel
@@ -64,18 +57,8 @@ class LandEntityListener(private val landService: LandService) :
 
         val hitBlock = event.hitBlock
         if (hitBlock != null) {
-
-            land = landService.getFullLand(hitBlock.chunk)?: return
-
-            val blockData = hitBlock.blockData
-            var cancel = false
-
-            if (blockData is Powerable) {
-                val landFlag = landService.getLandFlag(LandFlag.REDSTONE, land) ?: return
-                cancel = !landFlag.getValue<Boolean>()!!
-            }
-
-            event.isCancelled = cancel
+            land = landService.getFullLand(hitBlock.chunk) ?: return
+            event.isCancelled = shooter is Entity && !land.hasAccess(shooter.uniqueId)
         }
     }
 
@@ -84,8 +67,10 @@ class LandEntityListener(private val landService: LandService) :
         val target = event.entity
         val attacker = event.damager
         var land = landService.getFullLand(target.chunk)
+
         if (land == null) land = landService.getFullLand(attacker.chunk)
         if (land == null) return
+        if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
 
         var cancel = false;
 
@@ -146,29 +131,28 @@ class LandEntityListener(private val landService: LandService) :
         if (target != null && land == null) {
             land = landService.getFullLand(target.chunk)
         }
+
         if (land == null) return
         val landFlag = landService.getLandFlag(LandFlag.PVE, land)
         if (landFlag != null && landFlag.getValue()!!) return
+
         event.isCancelled = true
     }
 
     @EventHandler
     fun handleEntityInteract(event: EntityInteractEvent) {
-        val entity = event.entity
         val block = event.block
         val land = landService.getFullLand(block.chunk) ?: return
         val blockData = block.blockData
         val farmLandDestroyFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
-        val redstoneFlag = landService.getLandFlag(LandFlag.REDSTONE, land) ?: return
-        if (blockData is Farmland && !farmLandDestroyFlag.getValue<Boolean>()!! ||
-            blockData is Powerable && !redstoneFlag.getValue<Boolean>()!!
-        ) {
+        if (blockData is Farmland && !farmLandDestroyFlag.getValue<Boolean>()!!) {
             event.isCancelled = true
         }
     }
 
     @EventHandler
     fun handleHangingBreak(event: HangingBreakEvent) {
+        if (event.cause == HangingBreakEvent.RemoveCause.ENTITY) return
         val entity = event.entity
         val land = landService.getFullLand(entity.chunk) ?: return
         val landFlag = landService.getLandFlag(LandFlag.HANGING_BREAK, land) ?: return
@@ -261,9 +245,7 @@ class LandEntityListener(private val landService: LandService) :
     fun handleVehicleMovement(event: VehicleMoveEvent) {
         val vehicle = event.vehicle
         val to = event.to
-        val from = event.from
         val toLand = landService.getFullLand(to.chunk)
-        val fromLand = landService.getFullLand(from.chunk)
         if (toLand != null) {
             for (entity in vehicle.passengers) {
                 if (toLand.isBanned(entity.uniqueId)) {
@@ -271,11 +253,12 @@ class LandEntityListener(private val landService: LandService) :
                 }
             }
         }
-        if (fromLand != null) {
-            removeVehicle(vehicle, if (toLand != null && !ChunkUtil.hasSameOwner(toLand, fromLand)) to else from)
+
+        if (toLand == null) {
+            vehicle.remove()
         }
     }
-
+    @Suppress("kotlin:S3776")
     @EventHandler(priority = EventPriority.HIGHEST)
     fun handlePotionSplash(event: ProjectileLaunchEvent) {
 
@@ -290,7 +273,7 @@ class LandEntityListener(private val landService: LandService) :
                 if (land != null) {
 
                     val landFlag = landService.getLandFlag(LandFlag.POTION_SPLASH, land) ?: return
-                    if (landFlag.getValue()!!) return
+                    if (landFlag.getValue<Boolean>() == true) return
 
                     if (land.hasAccess(projectile.uniqueId)) return
                     if (Permission.POTION_SPLASH.hasPermission(projectile)) return
@@ -335,37 +318,5 @@ class LandEntityListener(private val landService: LandService) :
             if (Permission.VEHICLE_ENTER.hasPermission(entered)) return
             event.isCancelled = true
         }
-    }
-
-    private fun removeVehicle(vehicle: @NotNull Vehicle, location: @NotNull Location) {
-        val passengers = vehicle.passengers
-
-        var cancelDrop = false
-        if (passengers.isNotEmpty()) {
-            for (i in passengers.indices.reversed()) {
-                val passenger = passengers[i]
-                if (passenger is Player) {
-                    if (passenger.gameMode == GameMode.CREATIVE) {
-                        cancelDrop = true
-                    }
-                }
-            }
-        }
-
-        if (!cancelDrop) {
-
-            var dropItem: ItemStack? = null
-            if (vehicle is Minecart) {
-                dropItem = ItemStack(vehicle.minecartMaterial)
-            } else if (vehicle is Boat) {
-                dropItem = ItemStack(vehicle.boatType.material)
-            }
-
-            if (dropItem != null) {
-                location.world.dropItemNaturally(location, dropItem)
-            }
-        }
-
-        vehicle.remove()
     }
 }
