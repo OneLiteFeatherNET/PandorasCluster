@@ -8,10 +8,9 @@ import cloud.commandframework.annotations.parsers.Parser
 import cloud.commandframework.annotations.specifier.Greedy
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.LandRole
+import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
