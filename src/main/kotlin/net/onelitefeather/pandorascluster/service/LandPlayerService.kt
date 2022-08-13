@@ -49,8 +49,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             if (transaction != null) {
                 transaction!!.rollback()
-                pandorasClusterApi.getLogger()
-                    .log(Level.SEVERE, String.format("Could not delete player data for %s", uuid), e)
+                pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
             }
         }
         return true
@@ -68,8 +67,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
                 return chunkPlayerQuery.uniqueResult()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.getLogger()
-                .log(Level.SEVERE, String.format("Could not load player data for %s", uuid), e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
         }
         return null
     }
@@ -86,8 +84,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
                 exists = chunkPlayerQuery.uniqueResult() != null
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.getLogger()
-                .log(Level.SEVERE, String.format("Could not load player data for %s", uuid), e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
         }
         consumer.accept(exists)
     }
@@ -100,8 +97,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
                 session.transaction.commit()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.getLogger()
-                .log(Level.SEVERE, String.format("Could not update player data %s", chunkPlayer.getUniqueId()), e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
         }
     }
 
@@ -117,10 +113,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
                 return chunkPlayerQuery.uniqueResult()
             }
         } catch (e: HibernateException) {
-            pandorasClusterApi.getLogger()
-                .log(Level.SEVERE, String.format("Could not load player data for %s", name), e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
         }
         return null
     }
-
 }
+
+private const val couldNotLoadPlayerData = "Could not load player data"
