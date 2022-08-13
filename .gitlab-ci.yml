@@ -8,5 +8,5 @@ include:
 
 variables:
   JAR_FILE: "PandorasCluster.jar"
-    BUCKET: "olf-dev"
+  BUCKET: "olf-dev"
   TEMPLATE: "default"
