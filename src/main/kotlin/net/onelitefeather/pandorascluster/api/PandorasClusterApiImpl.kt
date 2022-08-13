@@ -6,7 +6,10 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.service.*
+import net.onelitefeather.pandorascluster.service.DatabaseService
+import net.onelitefeather.pandorascluster.service.DatabaseStorageService
+import net.onelitefeather.pandorascluster.service.LandPlayerService
+import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
@@ -22,17 +25,20 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private var landPlayerService: LandPlayerService? = null
 
     init {
-        val config = plugin.config
-        val jdbcUrl =
-            config.getString("database.jdbcUrl", "'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'")!!
-        val databaseDriver = config.getString("database.driver", "org.mariadb.jdbc.Driver")!!
-        val username = config.getString("database.username", "root")!!
-        val password = config.getString("database.password", "%Schueler90")!!
 
-        databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
-        databaseStorageService = DatabaseStorageService(this)
-        landService = LandService(databaseStorageService!!, this)
-        landPlayerService = LandPlayerService(this)
+        val jdbcUrl = plugin.config.getString("database.jdbcUrl")
+        val databaseDriver = plugin.config.getString("database.driver")
+        val username = plugin.config.getString("database.username")
+        val password = plugin.config.getString("database.password")
+
+        if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
+            databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
+            databaseStorageService = DatabaseStorageService(this)
+            landService = LandService(databaseStorageService, this)
+            landPlayerService = LandPlayerService(this)
+        } else {
+            this.plugin.server.pluginManager.disablePlugin(plugin)
+        }
     }
 
     override fun getPlugin(): PandorasClusterPlugin {
