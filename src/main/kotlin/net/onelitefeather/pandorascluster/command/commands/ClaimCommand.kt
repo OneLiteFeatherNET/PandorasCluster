@@ -9,6 +9,7 @@ import net.onelitefeather.pandorascluster.util.ChunkUtil
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 
+@Suppress("kotlin:S3776")
 class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
     @CommandMethod("land claim")
