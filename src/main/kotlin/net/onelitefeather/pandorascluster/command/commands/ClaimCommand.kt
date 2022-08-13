@@ -2,9 +2,8 @@ package net.onelitefeather.pandorascluster.command.commands
 
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
-import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.toMM
+import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.util.ChunkUtil
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
