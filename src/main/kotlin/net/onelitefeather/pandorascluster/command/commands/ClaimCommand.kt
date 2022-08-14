@@ -22,6 +22,11 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         val playerChunk = player.chunk
+        if (pandorasClusterApi.getLandService().checkWorldGuardRegion(playerChunk)) {
+            player.sendMessage(miniMessage { "This chunk is not available" })
+            return
+        }
+
         if (pandorasClusterApi.isChunkClaimed(playerChunk)) {
             player.sendMessage(miniMessage { "This chunk was already claimed!" })
             return
@@ -33,7 +38,6 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
             val chunkZ = playerChunk.z
             var claimedChunk: Chunk? = null
 
-
             for (x in -2..2) {
                 for (z in -2..2) {
                     if (claimedChunk != null) continue
@@ -44,7 +48,7 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
                 }
             }
 
-            if(it != null) {
+            if (it != null) {
 
                 if (claimedChunk != null) {
                     val claimedLand = pandorasClusterApi.getLand(claimedChunk)

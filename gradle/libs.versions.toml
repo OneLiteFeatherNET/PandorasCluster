@@ -26,6 +26,9 @@ redisson = "3.17.3"
 liquibaseCore = "3.4.1"
 liquibaseHibernate5 = "4.9.1"
 
+# FAWE
+fawe = "2.4.1"
+
 
 [libraries]
 
@@ -57,6 +60,11 @@ redisson = { group = "org.redisson", name = "redisson", version.ref = "redisson"
 liquibaseCore = { group = "org.liquibase", name = "liquibase-core", version.ref = "liquibaseCore" }
 liquibaseHibernate5 = { group = "org.liquibase.ext", name = "liquibase-hibernate5", version.ref = "liquibaseHibernate5" }
 
+# FAWE
+fawe = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Bukkit", version.ref = "fawe"}
+faweCore = { group = "com.fastasyncworldedit", name = "FastAsyncWorldEdit-Core" , version.ref = "fawe"}
+
+
 [bundles]
 
 cloudnet = ["cloudnetPerms", "cloudnetBridge", "cloudnetDriver"]
@@ -65,6 +73,7 @@ adventure = ["adventureApi", "adventureMinimessage", "adventureSerializerPlain"]
 cloud = ["cloudPaper", "cloudAnnotions", "cloudMinecraftExtras"]
 hibernate = ["hibernate", "hibernateHikariCP", "mariadbJavaClient", "hibernateEnvers"]
 liquibase = ["liquibaseCore", "liquibaseHibernate5"]
+fawe = ["fawe", "faweCore"]
 
 [plugins]
 
