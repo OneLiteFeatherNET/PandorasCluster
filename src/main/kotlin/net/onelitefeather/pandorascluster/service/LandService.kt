@@ -1,5 +1,9 @@
 package net.onelitefeather.pandorascluster.service
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter
+import com.sk89q.worldedit.math.BlockVector3
+import com.sk89q.worldguard.WorldGuard
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
@@ -12,14 +16,16 @@ import net.onelitefeather.pandorascluster.listener.LandBlockListener
 import net.onelitefeather.pandorascluster.listener.LandEntityListener
 import net.onelitefeather.pandorascluster.listener.LandPlayerListener
 import net.onelitefeather.pandorascluster.listener.LandWorldListener
+import net.onelitefeather.pandorascluster.util.CHUNK_ROTATIONS
+import net.onelitefeather.pandorascluster.util.getChunkIndex
 import org.bukkit.Chunk
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Level
-import net.onelitefeather.pandorascluster.util.CHUNK_ROTATIONS
-import net.onelitefeather.pandorascluster.util.getChunkIndex
+
 
 class LandService(
     private val pandorasClusterApi: PandorasClusterApi
@@ -193,6 +199,24 @@ class LandService(
         }
 
         return null
+    }
+
+    fun checkWorldGuardRegion(chunk: Chunk, location: Location): Boolean {
+
+        val world = BukkitAdapter.adapt(chunk.world)
+        val minChunkX = chunk.x shl 4
+        val minChunkZ = chunk.z shl 4
+        val maxChunkX = minChunkX + 15
+        val maxChunkZ = minChunkZ + 15
+
+        val regionManager = WorldGuard.getInstance().platform.regionContainer.get(world)
+        val region = ProtectedCuboidRegion(
+            "check_wg_overlaps",
+            BlockVector3.at(minChunkX, 0, minChunkZ),
+            BlockVector3.at(maxChunkX, chunk.world.maxHeight, maxChunkZ))
+
+        val regions = regionManager?.regions?.values
+        return region.getIntersectingRegions(regions).isNotEmpty()
     }
 }
 
