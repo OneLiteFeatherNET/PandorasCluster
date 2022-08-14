@@ -45,19 +45,26 @@ data class HomePosition(
         this::class.simpleName +
                 "(id = $id , posX = $posX , posY = $posY , posZ = $posZ , " +
                 "yaw = $yaw , pitch = $pitch)"
-}
 
-fun fromHomePosition(world: World, homePosition: HomePosition): Location {
-    return Location(
-        world,
-        homePosition.posX,
-        homePosition.posY,
-        homePosition.posZ,
-        homePosition.yaw,
-        homePosition.pitch
-    )
-}
-fun toHomePosition(location: Location): HomePosition =
-    HomePosition(null, location.x, location.y, location.z, location.yaw, location.pitch)
+    companion object {
 
-fun dummyHomePosition(): HomePosition = toHomePosition(Bukkit.getWorlds()[0].spawnLocation)
+        @JvmStatic
+        fun fromHomePosition(world: World, homePosition: HomePosition): Location {
+            return Location(
+                world,
+                homePosition.posX,
+                homePosition.posY,
+                homePosition.posZ,
+                homePosition.yaw,
+                homePosition.pitch
+            )
+        }
+
+        @JvmStatic
+        fun of(location: Location): HomePosition =
+            HomePosition(null, location.x, location.y, location.z, location.yaw, location.pitch)
+
+        @JvmStatic
+        fun dummyLocation(): HomePosition = of(Bukkit.getWorlds()[0].spawnLocation)
+    }
+}

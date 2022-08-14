@@ -9,16 +9,14 @@ import cloud.commandframework.annotations.specifier.Greedy
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.LAND_ROLES
 import net.onelitefeather.pandorascluster.enums.LandRole
-import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.enums.getLandRole
-import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
+import net.onelitefeather.pandorascluster.enums.LAND_ROLES
+import net.onelitefeather.pandorascluster.enums.getLandRole
 
 class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
@@ -30,57 +28,38 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
         @Argument("player", parserName = "landPlayer") landPlayer: LandPlayer,
         @Greedy @Argument("role", parserName = "landRole") landRole: LandRole
     ) {
-        val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
-        val targetPlayerId = landPlayer.getUniqueId()
 
-        if (land == null) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
-            return
-        }
+        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
+        val playerId = landPlayer.getUniqueId()
 
-        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_ROLE)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
-            return
-        }
-
-        val targetName = landPlayer.name ?: "not found"
-        if (targetPlayerId == null) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, targetName)) })
+        if (land == null || playerId == null) {
+            player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 
         if (!landRole.isGrantAble()) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-role.role-not.grantable", *arrayOf(pluginPrefix, landRole.display)) })
+            player.sendMessage(miniMessage { "Die Rolle ${landRole.name} ist nicht vergebbar" })
             return
         }
 
-        if (land.isOwner(targetPlayerId)) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-role.cannot-change-the-land-owner", *arrayOf(pluginPrefix)) })
+        if (land.isOwner(playerId)) {
+            player.sendMessage(
+                miniMessage { "Die Rolle des Land Besitzers kann nicht geändert werden." }
+            )
             return
         }
 
-        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
-            if(landRole != LandRole.VISITOR) {
-                pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
-                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, targetName, landRole.display)) })
-            } else {
-
-                val member = land.getLandMember(targetPlayerId)
-                if(member == null) {
-                    player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.not-found", *arrayOf(pluginPrefix, targetName)) })
-                    return
-                }
-
-                pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
-                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.success", *arrayOf(pluginPrefix, targetName)) })
-            }
+        if (land.isOwner(player.uniqueId)) {
+            pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
+            player.sendMessage(
+                miniMessage { "Der Spieler ${landPlayer.name} hat nun die Rolle ${landRole.name} auf deinem Land" }
+            )
         }
     }
 
     @Parser(name = "landRole", suggestions = "landRoles")
     fun parseLandRole(commandSender: CommandContext<CommandSender>, input: Queue<String>): LandRole {
-        return getLandRole(input.remove()) ?: return LandRole.VISITOR
+        return getLandRole(input.remove()) ?: return LandRole.MEMBER
     }
 
     @Suggestions("landRoles")

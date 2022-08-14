@@ -27,7 +27,7 @@ liquibaseCore = "3.4.1"
 liquibaseHibernate5 = "4.9.1"
 
 # FAWE
-fawe = "2.4.7"
+fawe = "2.4.1"
 
 
 [libraries]

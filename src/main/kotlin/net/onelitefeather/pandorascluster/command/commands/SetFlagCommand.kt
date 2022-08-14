@@ -6,47 +6,35 @@ import cloud.commandframework.annotations.CommandPermission
 import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.extensions.miniMessage
-import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.land.flag.isValidValue
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
+import net.onelitefeather.pandorascluster.util.DUMMY_FLAG_ENTITY
 import org.bukkit.entity.Player
 
 class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
+
 
     @CommandMethod("land flag set <flag> <value>")
     @CommandPermission("pandorascluster.command.land.flag.set")
     @Confirmation
     fun execute(
         player: Player,
-        @Argument("flag", parserName = "landFlag") landFlag: LandFlag,
-        @Argument(value = "value", suggestions = "flag_values") @Quoted value: String
+        @Argument("flag", parserName = "landFlag") landFlagEntity: LandFlagEntity,
+        @Argument(value = "value") @Quoted value: String
     ) {
-        val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
+
+        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 
-        if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_FLAG)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+        if(landFlagEntity == DUMMY_FLAG_ENTITY) {
+            player.sendMessage(miniMessage { "The flag not exists" })
             return
         }
 
-        if(!isValidValue(landFlag, value)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n(
-                "command.set-flag.invalid-value", *arrayOf(pluginPrefix, value, landFlag)) } )
-            return
-        }
-
-        pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.set-flag.success",
-                *arrayOf(pluginPrefix, landFlag.name, value)
-            )
-        })
+        pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlagEntity.copy(value = value))
+        player.sendMessage(miniMessage { "New value $value" })
     }
 }

@@ -11,14 +11,12 @@ import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.*
 
 class TestLandEntityListener {
 
 
-    @Disabled
     @Test
     fun `test execute`() {
         val pandorasClusterApi = mockk<PandorasClusterApi>()

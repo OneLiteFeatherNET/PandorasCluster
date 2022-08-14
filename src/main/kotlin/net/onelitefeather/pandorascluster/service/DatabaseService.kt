@@ -1,14 +1,11 @@
 package net.onelitefeather.pandorascluster.service
 
-import io.sentry.Sentry
-import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
-import org.bukkit.Bukkit
 import org.hibernate.SessionFactory
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder
@@ -20,14 +17,13 @@ import org.hibernate.tool.schema.Action
 import java.util.*
 
 class DatabaseService(
-    pandorasClusterPlugin: PandorasClusterPlugin,
     jdbcUrl: String,
     username: String,
     password: String,
     driver: String
 ) {
 
-    lateinit var sessionFactory: SessionFactory
+    var sessionFactory: SessionFactory
 
     init {
         val configuration = Configuration()
@@ -39,7 +35,8 @@ class DatabaseService(
         properties[Environment.IMPLICIT_NAMING_STRATEGY] = ImplicitNamingStrategyLegacyJpaImpl::class.java
         properties[Environment.CONNECTION_PROVIDER] = HikariCPConnectionProvider::class.java
         properties[Environment.DIALECT] = MariaDBDialect()
-        properties[Environment.HBM2DDL_AUTO] = Action.UPDATE.name.lowercase()
+        properties[Environment.HBM2DDL_AUTO] = Action.UPDATE
+        //        properties.put(Environment.SHOW_SQL, true);
 
         configuration.properties = properties
         configuration.addAnnotatedClass(Land::class.java)
@@ -49,17 +46,10 @@ class DatabaseService(
         configuration.addAnnotatedClass(HomePosition::class.java)
         configuration.addAnnotatedClass(ChunkPlaceholder::class.java)
         val registry = StandardServiceRegistryBuilder().applySettings(configuration.properties).build()
-        try {
-            sessionFactory = configuration.buildSessionFactory(registry)
-        } catch (e: Exception) {
-            Sentry.captureException(e)
-            Bukkit.getPluginManager().disablePlugin(pandorasClusterPlugin)
-        }
+        sessionFactory = configuration.buildSessionFactory(registry)
     }
 
     fun shutdown() {
         sessionFactory.close()
     }
-
-    fun isRunning() =  this::sessionFactory.isInitialized && sessionFactory.isOpen
 }

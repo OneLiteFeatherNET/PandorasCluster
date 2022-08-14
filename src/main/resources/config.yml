@@ -1,33 +1,6 @@
-zombie-velocity-multiplier: 0.4
-
-trusted-particle: REDSTONE
-untrusted-particle: FLAME
-particle-data:
-  trusted-speed: 1
-  untrusted-speed: 0
-  radius: 64
-  offX: 0
-  offY: 0
-  offZ: 0
-  trusted-particle-data:
-    red: 85
-    green: 255
-    blue: 85
-    size: 2.5
-    material: AIR
-  untrusted-particle-data:
-    red: 170
-    green: 0
-    blue: 0
-    size: 2.5
-    material: AIR
-
-
-tasks:
-  show-border-multiplier: 1
 database:
-  jdbcUrl: 'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'
-  username: 'pandorascluster'
-  password: 'CoTayoC4wIbu'
+  jdbcUrl: 'jdbc:mariadb://localhost:3307/pandorascluster?useSSL=false'
+  username: 'root'
+  password: '%Schueler90'
   driver: 'org.mariadb.jdbc.Driver'
   dialect: 'org.hibernate.dialect.MariaDBDialect'

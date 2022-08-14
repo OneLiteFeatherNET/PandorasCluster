@@ -3,7 +3,6 @@ package net.onelitefeather.pandorascluster.api
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
@@ -15,8 +14,8 @@ import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
-import java.text.MessageFormat
 import java.util.*
+import java.util.function.Consumer
 import java.util.logging.Logger
 
 class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : PandorasClusterApi {
@@ -25,7 +24,6 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private lateinit var landService: LandService
     private lateinit var databaseStorageService: DatabaseStorageService
     private lateinit var landPlayerService: LandPlayerService
-    private var messages: ResourceBundle
 
     init {
 
@@ -34,26 +32,14 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         val username = plugin.config.getString("database.username")
         val password = plugin.config.getString("database.password")
 
-        messages = ResourceBundle.getBundle("pandorascluster", Locale.US, UTF8ResourceBundleControl())
-
         if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
-            databaseService = DatabaseService(plugin, jdbcUrl, username, password, databaseDriver)
-            if(databaseService.isRunning()) {
-                databaseStorageService = DatabaseStorageService(this)
-                landService = LandService(this)
-                landPlayerService = LandPlayerService(this)
-            }
+            databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
+            databaseStorageService = DatabaseStorageService(this)
+            landService = LandService(this)
+            landPlayerService = LandPlayerService(this)
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
         }
-    }
-
-    override fun i18n(key: String, vararg objects: Any): String {
-        return MessageFormat(messages.getString(key)).format(objects)
-    }
-
-    override fun pluginPrefix(): String {
-        return messages.getString("prefix")
     }
 
     override fun getPlugin(): PandorasClusterPlugin {
@@ -85,7 +71,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getLandPlayer(player: Player): LandPlayer? {
-        return getLandPlayer(player.uniqueId)
+        return landPlayerService.getLandPlayer(player.uniqueId)
     }
 
     override fun getLandPlayer(uuid: UUID): LandPlayer? {
@@ -126,11 +112,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         return landService.getFullLand(chunk)
     }
 
-    override fun getLand(landOwner: LandPlayer): Land? {
-        return landService.getLand(landOwner)
-    }
-
-    override fun registerPlayer(uuid: UUID, name: String): Boolean {
-        return landPlayerService.createPlayer(uuid, name)
+    override fun registerPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>) {
+        landPlayerService.createPlayer(uuid, name, consumer)
     }
 }
