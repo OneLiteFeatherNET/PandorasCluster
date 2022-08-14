@@ -22,6 +22,7 @@ repositories {
     maven("https://libraries.minecraft.net")
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://jitpack.io")
+    maven("https://maven.enginehub.org/repo/")
 }
 
 dependencies {
@@ -42,6 +43,14 @@ dependencies {
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
+
+    //WorldGuard
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+    compileOnly(libs.faweCore)
+    compileOnly(libs.fawe) {
+        isTransitive = false
+    }
+
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
