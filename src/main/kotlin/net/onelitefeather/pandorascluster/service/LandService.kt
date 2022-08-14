@@ -19,7 +19,6 @@ import net.onelitefeather.pandorascluster.listener.LandWorldListener
 import net.onelitefeather.pandorascluster.util.CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.getChunkIndex
 import org.bukkit.Chunk
-import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import java.util.*
@@ -201,7 +200,7 @@ class LandService(
         return null
     }
 
-    fun checkWorldGuardRegion(chunk: Chunk, location: Location): Boolean {
+    fun checkWorldGuardRegion(chunk: Chunk): Boolean {
 
         val world = BukkitAdapter.adapt(chunk.world)
         val minChunkX = chunk.x shl 4
