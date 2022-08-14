@@ -1,8 +1,5 @@
 plugins {
     kotlin("jvm") version "1.7.10"
-//    checkstyle
-    // FIXME
-    // Bukkit
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
     id("xyz.jpenilla.run-paper") version "1.0.6"
 
@@ -80,11 +77,6 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-}
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
 }
 
 kotlin {
