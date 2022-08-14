@@ -26,8 +26,11 @@ repositories {
 }
 
 dependencies {
+
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
+
     // Commands
     implementation("cloud.commandframework", "cloud-paper", "1.7.0")
     implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
@@ -36,7 +39,6 @@ dependencies {
     implementation("me.lucko:commodore:2.0") {
         isTransitive = false
     }
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0");
 
     // Database
     implementation("org.hibernate:hibernate-core:6.1.1.Final")
@@ -51,9 +53,32 @@ dependencies {
         isTransitive = false
     }
 
+    testImplementation("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+    testImplementation(libs.faweCore)
+    testImplementation(libs.fawe) {
+        isTransitive = false
+
+    }
+
+    // Database
+    testImplementation("org.hibernate:hibernate-core:6.1.1.Final")
+    testImplementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
+    testImplementation("com.zaxxer:HikariCP:5.0.1")
+    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
+
+    // Commands
+    testImplementation("cloud.commandframework", "cloud-paper", "1.7.0")
+    testImplementation("cloud.commandframework", "cloud-annotations", "1.7.0")
+    testImplementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
+    testImplementation("net.kyori:adventure-platform-bukkit:4.1.1")
+    testImplementation("me.lucko:commodore:2.0") {
+        isTransitive = false
+    }
 
     // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
+    testImplementation("io.mockk:mockk:1.12.5")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 java {
