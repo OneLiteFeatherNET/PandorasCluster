@@ -22,7 +22,7 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         val playerChunk = player.chunk
-        if (pandorasClusterApi.getLandService().checkWorldGuardRegion(playerChunk, player.location)) {
+        if (pandorasClusterApi.getLandService().checkWorldGuardRegion(playerChunk)) {
             player.sendMessage(miniMessage { "This chunk is not available" })
             return
         }
