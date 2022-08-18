@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.onelitefeather"
-version = "1.0.0-SNAPSHOT"
+val baseVersion = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -140,4 +140,9 @@ sonarqube {
     properties {
         property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYImhlbRTSfGYIFfefLS")
     }
+}
+version = if (System.getenv().containsKey("CI")) {
+    "${baseVersion}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
+} else {
+    baseVersion
 }
