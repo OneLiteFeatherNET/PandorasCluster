@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion
+import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
@@ -47,6 +48,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e)
+            Sentry.captureException(e)
+
         }
         return lands
     }
@@ -70,6 +73,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
+            Sentry.captureException(e)
+
         }
         return null
     }
@@ -89,6 +94,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e)
+            Sentry.captureException(e)
+
             return false
         }
     }
@@ -125,6 +132,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
+            Sentry.captureException(e)
+
         }
         return null
     }
@@ -145,6 +154,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not found land", e)
+            Sentry.captureException(e)
+
         }
         return land
     }
@@ -161,6 +172,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
+            Sentry.captureException(e)
+
         }
         return listOf()
     }
@@ -178,6 +191,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
+            Sentry.captureException(e)
+
         }
         return null
     }
@@ -195,6 +210,8 @@ class LandService(
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotLoadFlags, e)
+            Sentry.captureException(e)
+
         }
 
         return null

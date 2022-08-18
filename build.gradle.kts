@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.onelitefeather"
-version = "1.0.0-SNAPSHOT"
+val baseVersion = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -36,6 +36,12 @@ dependencies {
     implementation("me.lucko:commodore:2.0") {
         isTransitive = false
     }
+
+    // Sentry
+    implementation("org.apache.logging.log4j:log4j-core:2.18.0")
+    implementation(libs.sentry)
+    implementation(libs.sentryJul)
+    implementation(libs.sentrylog4j2)
 
     // Database
     implementation("org.hibernate:hibernate-core:6.1.1.Final")
@@ -134,4 +140,9 @@ sonarqube {
     properties {
         property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYImhlbRTSfGYIFfefLS")
     }
+}
+version = if (System.getenv().containsKey("CI")) {
+    "${baseVersion}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
+} else {
+    baseVersion
 }
