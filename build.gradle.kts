@@ -37,6 +37,12 @@ dependencies {
         isTransitive = false
     }
 
+    // Sentry
+    implementation("org.apache.logging.log4j:log4j-core:2.18.0")
+    implementation(libs.sentry)
+    implementation(libs.sentryJul)
+    implementation(libs.sentrylog4j2)
+
     // Database
     implementation("org.hibernate:hibernate-core:6.1.1.Final")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")

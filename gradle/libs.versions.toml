@@ -41,6 +41,7 @@ adventureSerializerPlain = { group = "net.kyori", name = "adventure-text-seriali
 # Error Tracking
 sentry = { group = "io.sentry", name = "sentry", version.ref = "sentry" }
 sentryJul = { group = "io.sentry", name = "sentry-jul", version.ref = "sentry" }
+sentrylog4j2 = { group = "io.sentry", name = "sentry-log4j2", version.ref = "sentry" }
 # CloudNet
 cloudnetPerms = { group = "de.dytanic.cloudnet", name = "cloudnet-cloudperms", version.ref = "cloudnet" }
 cloudnetBridge = { group = "de.dytanic.cloudnet", name = "cloudnet-bridge", version.ref = "cloudnet" }
