@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.onelitefeather"
-version = "1.0.0-SNAPSHOT"
+val baseVersion = "1.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -105,4 +105,8 @@ tasks {
         property("sonar.qualitygate.wait", true)
     }
 }
-*/
+version = if (System.getenv().containsKey("CI")) {
+    "${baseVersion}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
+} else {
+    baseVersion
+}
