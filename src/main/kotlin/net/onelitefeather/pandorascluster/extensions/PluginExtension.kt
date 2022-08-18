@@ -10,6 +10,7 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
+import io.sentry.Sentry
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
@@ -29,6 +30,7 @@ fun PandorasClusterPlugin.buildCommandSystem() {
         )
     } catch (e: Exception) {
         logger.log(Level.WARNING, "Failed to build command system", e)
+        Sentry.captureException(e)
         server.pluginManager.disablePlugin(this)
         return
     }
