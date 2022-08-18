@@ -56,18 +56,23 @@ class PandorasClusterPlugin : JavaPlugin() {
     }
 
     override fun onEnable() {
-        saveDefaultConfig()
+        try {
 
-        bukkitAudiences = BukkitAudiences.create(this)
-        api = PandorasClusterApiImpl(this)
-        server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
+            saveDefaultConfig()
 
-        val pluginManager = server.pluginManager
-        pluginManager.registerEvents(PlayerConnectionListener(api), this)
+            bukkitAudiences = BukkitAudiences.create(this)
+            api = PandorasClusterApiImpl(this)
+            server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
 
-        buildCommandSystem()
-        registerCommands()
-        buildHelpSystem()
+            val pluginManager = server.pluginManager
+            pluginManager.registerEvents(PlayerConnectionListener(api), this)
+
+            buildCommandSystem()
+            registerCommands()
+            buildHelpSystem()
+        } catch (e: Exception) {
+            Sentry.captureException(e)
+        }
     }
 
     private fun registerCommands() {

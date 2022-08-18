@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.service
 
+import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
@@ -23,7 +24,7 @@ class DatabaseService(
     driver: String
 ) {
 
-    var sessionFactory: SessionFactory
+    lateinit var sessionFactory: SessionFactory
 
     init {
         val configuration = Configuration()
@@ -46,7 +47,11 @@ class DatabaseService(
         configuration.addAnnotatedClass(HomePosition::class.java)
         configuration.addAnnotatedClass(ChunkPlaceholder::class.java)
         val registry = StandardServiceRegistryBuilder().applySettings(configuration.properties).build()
-        sessionFactory = configuration.buildSessionFactory(registry)
+        try {
+            sessionFactory = configuration.buildSessionFactory(registry)
+        } catch (e: Exception) {
+            Sentry.captureException(e)
+        }
     }
 
     fun shutdown() {

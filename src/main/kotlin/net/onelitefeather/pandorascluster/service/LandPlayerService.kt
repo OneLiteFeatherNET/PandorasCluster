@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.service
 
+import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.hibernate.HibernateException
@@ -23,6 +24,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load players.", e)
+            Sentry.captureException(e)
         }
         return listOf()
     }
@@ -48,8 +50,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             if (transaction != null) {
-                transaction!!.rollback()
+                transaction?.rollback()
                 pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
+                Sentry.captureException(e)
+
             }
         }
         return true
@@ -68,6 +72,8 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
+            Sentry.captureException(e)
+
         }
         return null
     }
@@ -85,6 +91,8 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
+            Sentry.captureException(e)
+
         }
         consumer.accept(exists)
     }
@@ -98,6 +106,8 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
+            Sentry.captureException(e)
+
         }
     }
 
@@ -114,6 +124,8 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, couldNotLoadPlayerData, e)
+            Sentry.captureException(e)
+
         }
         return null
     }
