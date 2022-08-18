@@ -16,6 +16,7 @@ import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
 import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
 import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
+import net.onelitefeather.pandorascluster.extensions.sentry
 import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
@@ -32,27 +33,7 @@ class PandorasClusterPlugin : JavaPlugin() {
     lateinit var api: PandorasClusterApiImpl
 
     override fun onLoad() {
-        if (System.getProperty("sentry.dsn") != null && System.getProperty("sentry.env") != null) {
-            val dsn = System.getProperty("sentry.dsn", "https://b798943d3b7f4bb0a3b0c0ac14cfd376@sentry.themeinerlp.dev/3")
-            val env = System.getProperty("sentry.env", "local")
-            Sentry.init {
-                it.dsn = dsn
-                it.environment = env
-                it.release = this.description.version
-                val handler = SentryHandler(it)
-                logger.addHandler(handler)
-            }
-            val appender = SentryAppender.createAppender(
-                "${description.name}-SentryBukkit",
-                null,
-                null,
-                dsn,
-                null,
-                null,
-                null
-            )
-            appender?.start()
-        }
+        sentry()
     }
 
     override fun onEnable() {
