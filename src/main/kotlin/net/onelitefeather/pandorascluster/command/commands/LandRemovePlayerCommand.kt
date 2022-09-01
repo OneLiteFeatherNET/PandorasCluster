@@ -14,7 +14,7 @@ class LandRemovePlayerCommand(val pandorasClusterApi: PandorasClusterApi) {
     @CommandPermission("pandorascluster.command.land.remove")
     fun execute(player: Player, @Argument(value = "player", parserName = "landPlayer") landPlayer: LandPlayer) {
 
-        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
+        val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
             player.sendMessage(miniMessage { "Nichts gefunden" })
             return

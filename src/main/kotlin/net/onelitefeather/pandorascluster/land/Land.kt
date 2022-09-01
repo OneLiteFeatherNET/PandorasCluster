@@ -7,6 +7,7 @@ import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
+import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.hibernate.Hibernate
 import java.util.*
 
@@ -20,7 +21,7 @@ data class Land(
     val owner: LandPlayer? = null,
 
     @OneToOne
-    val homePosition: HomePosition = HomePosition.dummyLocation(),
+    val homePosition: HomePosition = dummyHomePosition(),
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "land")
     val landMembers: List<LandMember> = arrayListOf(),

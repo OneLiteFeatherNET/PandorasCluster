@@ -27,13 +27,12 @@ dependencies {
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
-
     // Commands
     implementation("cloud.commandframework", "cloud-paper", "1.7.0")
     implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
     implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
-    implementation("me.lucko:commodore:2.0") {
+    implementation("net.kyori:adventure-platform-bukkit:4.1.2")
+    implementation("me.lucko:commodore:2.2") {
         isTransitive = false
     }
 
@@ -44,10 +43,10 @@ dependencies {
     implementation(libs.sentrylog4j2)
 
     // Database
-    implementation("org.hibernate:hibernate-core:6.1.1.Final")
+    implementation("org.hibernate:hibernate-core:6.1.2.Final")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.2.Final")
 
     //WorldGuard
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
@@ -64,17 +63,17 @@ dependencies {
     }
 
     // Database
-    testImplementation("org.hibernate:hibernate-core:6.1.1.Final")
+    testImplementation("org.hibernate:hibernate-core:6.1.2.Final")
     testImplementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     testImplementation("com.zaxxer:HikariCP:5.0.1")
-    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
+    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.2.Final")
 
     // Commands
     testImplementation("cloud.commandframework", "cloud-paper", "1.7.0")
     testImplementation("cloud.commandframework", "cloud-annotations", "1.7.0")
     testImplementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
-    testImplementation("net.kyori:adventure-platform-bukkit:4.1.1")
-    testImplementation("me.lucko:commodore:2.0") {
+    testImplementation("net.kyori:adventure-platform-bukkit:4.1.2")
+    testImplementation("me.lucko:commodore:2.2") {
         isTransitive = false
     }
 
@@ -118,7 +117,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.1")
+        minecraftVersion("1.19.2")
     }
 
     shadowJar {
@@ -133,8 +132,8 @@ bukkit {
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
     authors = listOf("UniqueGame", "OneLiteFeather")
-
     depend = listOf("ProtocolLib")
+    softDepend = listOf("WorldGuard")
 }
 sonarqube {
     properties {

@@ -7,8 +7,7 @@ import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
-import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import net.onelitefeather.pandorascluster.util.DUMMY_FLAG_ENTITY
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.entity.Player
 
 class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
@@ -19,22 +18,22 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
     @Confirmation
     fun execute(
         player: Player,
-        @Argument("flag", parserName = "landFlag") landFlagEntity: LandFlagEntity,
+        @Argument("flag", parserName = "landFlag") landFlag: LandFlag,
         @Argument(value = "value") @Quoted value: String
     ) {
 
-        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
+        val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
             player.sendMessage(miniMessage { "Nichts gefunden!" })
             return
         }
 
-        if(landFlagEntity == DUMMY_FLAG_ENTITY) {
+        if(landFlag == LandFlag.UNKNOWN) {
             player.sendMessage(miniMessage { "The flag not exists" })
             return
         }
 
-        pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlagEntity.copy(value = value))
+        pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
         player.sendMessage(miniMessage { "New value $value" })
     }
 }

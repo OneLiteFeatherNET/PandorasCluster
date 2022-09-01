@@ -4,27 +4,41 @@ import org.bukkit.permissions.Permissible
 
 enum class Permission(val permissionNode: String) {
 
-    BLOCK_BREAK("pandorascluster.unowned.block.break"),
-    BLOCK_PLACE("pandorascluster.unowned.block.place"),
-    ENTITY_MOUNT("pandorascluster.unowned.mount"),
-    LAND_ENTRY_DENIED("pandorascluster.unowned.entry.denied"),
+    BLOCK_BREAK("pandorascluster.bypass.block.break"),
+    BLOCK_PLACE("pandorascluster.bypass.block.place"),
+    ENTITY_MOUNT("pandorascluster.bypass.mount"),
+    LAND_ENTRY_DENIED("pandorascluster.bypass.entry.denied"),
 
-    PVP("pandorascluster.unowned.attack.player"),
-    PVE("pandorascluster.unowned.attack.entity"),
+    PVP("pandorascluster.bypass.attack.player"),
+    PVE("pandorascluster.bypass.attack.entity"),
 
-    VEHICLE_ENTER("pandorascluster.unowned.vehicle.use"),
-    VEHICLE_DAMAGE("pandorascluster.unowned.vehicle.damage"),
-    VEHICLE_DESTROY("pandorascluster.unowned.vehicle.destroy"),
-    EXPLOSION("pandorascluster.unowned.explosion"),
-    INTERACT_CONTAINERS("pandorascluster.unowned.interact.container"),
-    INTERACT_FARMLAND("pandorascluster.unowned.interact.farmland"),
-    INTERACT_USE("pandorascluster.unowned.interact.use"),
-    POTION_SPLASH("pandorascluster.unowned.potion.splash"),
-    PROJECTILE_HIT_ENTITY("pandorascluster.unowned.projectile.hit");
+    VEHICLE_ENTER("pandorascluster.bypass.vehicle.use"),
+    VEHICLE_DAMAGE("pandorascluster.bypass.vehicle.damage"),
+    VEHICLE_DESTROY("pandorascluster.bypass.vehicle.destroy"),
+    EXPLOSION("pandorascluster.bypass.explosion"),
+    INTERACT_CONTAINERS("pandorascluster.bypass.interact.container"),
+    INTERACT_FARMLAND("pandorascluster.bypass.interact.farmland"),
+    INTERACT_USE("pandorascluster.bypass.interact.use"),
+    POTION_SPLASH("pandorascluster.bypass.potion.splash"),
+    BUCKET_USE("pandorascluster.bypass.use.bucket"),
+    SHEAR_ENTITY("pandorascluster.bypass.shear.entity"),
+    SHEAR_BLOCK("pandorascluster.bypass.shear.block"),
+    ENTER_BED("pandorascluster.bypass.bed.enter"),
+    LEAVE_BED("pandorascluster.bypass.bed.leave"),
+    TAKE_LECTERN("pandorascluster.bypass.lectern.take"),
+    LEASH_ENTITY("pandorascluster.bypass.entity.leash"),
+    UNLEASH_ENTITY("pandorascluster.bypass.entity.unleash"),
+    TRIGGER_RAID("pandorascluster.bypass.raid.trigger"),
+
+    HANGING_BREAK("pandorascluster.bypass.hanging.break"),
+    HANGING_PLACE("pandorascluster.bypass.hanging.place"),
+    TAME_ENTITY("pandorascluster.bypass.entity.tame"),
+
+    PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit");
 
 
     fun hasPermission(permissible: Permissible): Boolean {
-        return permissible.hasPermission(permissionNode)
+        return permissible.hasPermission("pandorascluster.bypass.*") || permissible.hasPermission(permissionNode)
     }
 
 }
