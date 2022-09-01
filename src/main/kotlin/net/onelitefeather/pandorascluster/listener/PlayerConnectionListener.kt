@@ -11,10 +11,8 @@ class PlayerConnectionListener(private val api: PandorasClusterApi) : Listener {
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
-        this.api.registerPlayer(player.uniqueId, player.name) { success: Boolean ->
-            if (success) {
-                player.sendMessage("Your playerdata was successfully created!")
-            }
+        if(api.registerPlayer(player.uniqueId, player.name)) {
+            player.sendMessage("Your playerdata was successfully created!")
         }
     }
 

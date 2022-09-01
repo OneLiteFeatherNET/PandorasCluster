@@ -37,7 +37,6 @@ class DatabaseService(
         properties[Environment.CONNECTION_PROVIDER] = HikariCPConnectionProvider::class.java
         properties[Environment.DIALECT] = MariaDBDialect()
         properties[Environment.HBM2DDL_AUTO] = Action.UPDATE
-        //        properties.put(Environment.SHOW_SQL, true);
 
         configuration.properties = properties
         configuration.addAnnotatedClass(Land::class.java)

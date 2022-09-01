@@ -6,20 +6,19 @@ import net.onelitefeather.pandorascluster.builder.landBuilder
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import net.onelitefeather.pandorascluster.land.flag.LandFlagType
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
+import net.onelitefeather.pandorascluster.land.position.toHomePosition
+import net.onelitefeather.pandorascluster.util.getChunkIndex
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import org.hibernate.Transaction
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
-import net.onelitefeather.pandorascluster.land.flag.LAND_FLAGS
-import net.onelitefeather.pandorascluster.util.getChunkIndex
 
 class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi) {
 
@@ -59,7 +58,8 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
     }
 
     fun addLandMember(land: Land, member: LandPlayer, landRole: LandRole?) {
-        val landMember = LandMember(null, member, landRole ?: LandRole.MEMBER, land)
+        val role = landRole ?: LandRole.VISITOR
+        val landMember = LandMember(null, member, role, land)
         var transaction: Transaction? = null
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
@@ -67,7 +67,7 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
 
                 val storedMember = pandorasClusterApi.getLandService().getLandMember(land, member)
                 if (storedMember != null) {
-                    session.merge(storedMember.copy(role = landRole ?: LandRole.MEMBER, member = member, land = land))
+                    session.merge(storedMember.copy(role = role, member = member, land = land))
                 } else {
                     session.persist(landMember)
                 }
@@ -89,18 +89,24 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
         updateLand(land.copy(owner = landPlayer))
     }
 
-    fun updateLandFlag(landFlagEntity: LandFlagEntity) {
+    fun updateLandFlag(landFlag: LandFlag, value: String, land: Land) {
+
         var transaction: Transaction? = null
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
-                session.merge(landFlagEntity)
+                if (!pandorasClusterApi.getLandFlagService().existsFlagInLand(landFlag, land)) {
+                    session.persist(LandFlagEntity(null, landFlag.name, value, landFlag.type, landFlag.landFlagType, land))
+                } else {
+                    session.merge(pandorasClusterApi.getLandFlag(landFlag, land)?.copy(value = value))
+                }
+
                 transaction?.commit()
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger()
-                .log(Level.SEVERE, String.format("Cannot update landflag %s", landFlagEntity), e)
+                .log(Level.SEVERE, String.format("Cannot update landflag %s", landFlag), e)
             Sentry.captureException(e)
         }
     }
@@ -120,9 +126,9 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
         }
     }
 
-    fun addChunkPlaceholder(chunk: Chunk?, land: Land?) {
+    fun addChunkPlaceholder(chunk: Chunk, land: Land?) {
         var transaction: Transaction? = null
-        val chunkPlaceholder = ChunkPlaceholder(null, getChunkIndex(chunk!!), land)
+        val chunkPlaceholder = ChunkPlaceholder(null, getChunkIndex(chunk), land)
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
@@ -141,80 +147,62 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
     }
 
     private fun addFlags(land: Land) {
-        CompletableFuture.runAsync {
-            val flagEntities: MutableList<LandFlagEntity> = ArrayList()
-            for (landFlag in LAND_FLAGS) {
+        var transaction: Transaction? = null
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
 
-                if (landFlag.landFlagType == LandFlagType.UNKNOWN) continue
-                flagEntities.add(
-                    LandFlagEntity(
-                        null,
-                        landFlag.name,
-                        landFlag.defaultValue.toString(),
-                        landFlag.type,
-                        landFlag.landFlagType,
-                        land
-                    )
-                )
-            }
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.getSessionFactory().openSession().use { session ->
-
-                    transaction = session.beginTransaction()
-                    for (landFlag in flagEntities) {
-                        session.persist(landFlag)
-                    }
-
-                    transaction?.commit()
+                transaction = session.beginTransaction()
+                for (landFlag in pandorasClusterApi.getDefaultFlags()) {
+                    session.persist(landFlag)
                 }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot add flags to land $land", e)
-                Sentry.captureException(e)
+
+                transaction?.commit()
             }
+        } catch (e: HibernateException) {
+            transaction?.rollback()
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot add flags to land $land", e)
+            Sentry.captureException(e)
         }
     }
 
     fun createLand(owner: LandPlayer, player: Player, chunk: Chunk) {
-        if (!pandorasClusterApi.getLandService().hasPlayerLand(player.uniqueId)) {
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.getSessionFactory().openSession().use { session ->
-                    transaction = session.beginTransaction()
+        if(pandorasClusterApi.hasPlayerLand(player.uniqueId)) return
+        var transaction: Transaction? = null
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                transaction = session.beginTransaction()
 
-                    val homePosition = HomePosition.of(player.location)
-                    session.persist(homePosition)
+                val homePosition = toHomePosition(player.location)
+                session.persist(homePosition)
 
-                    val land = landBuilder {
-                        chunkX { chunk.x }
-                        chunkZ { chunk.z }
-                        owner { owner }
-                        homePosition { homePosition }
-                        world { player.world }
-                        members { emptyList() }
-                        chunks { emptyList() }
-                        flags { emptyList() }
-                    }
-
-                    session.persist(land)
-
-                    addFlags(land)
-                    transaction?.commit()
-                    addChunkPlaceholder(chunk, land)
+                val land = landBuilder {
+                    chunkX { chunk.x }
+                    chunkZ { chunk.z }
+                    owner { owner }
+                    homePosition { homePosition }
+                    world { player.world }
+                    members { emptyList() }
+                    chunks { emptyList() }
+                    flags { emptyList() }
                 }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e)
-                Sentry.captureException(e)
+
+                session.persist(land)
+
+                addFlags(land)
+                transaction?.commit()
+                addChunkPlaceholder(chunk, land)
             }
+        } catch (e: HibernateException) {
+            transaction?.rollback()
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e)
+            Sentry.captureException(e)
         }
     }
 
     fun deletePlayerLand(player: Player) {
         val landPlayer = pandorasClusterApi.getLandPlayer(player.uniqueId) ?: return
-        val land: Land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return
-        if (pandorasClusterApi.getLandService().exists(land)) {
+        val land = pandorasClusterApi.getLand(landPlayer)
+        if (land != null) {
             var transaction: Transaction? = null
             try {
                 pandorasClusterApi.getSessionFactory().openSession().use { session ->
@@ -240,7 +228,7 @@ class DatabaseStorageService(private val pandorasClusterApi: PandorasClusterApi)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
-            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the land from the database.", e)
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
             Sentry.captureException(e)
         }
     }

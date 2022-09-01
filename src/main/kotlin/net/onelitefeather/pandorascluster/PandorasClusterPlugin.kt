@@ -68,6 +68,7 @@ class PandorasClusterPlugin : JavaPlugin() {
         annotationParser.parse(SetOwnerCommand(api))
         annotationParser.parse(SetRoleCommand(api))
         annotationParser.parse(LandRemovePlayerCommand(api))
+        annotationParser.parse(LandInfoCommand(api))
 
         val builder = paperCommandManager.commandBuilder("land")
         paperCommandManager.command(builder.literal("confirm").

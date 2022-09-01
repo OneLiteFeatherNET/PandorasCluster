@@ -6,16 +6,14 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.service.DatabaseService
-import net.onelitefeather.pandorascluster.service.DatabaseStorageService
-import net.onelitefeather.pandorascluster.service.LandPlayerService
-import net.onelitefeather.pandorascluster.service.LandService
+import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
 import java.util.*
-import java.util.function.Consumer
 import java.util.logging.Logger
 
 class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : PandorasClusterApi {
@@ -24,6 +22,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private lateinit var landService: LandService
     private lateinit var databaseStorageService: DatabaseStorageService
     private lateinit var landPlayerService: LandPlayerService
+    private lateinit var landFlagService: LandFlagService
 
     init {
 
@@ -36,6 +35,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
             databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
             databaseStorageService = DatabaseStorageService(this)
             landService = LandService(this)
+            landFlagService = LandFlagService(this)
             landPlayerService = LandPlayerService(this)
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
@@ -71,7 +71,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getLandPlayer(player: Player): LandPlayer? {
-        return landPlayerService.getLandPlayer(player.uniqueId)
+        return getLandPlayer(player.uniqueId)
     }
 
     override fun getLandPlayer(uuid: UUID): LandPlayer? {
@@ -98,6 +98,26 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         return landService
     }
 
+    override fun getLandFlagService(): LandFlagService {
+        return landFlagService
+    }
+
+    override fun getDefaultFlags(): List<LandFlagEntity> {
+        return landFlagService.getDefaultFlags()
+    }
+
+    override fun getDefaultFlag(landFlag: LandFlag): LandFlagEntity {
+        return landFlagService.getDefaultFlag(landFlag)
+    }
+
+    override fun getFlags(land: Land): List<LandFlagEntity> {
+        return landFlagService.getFlagsByLand(land)
+    }
+
+    override fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
+        return landFlagService.getLandFlag(landFlag, land)
+    }
+
     override fun getLogger(): Logger {
         return plugin.logger
     }
@@ -112,7 +132,11 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         return landService.getFullLand(chunk)
     }
 
-    override fun registerPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>) {
-        landPlayerService.createPlayer(uuid, name, consumer)
+    override fun getLand(landOwner: LandPlayer): Land? {
+        return landService.getLand(landOwner)
+    }
+
+    override fun registerPlayer(uuid: UUID, name: String): Boolean {
+        return landPlayerService.createPlayer(uuid, name)
     }
 }
