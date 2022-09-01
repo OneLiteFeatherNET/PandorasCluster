@@ -4,7 +4,7 @@ import net.onelitefeather.pandorascluster.enums.ChunkRotation
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.flag.LandFlagType
-import net.onelitefeather.pandorascluster.land.position.HomePosition
+import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import java.util.*
@@ -18,7 +18,7 @@ val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
 val DUMMY_LAND = Land(
     -1,
     null,
-    (HomePosition.dummyLocation()),
+    dummyHomePosition(),
     arrayListOf(),
     arrayListOf(),
     arrayListOf(),
@@ -46,7 +46,7 @@ val DUMMY_FLAG_ENTITY = LandFlagEntity(
     "dummy",
     "dummy",
     0,
-    LandFlagType.UNKNOWN,
+    LandFlagType.ENTITY,
     DUMMY_LAND
 )
 

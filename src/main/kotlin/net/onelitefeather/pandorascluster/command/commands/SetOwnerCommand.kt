@@ -14,7 +14,7 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
     @Confirmation
     fun execute(player: Player, @Argument("player", parserName = "landPlayer") landPlayer: LandPlayer) {
 
-        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
+        val land = pandorasClusterApi.getLand(player.chunk)
         if(land == null) {
             player.sendMessage(miniMessage { "Du musst auf deinem Land stehen" })
             return

@@ -29,7 +29,7 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
         @Greedy @Argument("role", parserName = "landRole") landRole: LandRole
     ) {
 
-        val land = pandorasClusterApi.getLandService().getFullLand(player.chunk)
+        val land = pandorasClusterApi.getLand(player.chunk)
         val playerId = landPlayer.getUniqueId()
 
         if (land == null || playerId == null) {

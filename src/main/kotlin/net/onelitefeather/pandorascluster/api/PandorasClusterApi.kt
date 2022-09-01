@@ -3,13 +3,14 @@ package net.onelitefeather.pandorascluster.api
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
 import java.util.*
-import java.util.function.Consumer
 import java.util.logging.Logger
 
 interface PandorasClusterApi {
@@ -49,11 +50,22 @@ interface PandorasClusterApi {
 
     fun getLandService(): LandService
 
+    fun getLandFlagService(): LandFlagService
+
+    fun getDefaultFlags(): List<LandFlagEntity>
+
+    fun getDefaultFlag(landFlag: LandFlag): LandFlagEntity
+
+    fun getFlags(land: Land): List<LandFlagEntity>
+
+    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity?
+
     fun getLogger(): Logger
 
     fun translateLegacyCodes(text: String): Component
 
     fun getLand(chunk: Chunk): Land?
+    fun getLand(landOwner: LandPlayer): Land?
 
-    fun registerPlayer(uuid: UUID, name: String, consumer: Consumer<Boolean>)
+    fun registerPlayer(uuid: UUID, name: String): Boolean
 }
