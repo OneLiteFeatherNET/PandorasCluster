@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.api
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
@@ -13,6 +14,7 @@ import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
+import java.text.MessageFormat
 import java.util.*
 import java.util.logging.Logger
 
@@ -23,6 +25,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private lateinit var databaseStorageService: DatabaseStorageService
     private lateinit var landPlayerService: LandPlayerService
     private lateinit var landFlagService: LandFlagService
+    private var messages: ResourceBundle
 
     init {
 
@@ -30,6 +33,8 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         val databaseDriver = plugin.config.getString("database.driver")
         val username = plugin.config.getString("database.username")
         val password = plugin.config.getString("database.password")
+
+        messages = ResourceBundle.getBundle("pandorascluster", UTF8ResourceBundleControl())
 
         if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
             databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
@@ -40,6 +45,14 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
         }
+    }
+
+    override fun i18n(key: String, vararg objects: Any): String {
+        return MessageFormat(messages.getString(key)).format(objects)
+    }
+
+    override fun pluginPrefix(): String {
+        return messages.getString("prefix")
     }
 
     override fun getPlugin(): PandorasClusterPlugin {
