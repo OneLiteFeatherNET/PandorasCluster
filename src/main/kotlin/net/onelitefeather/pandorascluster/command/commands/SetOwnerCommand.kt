@@ -13,30 +13,36 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
     @CommandDescription("Set the Owner of the Land")
     @Confirmation
     fun execute(player: Player, @Argument("player", parserName = "landPlayer") landPlayer: LandPlayer) {
-
+        val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
-        if(land == null) {
-            player.sendMessage(miniMessage { "Du musst auf deinem Land stehen" })
+        if (land == null) {
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", pluginPrefix) })
             return
         }
 
-        val playerId = landPlayer.getUniqueId();
+        val playerId = landPlayer.getUniqueId()
+        val playerName = landPlayer.name ?: "null"
         if (playerId == null) {
-            player.sendMessage(miniMessage { "Der Spieler ${landPlayer.name} existiert nicht" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("player-data-not-found", *arrayOf( pluginPrefix, playerName)) })
+            return
+        }
+
+        if(pandorasClusterApi.hasPlayerLand(playerId)) {
+            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("target-player-already-has-land", *arrayOf( pluginPrefix, playerName)) })
             return
         }
 
         if(land.isOwner(playerId)) {
-            player.sendMessage(miniMessage { "Nothing changed player ${landPlayer.name} is already the land owner" })
+            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-owner.nothing-changed", *arrayOf( pluginPrefix, playerName)) })
             return
         }
 
         if(land.getLandMember(playerId) != null) {
-            player.sendMessage(miniMessage { "The player ${landPlayer.name} is already a member of this Land" })
+            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-owner.player-is-member", *arrayOf( pluginPrefix, playerName))})
             return
         }
 
         this.pandorasClusterApi.getDatabaseStorageService().setLandOwner(land, landPlayer)
-        player.sendMessage(miniMessage { "Owner changed" })
+        player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-owner.success", pluginPrefix, playerName) })
     }
 }

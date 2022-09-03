@@ -4,6 +4,7 @@ import org.bukkit.permissions.Permissible
 
 enum class Permission(val permissionNode: String) {
 
+
     BLOCK_BREAK("pandorascluster.bypass.block.break"),
     BLOCK_PLACE("pandorascluster.bypass.block.place"),
     ENTITY_MOUNT("pandorascluster.bypass.mount"),
@@ -33,9 +34,9 @@ enum class Permission(val permissionNode: String) {
     HANGING_BREAK("pandorascluster.bypass.hanging.break"),
     HANGING_PLACE("pandorascluster.bypass.hanging.place"),
     TAME_ENTITY("pandorascluster.bypass.entity.tame"),
+    PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
 
-    PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit");
-
+    SET_LAND_ROLE("pandorascluster.admin.set.role");
 
     fun hasPermission(permissible: Permissible): Boolean {
         return permissible.hasPermission("pandorascluster.bypass.*") || permissible.hasPermission(permissionNode)

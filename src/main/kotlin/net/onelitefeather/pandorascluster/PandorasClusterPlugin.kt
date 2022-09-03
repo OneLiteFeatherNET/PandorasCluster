@@ -6,8 +6,6 @@ import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
 import io.sentry.Sentry
-import io.sentry.jul.SentryHandler
-import io.sentry.log4j2.SentryAppender
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl
@@ -53,6 +51,7 @@ class PandorasClusterPlugin : JavaPlugin() {
             buildHelpSystem()
         } catch (e: Exception) {
             Sentry.captureException(e)
+            e.printStackTrace()
         }
     }
 
@@ -73,8 +72,6 @@ class PandorasClusterPlugin : JavaPlugin() {
         val builder = paperCommandManager.commandBuilder("land")
         paperCommandManager.command(builder.literal("confirm").
         meta(CommandMeta.DESCRIPTION, "Confirm").handler(confirmationManager.createConfirmationExecutionHandler()))
-
-
     }
 
     override fun onDisable() {

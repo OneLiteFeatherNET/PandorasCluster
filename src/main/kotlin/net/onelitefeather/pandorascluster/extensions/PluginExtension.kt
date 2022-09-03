@@ -10,7 +10,6 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
-import com.destroystokyo.paper.event.server.ServerExceptionEvent
 import io.sentry.Sentry
 import io.sentry.jul.SentryHandler
 import io.sentry.log4j2.SentryAppender
@@ -18,12 +17,10 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import org.bukkit.command.CommandSender
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
 import java.util.logging.Level
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.plugin.java.JavaPlugin
 
 
 fun PandorasClusterPlugin.buildCommandSystem() {
@@ -114,16 +111,4 @@ fun JavaPlugin.sentry() {
         null
     )
     appender?.start()
-    val pluginManager = server.pluginManager
-    pluginManager.registerEvents(PluginExtension(), this)
-}
-
-class PluginExtension : Listener {
-
-
-    @EventHandler
-    fun exceptionHandler(e: ServerExceptionEvent) {
-        Sentry.captureException(e.exception)
-    }
-
 }
