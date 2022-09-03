@@ -15,13 +15,14 @@ class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) {
     @CommandDescription("Set the home position of your land to your current position")
     fun execute(player: Player) {
 
+        val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { "Nichts gefunden!" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
             return
         }
 
         pandorasClusterApi.getDatabaseStorageService().updateLandHome(toHomePosition(player.location), player.uniqueId)
-        player.sendMessage(miniMessage { "Home position was successfully set to your current position" })
+        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-home.success", *arrayOf(pluginPrefix)) })
     }
 }

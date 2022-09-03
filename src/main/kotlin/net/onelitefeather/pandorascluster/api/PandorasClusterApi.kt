@@ -15,6 +15,10 @@ import java.util.logging.Logger
 
 interface PandorasClusterApi {
 
+    fun i18n(key: String, vararg objects: Any) : String
+
+    fun pluginPrefix(): String
+
     fun getPlugin(): PandorasClusterPlugin
 
     fun getDatabaseStorageService(): DatabaseStorageService

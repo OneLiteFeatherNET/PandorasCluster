@@ -12,7 +12,6 @@ import org.bukkit.entity.Player
 
 class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
-
     @CommandMethod("land flag set <flag> <value>")
     @CommandPermission("pandorascluster.command.land.flag.set")
     @Confirmation
@@ -21,19 +20,19 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
         @Argument("flag", parserName = "landFlag") landFlag: LandFlag,
         @Argument(value = "value") @Quoted value: String
     ) {
-
+        val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { "Nichts gefunden!" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
             return
         }
 
         if(landFlag == LandFlag.UNKNOWN) {
-            player.sendMessage(miniMessage { "The flag not exists" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.not-found", *arrayOf(pluginPrefix)) })
             return
         }
 
         pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
-        player.sendMessage(miniMessage { "New value $value" })
+        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.success", *arrayOf(pluginPrefix, landFlag.name, value)) })
     }
 }
