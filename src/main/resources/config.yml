@@ -1,6 +1,6 @@
 database:
   jdbcUrl: 'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'
   username: 'pandorascluster'
-  password: '%Schueler90'
+  password: 'CoTayoC4wIbu'
   driver: 'org.mariadb.jdbc.Driver'
   dialect: 'org.hibernate.dialect.MariaDBDialect'
