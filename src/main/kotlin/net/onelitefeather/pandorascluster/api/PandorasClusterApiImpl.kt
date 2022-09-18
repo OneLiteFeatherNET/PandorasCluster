@@ -37,7 +37,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         messages = ResourceBundle.getBundle("pandorascluster", UTF8ResourceBundleControl())
 
         if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
-            databaseService = DatabaseService(jdbcUrl, username, password, databaseDriver)
+            databaseService = DatabaseService(plugin, jdbcUrl, username, password, databaseDriver)
             databaseStorageService = DatabaseStorageService(this)
             landService = LandService(this)
             landFlagService = LandFlagService(this)

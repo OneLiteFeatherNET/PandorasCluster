@@ -1,12 +1,14 @@
 package net.onelitefeather.pandorascluster.service
 
 import io.sentry.Sentry
+import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
+import org.bukkit.Bukkit
 import org.hibernate.SessionFactory
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder
@@ -18,6 +20,7 @@ import org.hibernate.tool.schema.Action
 import java.util.*
 
 class DatabaseService(
+    pandorasClusterPlugin: PandorasClusterPlugin,
     jdbcUrl: String,
     username: String,
     password: String,
@@ -50,6 +53,7 @@ class DatabaseService(
             sessionFactory = configuration.buildSessionFactory(registry)
         } catch (e: Exception) {
             Sentry.captureException(e)
+            Bukkit.getPluginManager().disablePlugin(pandorasClusterPlugin)
         }
     }
 
