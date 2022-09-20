@@ -39,7 +39,7 @@ class DatabaseService(
         properties[Environment.IMPLICIT_NAMING_STRATEGY] = ImplicitNamingStrategyLegacyJpaImpl::class.java
         properties[Environment.CONNECTION_PROVIDER] = HikariCPConnectionProvider::class.java
         properties[Environment.DIALECT] = MariaDBDialect()
-        properties[Environment.HBM2DDL_AUTO] = Action.UPDATE
+        properties[Environment.HBM2DDL_AUTO] = Action.UPDATE.name.lowercase()
 
         configuration.properties = properties
         configuration.addAnnotatedClass(Land::class.java)
