@@ -27,6 +27,14 @@ dependencies {
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
+
+    //WorldGuard
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+    compileOnly(libs.faweCore)
+    compileOnly(libs.fawe) {
+        isTransitive = false
+    }
+
     // Commands
     implementation("cloud.commandframework", "cloud-paper", "1.7.0")
     implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
@@ -36,6 +44,9 @@ dependencies {
         isTransitive = false
     }
 
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
     // Sentry
     implementation("org.apache.logging.log4j:log4j-core:2.18.0")
     implementation(libs.sentry)
@@ -43,30 +54,21 @@ dependencies {
     implementation(libs.sentrylog4j2)
 
     // Database
-    implementation("org.hibernate:hibernate-core:6.1.2.Final")
+    implementation("org.hibernate:hibernate-core:6.1.3.Final")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
-    implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.2.Final")
-
-    //WorldGuard
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
-    compileOnly(libs.faweCore)
-    compileOnly(libs.fawe) {
-        isTransitive = false
-    }
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
 
     testImplementation("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     testImplementation(libs.faweCore)
     testImplementation(libs.fawe) {
         isTransitive = false
-
     }
 
     // Database
-    testImplementation("org.hibernate:hibernate-core:6.1.2.Final")
+    testImplementation("org.hibernate:hibernate-core:6.1.3.Final")
     testImplementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     testImplementation("com.zaxxer:HikariCP:5.0.1")
-    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.2.Final")
+    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
 
     // Commands
     testImplementation("cloud.commandframework", "cloud-paper", "1.7.0")
@@ -79,7 +81,7 @@ dependencies {
 
     // Testing
     testImplementation("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
-    testImplementation("io.mockk:mockk:1.12.5")
+    testImplementation("io.mockk:mockk:1.12.7")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
