@@ -75,7 +75,7 @@ class PandorasClusterPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
-        if(api != null){
+        if(this::api.isInitialized){
             api.getDatabaseService().shutdown()
             server.servicesManager.unregisterAll(this)
         }
