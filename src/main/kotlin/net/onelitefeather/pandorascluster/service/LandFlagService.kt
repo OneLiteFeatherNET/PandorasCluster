@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.service
 
 import io.sentry.Sentry
+import kotlinx.coroutines.runBlocking
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LAND_FLAGS
@@ -12,10 +13,12 @@ import java.util.logging.Level
 
 class LandFlagService(private val pandorasClusterApi: PandorasClusterApi) {
 
-    fun getDefaultFlags(): List<LandFlagEntity> {
-        val list = arrayListOf<LandFlagEntity>()
+    private val defaultFlags = arrayListOf<LandFlagEntity>()
+
+    init {
         LAND_FLAGS.forEach {
-            list.add(
+            if(it == LandFlag.UNKNOWN) return@forEach
+            defaultFlags.add(
                 LandFlagEntity(
                     null,
                     it.name,
@@ -26,8 +29,10 @@ class LandFlagService(private val pandorasClusterApi: PandorasClusterApi) {
                 )
             )
         }
+    }
 
-        return list
+    fun getDefaultFlags(): List<LandFlagEntity> {
+        return defaultFlags
     }
 
     fun getDefaultFlag(landFlag: LandFlag): LandFlagEntity {
@@ -39,7 +44,7 @@ class LandFlagService(private val pandorasClusterApi: PandorasClusterApi) {
         return getLandFlag(landFlag ?: LandFlag.UNKNOWN, land) != null
     }
 
-    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
+    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? = runBlocking{
 
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
@@ -49,17 +54,17 @@ class LandFlagService(private val pandorasClusterApi: PandorasClusterApi) {
                 )
                 flagOfLand.setParameter("landId", land.id)
                 flagOfLand.setParameter("name", landFlag.name)
-                return flagOfLand.uniqueResult()
+                return@runBlocking flagOfLand.uniqueResult()
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load landflag $landFlag", e)
             Sentry.captureException(e)
         }
 
-        return getDefaultFlag(landFlag)
+        return@runBlocking getDefaultFlag(landFlag)
     }
 
-    fun getFlagsByLand(land: Land): List<LandFlagEntity> {
+    fun getFlagsByLand(land: Land): List<LandFlagEntity> = runBlocking {
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val flagsOfLand = session.createQuery(
@@ -67,13 +72,13 @@ class LandFlagService(private val pandorasClusterApi: PandorasClusterApi) {
                     LandFlagEntity::class.java
                 )
                 flagsOfLand.setParameter("landId", land.id)
-                return flagsOfLand.list()
+                return@runBlocking flagsOfLand.list()
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load flags by land", e)
             Sentry.captureException(e)
         }
 
-        return listOf()
+        return@runBlocking listOf()
     }
 }
