@@ -67,6 +67,7 @@ class LandPlayerListener(private val pandorasClusterApi: PandorasClusterApi) :
         event.isCancelled = true
     }
 
+    @Suppress("kotlin:S3776")
     @EventHandler
     fun handlePlayerInteract(event: PlayerInteractEvent) {
 
