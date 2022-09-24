@@ -2,12 +2,15 @@ package net.onelitefeather.pandorascluster.land
 
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.enums.LandRole
+import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
+import org.bukkit.Bukkit
 import org.hibernate.Hibernate
 import java.util.*
 
@@ -55,10 +58,18 @@ data class Land(
     fun getLandMember(uuid: UUID): LandMember? =
         landMembers.firstOrNull { landMember -> landMember.member?.getUniqueId() == uuid }
 
+    fun hasMemberPermission(memberId: UUID, permission: Permission): Boolean {
+        val bukkitPlayer = Bukkit.getPlayer(memberId) ?: return false
+        return bukkitPlayer.hasPermission(permission)
+    }
+
     fun hasAccess(uuid: UUID): Boolean {
-        if (owner?.getUniqueId() == uuid) return true
-        val role = getLandMember(uuid)?.role ?: return false
-        return role.access || role == LandRole.MEMBER && owner?.isOnline() == true
+        if(isOwner(uuid)) return true
+        if(hasMemberPermission(uuid, Permission.ACCESS)) return true
+        val landOwner = owner ?: return false
+        val landMember = getLandMember(uuid) ?: return false
+        if (landMember.role == LandRole.MEMBER && !landOwner.isOnline()) return false
+        return landMember.role.access
     }
 
     override fun equals(other: Any?): Boolean {
