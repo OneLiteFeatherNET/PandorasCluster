@@ -129,7 +129,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         }
     }
 
-    fun addChunkPlaceholder(chunk: Chunk, land: Land?) = runBlocking {
+    fun addChunkPlaceholder(chunk: Chunk, land: Land?) {
         var transaction: Transaction? = null
         val chunkPlaceholder = ChunkPlaceholder(null, getChunkIndex(chunk), land)
         try {
