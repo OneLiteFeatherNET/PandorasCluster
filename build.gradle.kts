@@ -36,14 +36,13 @@ dependencies {
     }
 
     // Commands
-    implementation("cloud.commandframework", "cloud-paper", "1.7.0")
-    implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
-    implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
+    implementation("cloud.commandframework", "cloud-paper", "1.7.1")
+    implementation("cloud.commandframework", "cloud-annotations", "1.7.1")
+    implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.1")
     implementation("net.kyori:adventure-platform-bukkit:4.1.2")
     implementation("me.lucko:commodore:2.2") {
         isTransitive = false
     }
-
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
