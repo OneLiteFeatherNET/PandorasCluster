@@ -5,6 +5,7 @@ import org.bukkit.permissions.Permissible
 enum class Permission(val permissionNode: String) {
 
 
+    ACCESS("pandorascluster.access.other"),
     BLOCK_BREAK("pandorascluster.bypass.block.break"),
     BLOCK_PLACE("pandorascluster.bypass.block.place"),
     ENTITY_MOUNT("pandorascluster.bypass.mount"),
