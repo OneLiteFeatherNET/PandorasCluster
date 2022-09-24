@@ -4,7 +4,6 @@ import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
-import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.block.data.type.Farmland
@@ -22,56 +21,41 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
     Listener {
 
     @EventHandler
-    fun handleProjectileHit(event: ProjectileHitEvent) {
+    fun handleProjectileBlockHit(event: ProjectileHitEvent) {
         val entity = event.entity
         val shooter = if (entity.shooter is Entity) {
-            entity.shooter
-        } else null
-
-        val land: Land?
-        val hitEntity = event.hitEntity
-        if (hitEntity != null) {
-
-            land = pandorasClusterApi.getLand(hitEntity.chunk) ?: return
-            if (shooter is Entity && land.hasAccess(shooter.uniqueId)) return
-
-            val cancel = if (hitEntity !is Player) {
-                val flag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
-                val value = flag.getValue<Boolean>() == false
-                shooter is Permissible && shooter.hasPermission(Permission.PVE) || !value || shooter is Entity
-            } else {
-                val flag = pandorasClusterApi.getLandFlag(LandFlag.PVP, land) ?: return
-                val value = flag.getValue<Boolean>() == false
-                shooter is Permissible && shooter.hasPermission(Permission.PVP) || !value || shooter is Entity
-            }
-
-            event.isCancelled = cancel
-            return
-        }
-
+            entity.shooter as Entity
+        } else null ?: return
         val hitBlock = event.hitBlock
         if (hitBlock != null) {
-            land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
-            event.isCancelled = shooter is Entity && !land.hasAccess(shooter.uniqueId)
+            val land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
+            event.isCancelled = !land.hasAccess(shooter.uniqueId)
         }
     }
 
     @EventHandler
     fun theConfuser(event: EntityDamageByEntityEvent) {
+
         val target = event.entity
-        val attacker = event.damager
+        var attacker = event.damager
+
+        if (attacker is Projectile) {
+            attacker = attacker.shooter as Entity
+        }
+
         val land = pandorasClusterApi.getLand(target.chunk) ?: pandorasClusterApi.getLand(attacker.chunk) ?: return
-        if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
-        if (attacker is Player) {
-            event.isCancelled = if (target !is Player) {
-                val flag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
-                val value = flag.getValue<Boolean>()
-                !attacker.hasPermission(Permission.PVE) || value == false
-            } else {
-                val flag = pandorasClusterApi.getLandFlag(LandFlag.PVP, land) ?: return
-                val value = flag.getValue<Boolean>()
-                !attacker.hasPermission(Permission.PVP) || value == false
-            }
+        event.isCancelled = if (target is Player && attacker !is Player) {
+            val flag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
+            val value = flag.getValue<Boolean>() == true
+            if (target.hasPermission(Permission.PVE)) return
+            if (land.hasAccess(target.uniqueId)) return
+            !value
+        } else {
+            val flag = pandorasClusterApi.getLandFlag(LandFlag.PVP, land) ?: return
+            val value = flag.getValue<Boolean>() == true
+            if (attacker.hasPermission(Permission.PVP)) return
+            if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
+            !value
         }
     }
 
@@ -86,7 +70,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
-                if (Permission.EXPLOSION.hasPermission(primerEntity)) return
+                if (primerEntity.hasPermission(Permission.EXPLOSION)) return
                 true
             } else false
         }
@@ -115,7 +99,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
         val land = pandorasClusterApi.getLand(entity.chunk) ?: pandorasClusterApi.getLand(target.chunk) ?: return
         val landFlag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land)
         if (landFlag != null && landFlag.getValue<Boolean>() == true) return
-        event.isCancelled = true
+        event.isCancelled = false
     }
 
     @EventHandler
