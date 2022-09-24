@@ -4,6 +4,7 @@ import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
+import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
@@ -36,23 +37,21 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
+        val chunkX = playerChunk.x
+        val chunkZ = playerChunk.z
+
         pandorasClusterApi.getLandService().findConnectedChunk(player) {
+            if (it != null) {
 
-            val chunkX = playerChunk.x
-            val chunkZ = playerChunk.z
-            var claimedChunk: Chunk? = null
+                var claimedChunk: Chunk? = null
 
-            for (x in -2..2) {
-                for (z in -2..2) {
+                for(facing in AVAILABLE_CHUNK_ROTATIONS) {
                     if (claimedChunk != null) continue
-                    val chunk = player.world.getChunkAt(x + chunkX, z + chunkZ)
+                    val chunk = player.world.getChunkAt(facing.modX + chunkX, facing.modZ + chunkZ)
                     if (pandorasClusterApi.isChunkClaimed(chunk)) {
                         claimedChunk = chunk
                     }
                 }
-            }
-
-            if (it != null) {
 
                 if (claimedChunk != null) {
                     val claimedLand = pandorasClusterApi.getLand(claimedChunk)
