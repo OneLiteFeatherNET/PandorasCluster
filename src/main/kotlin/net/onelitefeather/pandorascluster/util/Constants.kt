@@ -41,6 +41,12 @@ fun getBlockFace(location: Location): BlockFace? {
     return BLOCK_FACES.firstOrNull { blockFace ->  blockFace.direction == location.direction}
 }
 
+val AVAILABLE_CHUNK_ROTATIONS = arrayOf(
+    BlockFace.NORTH,
+    BlockFace.EAST,
+    BlockFace.SOUTH,
+    BlockFace.WEST)
+
 val DUMMY_FLAG_ENTITY = LandFlagEntity(
     -1,
     "dummy",
@@ -54,4 +60,8 @@ val DUMMY_FLAG_ENTITY = LandFlagEntity(
 val BLOCK_FACES = BlockFace.values()
 
 val CHUNK_ROTATIONS = ChunkRotation.values()
+
+fun getChunkRotation(facing: BlockFace) : ChunkRotation? {
+    return CHUNK_ROTATIONS.firstOrNull { it.name == facing.name }
+}
 
