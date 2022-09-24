@@ -53,14 +53,63 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val separator = ", "
         for (landMember in land.landMembers) {
             if (landMember.member?.name == null) continue
-            out.append(pandorasClusterApi.i18n("command.info.members.entry",
-                landMember.role.display,
-                landMember.member.name)).append(separator)
+            out.append(
+                pandorasClusterApi.i18n(
+                    "command.info.members.entry",
+                    landMember.role.display,
+                    landMember.member.name
+                )
+            ).append(separator)
         }
 
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n(
-            "command.info.members",
-            pluginPrefix,
-            if(out.isNotEmpty()) out.removeSuffix(separator).toString() else pandorasClusterApi.i18n("command.info.members.nobody") ) })
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.members",
+                pluginPrefix,
+                if (out.isNotEmpty()) out.removeSuffix(separator)
+                    .toString() else pandorasClusterApi.i18n("command.info.members.nobody")
+            )
+        })
+
+        val symbol = pandorasClusterApi.i18n("command.info.flag.symbol")
+        val stringBuilder = StringBuilder()
+
+        for (landFlag in land.flags) {
+
+            val value = landFlag.value ?: "Unknown Value"
+            val flagName = landFlag.name ?: "Unknown Flag"
+
+            val booleanFlag = landFlag.type?.toInt() == 2
+
+            val symbolColor = if (booleanFlag) {
+                val booleanValue = value.toBoolean()
+                if (booleanValue) {
+                    pandorasClusterApi.i18n("command.info.flag.enabled", symbol)
+                } else {
+                    pandorasClusterApi.i18n("command.info.flag.disabled", symbol)
+                }
+            } else {
+                symbol
+            }
+
+            stringBuilder.append(
+                pandorasClusterApi.i18n(
+                    "command.info.flags.entry",
+                    flagName,
+                    value,
+                    flagName,
+                    if (booleanFlag) !value.toBoolean() else value,
+                    symbolColor
+                )
+            )
+        }
+
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.flags",
+                pluginPrefix,
+                if (stringBuilder.isNotEmpty()) stringBuilder.toString() else pandorasClusterApi.i18n("command.info.flags.none")
+            )
+        })
     }
 }
