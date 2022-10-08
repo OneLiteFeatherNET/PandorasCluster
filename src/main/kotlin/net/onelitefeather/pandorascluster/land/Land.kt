@@ -95,29 +95,9 @@ data class Land(
         return member.role == LandRole.BANNED
     }
 
-    fun isAllowUse(material: Material): Boolean = getUseMaterials().contains(material)
-
-    fun getUseMaterials(): List<Material> {
-        if(!hasFlag(LandFlag.USE)) return emptyList()
-        val value = getLandFlag(LandFlag.USE).getValue<String>() ?: return emptyList()
-
-        if(!value.contains(",")) {
-            val material = Material.matchMaterial(value)
-            return if(material != null) listOf(material) else emptyList()
-        } else {
-            val args = value.split(",")
-            val list = arrayListOf<Material>()
-            for(materialName in args) {
-                val material = Material.matchMaterial(materialName.uppercase()) ?: continue
-                list.add(material)
-            }
-        }
-
-        return emptyList()
+    fun isMerged() = chunks.isNotEmpty()
+    fun isAdmin(playerId: UUID): Boolean {
+        val member = getLandMember(playerId) ?: return false
+        return member.role == LandRole.ADMIN
     }
-
-    fun isMerged() = chunks.map { chunkPlaceholder -> {
-        chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey }}.isNotEmpty()
-    
-    fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
 }
