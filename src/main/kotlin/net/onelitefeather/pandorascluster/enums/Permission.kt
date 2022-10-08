@@ -81,14 +81,11 @@ enum class Permission(val permissionNode: String) {
     @Deprecated(message = "This field will be removed in future releases")
     PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
 
-    @Deprecated(message = "This field will be removed in future releases")
-    ENTITY_INTERACT("pandorascluster.bypass.interact.entity"),
-
-    @Deprecated(message = "This field will be removed in future releases")
-    FERTILIZE_BLOCK("pandorascluster.bypass.interact.fertilize"),
-
-    @Deprecated(message = "This field will be removed in future releases")
-    ENTITY_CHANGE_BLOCK("pandorascluster.bypass.block.change");
+    SET_LAND_ROLE("pandorascluster.admin.set.role"),
+    REMOVE_PLAYER_OTHER_LAND("pandorascluster.land.remove.others"),
+    SET_LAND_FLAG("pandorascluster.admin.set.flags"),
+    SET_LAND_HOME("pandorascluster.admin.set.home"),
+    SET_LAND_OWNER("pandorascluster.admin.set.owner");
 
     fun hasPermission(permissible: Permissible): Boolean {
         return permissible.hasPermission("pandorascluster.bypass.*") || permissible.hasPermission(permissionNode)
