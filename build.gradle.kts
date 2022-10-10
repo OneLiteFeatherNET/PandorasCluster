@@ -3,10 +3,12 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
     id("xyz.jpenilla.run-paper") version "1.0.6"
 
-    // LIQUIBASE
-    // alias(libs.plugins.liquibase)
-    // SonarQube
-    // id("org.sonarqube") version "3.4.0.2513"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("org.liquibase.gradle") version "2.1.0"
+    id("org.sonarqube") version "3.4.0.2513"
+    jacoco
+
+    id("io.papermc.paperweight.userdev") version "1.3.6"
 }
 
 group = "net.onelitefeather"
@@ -23,9 +25,9 @@ repositories {
 }
 
 dependencies {
+    paperDevBundle("1.19.2-R0.1-SNAPSHOT")
 
     // Paper
-    compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 
     //WorldGuard
@@ -92,7 +94,9 @@ kotlin {
 }
 
 tasks {
-
+    build {
+        dependsOn(reobfJar)
+    }
     compileKotlin {
         kotlinOptions {
             jvmTarget = "17"
@@ -104,9 +108,6 @@ tasks {
         useJUnitPlatform()
     }
 
-    build {
-        dependsOn(shadowJar)
-    }
     jacocoTestReport {
         dependsOn(rootProject.tasks.test)
         reports {
