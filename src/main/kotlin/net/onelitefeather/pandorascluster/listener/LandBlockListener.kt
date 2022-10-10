@@ -17,7 +17,7 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
     @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
 
-        if (event.player.hasPermission(Permission.BLOCK_PLACE)) return
+        if (event.player.hasPermission(Permission.BLOCK_BREAK)) return
         val land = pandorasClusterApi.getLand(event.block.chunk)
         if (land == null) {
             event.isCancelled = true
