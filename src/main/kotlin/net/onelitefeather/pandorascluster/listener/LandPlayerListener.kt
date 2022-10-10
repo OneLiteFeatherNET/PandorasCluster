@@ -74,27 +74,30 @@ class LandPlayerListener(private val pandorasClusterApi: PandorasClusterApi) :
         val clickedBlock = event.clickedBlock ?: return
         val land = pandorasClusterApi.getLand(clickedBlock.chunk) ?: return
 
-        if (land.hasAccess(event.player.uniqueId)) return
+        val material = clickedBlock.type
         val blockData = clickedBlock.blockData
-        event.isCancelled = if (event.material.isInteractable) {
+
+        event.isCancelled = if (material.isInteractable && clickedBlock.state !is Container) {
+            if (land.hasAccess(event.player.uniqueId)) return
             if (Permission.INTERACT_USE.hasPermission(event.player)) return
-            true
+            pandorasClusterApi.getLandFlag(LandFlag.INTERACT_USE, land)?.getValue<Boolean>() == false
         } else if (blockData is Farmland && event.action == Action.PHYSICAL) {
+            if (land.hasAccess(event.player.uniqueId)) return
             if (pandorasClusterApi.getLandFlag(LandFlag.FARMLAND_DESTROY, land)?.getValue<Boolean>() == true) return
             if (Permission.INTERACT_FARMLAND.hasPermission(event.player)) return
             true
         } else if (clickedBlock.state is Container) {
+            if (land.hasAccess(event.player.uniqueId)) return
             if (Permission.INTERACT_CONTAINERS.hasPermission(event.player)) return
+            if (pandorasClusterApi.getLandFlag(LandFlag.INTERACT_CONTAINERS, land)?.getValue<Boolean>() == true) return
             true
-        } else if (blockData is RespawnAnchor &&
-            event.action == Action.RIGHT_CLICK_BLOCK &&
-            blockData.charges == blockData.maximumCharges
-        ) {
-            val landFlag = pandorasClusterApi.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
-            if (landFlag.getValue<Boolean>() == true) return
+        } else if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK) {
+            if (pandorasClusterApi.getLandFlag(LandFlag.EXPLOSIONS, land)?.getValue<Boolean>() == true) return
             if (Permission.EXPLOSION.hasPermission(event.player)) return
             true
-        } else if(blockData is TurtleEgg) {
+        } else if(blockData is TurtleEgg && event.action == Action.PHYSICAL) {
+            if (land.hasAccess(event.player.uniqueId)) return
+            if (pandorasClusterApi.getLandFlag(LandFlag.TURTLE_EGG_DESTROY, land)?.getValue<Boolean>() == true) return
             !Permission.PVE.hasPermission(event.player)
         } else {
             false
