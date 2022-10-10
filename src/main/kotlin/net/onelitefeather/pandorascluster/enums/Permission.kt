@@ -20,7 +20,9 @@ enum class Permission(val permissionNode: String) {
     EXPLOSION("pandorascluster.bypass.explosion"),
     INTERACT_CONTAINERS("pandorascluster.bypass.interact.container"),
     INTERACT_FARMLAND("pandorascluster.bypass.interact.farmland"),
+
     INTERACT_USE("pandorascluster.bypass.interact.use"),
+
     POTION_SPLASH("pandorascluster.bypass.potion.splash"),
     BUCKET_USE("pandorascluster.bypass.use.bucket"),
     SHEAR_ENTITY("pandorascluster.bypass.shear.entity"),
@@ -36,6 +38,7 @@ enum class Permission(val permissionNode: String) {
     HANGING_PLACE("pandorascluster.bypass.hanging.place"),
     TAME_ENTITY("pandorascluster.bypass.entity.tame"),
     PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
+    ENTITY_INTERACT("pandorascluster.bypass.interact.entity"),
 
     SET_LAND_ROLE("pandorascluster.admin.set.role");
 
