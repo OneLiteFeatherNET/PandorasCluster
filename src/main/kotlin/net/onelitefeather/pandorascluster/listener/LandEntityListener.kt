@@ -44,17 +44,18 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
         }
 
         val land = pandorasClusterApi.getLand(target.chunk) ?: pandorasClusterApi.getLand(attacker.chunk) ?: return
-        event.isCancelled = if (target is Player && attacker !is Player) {
-            val flag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
-            val value = flag.getValue<Boolean>() == true
-            if (target.hasPermission(Permission.PVE)) return
-            if (land.hasAccess(target.uniqueId)) return
-            !value
-        } else {
+
+        event.isCancelled = if(target is Player && attacker is Player) {
             val flag = pandorasClusterApi.getLandFlag(LandFlag.PVP, land) ?: return
             val value = flag.getValue<Boolean>() == true
             if (attacker.hasPermission(Permission.PVP)) return
             if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
+            !value
+        } else {
+            val flag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
+            val value = flag.getValue<Boolean>() == true
+            if (target.hasPermission(Permission.PVE) || attacker.hasPermission(Permission.PVE)) return
+            if (land.hasAccess(target.uniqueId) || land.hasAccess(attacker.uniqueId)) return
             !value
         }
     }
@@ -94,12 +95,10 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
 
     @EventHandler
     fun handleEntityTargetLivingEntity(event: EntityTargetLivingEntityEvent) {
-        val entity = event.entity
         val target = event.target ?: return
-        val land = pandorasClusterApi.getLand(entity.chunk) ?: pandorasClusterApi.getLand(target.chunk) ?: return
-        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land)
-        if (landFlag != null && landFlag.getValue<Boolean>() == true) return
-        event.isCancelled = false
+        val land = pandorasClusterApi.getLand(target.chunk) ?: return
+        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.PVE, land) ?: return
+        event.isCancelled = landFlag.getValue<Boolean>() == true
     }
 
     @EventHandler
