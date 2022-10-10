@@ -24,6 +24,7 @@ enum class LandFlag(val flagName: String,
     VEHICLE_CREATE("vehicle-create", false, LandFlagType.ENTITY, 2),
     VEHICLE_DAMAGE("vehicle-damage", false, LandFlagType.ENTITY, 2),
 
+    INTERACT_USE("use", false, LandFlagType.PLAYER, 2),
     INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, 2),
     LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, 2),
 
@@ -36,6 +37,7 @@ enum class LandFlag(val flagName: String,
     BEE_INTERACT("bee-interact", false, LandFlagType.ENTITY, 2),
     BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2),
     TURTLE_EGG_DESTROY("turtle_egg_destroy", false, LandFlagType.ENTITY, 2),
+    ENTITY_INTERACT("entity_interact", false, LandFlagType.ENTITY, 2),
 
     UNKNOWN("unknown", false, LandFlagType.ENTITY, 2);
 }
