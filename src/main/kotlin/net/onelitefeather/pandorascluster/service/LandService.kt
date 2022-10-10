@@ -15,7 +15,6 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.listener.*
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
-import net.onelitefeather.pandorascluster.util.getChunkIndex
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
@@ -33,6 +32,7 @@ class LandService(
         pluginManager.registerEvents(LandBlockListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(LandEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(LandPlayerListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandPlayerInteractListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(LandWorldListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(
             LandContainerProtectionListener(pandorasClusterApi),
@@ -151,7 +151,7 @@ class LandService(
                     "SELECT ch FROM ChunkPlaceholder ch JOIN FETCH ch.land WHERE ch.chunkIndex = :chunkIndex",
                     ChunkPlaceholder::class.java
                 )
-                query.setParameter("chunkIndex", getChunkIndex(chunk))
+                query.setParameter("chunkIndex", chunk.chunkKey)
                 val chunkHolder = query.uniqueResult()
                 if (chunkHolder != null) {
                     land = chunkHolder.land
