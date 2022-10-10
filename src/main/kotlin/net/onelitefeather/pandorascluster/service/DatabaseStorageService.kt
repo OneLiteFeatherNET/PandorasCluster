@@ -14,7 +14,6 @@ import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.toHomePosition
-import net.onelitefeather.pandorascluster.util.getChunkIndex
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
@@ -131,7 +130,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
 
     fun addChunkPlaceholder(chunk: Chunk, land: Land?) {
         var transaction: Transaction? = null
-        val chunkPlaceholder = ChunkPlaceholder(null, getChunkIndex(chunk), land)
+        val chunkPlaceholder = ChunkPlaceholder(null, chunk.chunkKey, land)
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
