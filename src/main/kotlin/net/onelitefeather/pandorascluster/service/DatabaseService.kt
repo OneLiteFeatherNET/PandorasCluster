@@ -60,4 +60,6 @@ class DatabaseService(
     fun shutdown() {
         sessionFactory.close()
     }
+
+    fun isRunning() =  this::sessionFactory.isInitialized && sessionFactory.isOpen
 }
