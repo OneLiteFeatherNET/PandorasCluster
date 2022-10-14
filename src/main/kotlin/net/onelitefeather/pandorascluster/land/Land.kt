@@ -49,8 +49,17 @@ data class Land(
         return owner?.getUniqueId() == uniqueId
     }
 
-    fun getLandFlag(landFlag: LandFlag): LandFlagEntity? =
-        flags.firstOrNull { landFlagEntity -> landFlagEntity.name?.uppercase() == landFlag.name.uppercase() }
+    fun getLandFlag(landFlag: LandFlag): LandFlagEntity {
+
+        val result = LandFlagEntity(
+            null, landFlag.name,
+            landFlag.defaultValue.toString(), landFlag.type,
+            landFlag.landFlagType,
+            this)
+
+        return flags.find { it.name?.uppercase() == landFlag.name.uppercase() } ?: result
+    }
+
 
     fun getMergedChunk(chunkIndex: Long): ChunkPlaceholder? =
         chunks.firstOrNull { chunkPlaceholder -> chunkPlaceholder.chunkIndex == chunkIndex }
