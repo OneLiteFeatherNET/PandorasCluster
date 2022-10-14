@@ -5,7 +5,6 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.TurtleEgg
 import org.bukkit.entity.*
@@ -45,7 +44,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
 
         val land = pandorasClusterApi.getLand(target.chunk) ?: pandorasClusterApi.getLand(attacker.chunk) ?: return
 
-        event.isCancelled = if(target is Player && attacker is Player) {
+        event.isCancelled = if (target is Player && attacker is Player) {
             val flag = pandorasClusterApi.getLandFlag(LandFlag.PVP, land) ?: return
             val value = flag.getValue<Boolean>() == true
             if (attacker.hasPermission(Permission.PVP)) return
@@ -66,8 +65,8 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
         val land = pandorasClusterApi.getLand(block.chunk)
         val primerEntity = event.primerEntity
         if (land != null) {
-            val landFlag = pandorasClusterApi.getLandFlag(LandFlag.EXPLOSIONS, land)
-            event.isCancelled = if (landFlag != null && landFlag.getValue<Boolean>() == false) {
+            val landFlag = land.getLandFlag(LandFlag.EXPLOSIONS)
+            event.isCancelled = if (landFlag.getValue<Boolean>() == false) {
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
@@ -79,18 +78,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
 
     @EventHandler
     fun handleEntityExplode(event: EntityExplodeEvent) {
-        val entity = event.entity
-        val land = pandorasClusterApi.getLand(entity.chunk)
-        if (land != null) {
-            val iterator = event.blockList().iterator()
-            while (iterator.hasNext()) {
-                val next = iterator.next()
-                val nextLand = pandorasClusterApi.getLand(next.chunk)
-                if (nextLand != null && !hasSameOwner(land, nextLand)) {
-                    iterator.remove()
-                }
-            }
-        }
+        event.blockList().groupBy { it.chunk }.filter {
+            pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
+        }.forEach { event.blockList().removeAll(it.value) }
     }
 
     @EventHandler
@@ -112,7 +102,8 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) :
             val turtleEggDestroyFlag = pandorasClusterApi.getLandFlag(LandFlag.TURTLE_EGG_DESTROY, land)
             if (turtleEggDestroyFlag != null && turtleEggDestroyFlag.getValue<Boolean>() == false) {
                 event.isCancelled = true
-                event.entity.velocity = event.entity.velocity.subtract(event.entity.location.direction)
+                event.entity.velocity =
+                    event.entity.velocity.subtract(event.entity.location.direction).multiply(0.5).normalize()
                 return
             }
         }
