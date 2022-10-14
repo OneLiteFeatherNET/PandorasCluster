@@ -41,18 +41,16 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
     }
 
     @EventHandler
-    fun handleBlockExplode(event: BlockExplodeEvent) {
-        val iterator = event.blockList().iterator()
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            val nextLand = pandorasClusterApi.getLand(next.chunk)
-            if (nextLand != null) {
-                val landFlag = pandorasClusterApi.getLandFlag(LandFlag.EXPLOSIONS, nextLand)
-                if (landFlag != null && landFlag.getValue<Boolean>() == false) {
-                    iterator.remove()
-                }
-            }
-        }
+    fun handleBlockForm(event: BlockFormEvent) {
+        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
+
+    }
+
+    @EventHandler
+    fun handleEntityBlockForm(event: EntityBlockFormEvent) {
+        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
     }
 
     @EventHandler
@@ -71,8 +69,10 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         val block = event.block
         val land = pandorasClusterApi.getLand(block.chunk)
         if (land != null) {
-            val landFlag = pandorasClusterApi.getLandFlag(LandFlag.REDSTONE, land) ?: return
-            event.newCurrent = if (landFlag.getValue<Boolean>() == false) 0 else event.oldCurrent
+            val landFlag = land.getLandFlag(LandFlag.REDSTONE) ?: return
+            if (landFlag.getValue<Boolean>() == false) {
+                event.newCurrent = 0
+            }
         }
     }
 
