@@ -6,7 +6,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-class PlayerConnectionListener(private val api: PandorasClusterApi) : Listener {
+class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
 
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
