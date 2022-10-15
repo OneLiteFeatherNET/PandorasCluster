@@ -50,7 +50,7 @@ dependencies {
     bukkitLibrary(libs.sentrylog4j2)
 
     // Database
-    implementation("org.hibernate:hibernate-core:6.1.3.Final")
+    implementation("org.hibernate:hibernate-core:6.1.4.Final")
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     implementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
 
