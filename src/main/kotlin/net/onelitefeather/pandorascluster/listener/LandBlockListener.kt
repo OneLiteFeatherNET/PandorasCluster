@@ -43,25 +43,22 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
     @EventHandler
     fun handleBlockForm(event: BlockFormEvent) {
         val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        if (event is EntityBlockFormEvent) return
         event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
-
     }
 
     @EventHandler
     fun handleEntityBlockForm(event: EntityBlockFormEvent) {
         val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
+        event.isCancelled =
+            land.getLandFlag(LandFlag.ICE_FORM).getValue<Boolean>() == false || !land.hasAccess(event.entity.uniqueId)
     }
 
     @EventHandler
     fun handleBlockFromTo(event: BlockFromToEvent) {
-        val block = event.block
-        val toBlock = event.toBlock
-        val blockChunk = pandorasClusterApi.getLand(block.chunk)
-        val toBlockChunk = pandorasClusterApi.getLand(toBlock.chunk)
-        if (blockChunk != null && toBlockChunk != null && !hasSameOwner(blockChunk, toBlockChunk)) {
-            event.isCancelled = true
-        }
+        val block = event.toBlock
+        val land = pandorasClusterApi.getLand(block.chunk) ?: return
+        event.isCancelled = land.getLandFlag(LandFlag.LIQUID_FLOW).getValue<Boolean>() == false
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
