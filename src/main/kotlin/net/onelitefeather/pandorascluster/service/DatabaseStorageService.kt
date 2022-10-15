@@ -73,6 +73,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 }
 
                 transaction?.commit()
+                pandorasClusterApi.getLandService().updateLoadedChunks(land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -102,6 +103,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 }
 
                 transaction?.commit()
+                pandorasClusterApi.getLandService().updateLoadedChunks(land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -118,6 +120,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 transaction = session.beginTransaction()
                 session.merge(land)
                 transaction?.commit()
+                pandorasClusterApi.getLandService().updateLoadedChunks(land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -134,7 +137,9 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 transaction = session.beginTransaction()
                 session.persist(chunkPlaceholder)
                 transaction?.commit()
-                pandorasClusterApi.getLandService().loadChunk(chunk)
+                if (land != null) {
+                    pandorasClusterApi.getLandService().claimChunk(chunk, land)
+                }
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -208,6 +213,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 transaction = session.beginTransaction()
                 session.remove(member)
                 transaction?.commit()
+                pandorasClusterApi.getLandService().updateLoadedChunks(member.land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
