@@ -31,9 +31,10 @@ enum class LandFlag(val flagName: String,
     ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
     BEE_INTERACT("bee-interact", false, LandFlagType.ENTITY, 2),
     BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2),
-    TURTLE_EGG_DESTROY("turtle_egg_destroy", false, LandFlagType.ENTITY, 2),
-    ENTITY_INTERACT("entity_interact", false, LandFlagType.ENTITY, 2),
-    UNKNOWN("unknown", false, LandFlagType.ENTITY, 2);
+    TURTLE_EGG_DESTROY("turtle-egg-destroy", false, LandFlagType.ENTITY, 2),
+    ENTITY_INTERACT("entity-interact", false, LandFlagType.ENTITY, 2),
+    UNKNOWN("unknown", false, LandFlagType.ENTITY, 2),
+    LIQUID_FLOW("liquid-flow", false, LandFlagType.WORLD_TICK, 2);
 }
 
 val LAND_FLAGS = LandFlag.values()
