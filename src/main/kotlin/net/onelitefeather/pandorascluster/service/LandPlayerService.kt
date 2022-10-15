@@ -80,7 +80,7 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val chunkPlayerQuery = session.createQuery(
-                    "SELECT 1 FROM LandPlayer lp WHERE lp.uuid = :uuid",
+                    "SELECT lp FROM LandPlayer lp WHERE lp.uuid = :uuid",
                     LandPlayer::class.java
                 )
                 chunkPlayerQuery.setParameter("uuid", uuid.toString())
