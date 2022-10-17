@@ -51,5 +51,10 @@ data class LandFlagEntity(
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , name = $name , value = $value , type = $type , flagType = $flagType )"
     }
-
 }
+
+fun getDefaultFlag(landFlag: LandFlag) : LandFlagEntity = LandFlagEntity(
+    landFlag.ordinal.toLong(), landFlag.name,
+    landFlag.defaultValue.toString(), landFlag.type,
+    landFlag.landFlagType,
+    null)
