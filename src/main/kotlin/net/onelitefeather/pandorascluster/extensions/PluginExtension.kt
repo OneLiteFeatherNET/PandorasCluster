@@ -49,7 +49,7 @@ fun PandorasClusterPlugin.buildCommandSystem() {
     }
 
     confirmationManager = CommandConfirmationManager(
-        10L, TimeUnit.SECONDS, { context: CommandPostprocessingContext<CommandSender> ->
+        20L, TimeUnit.SECONDS, { context: CommandPostprocessingContext<CommandSender> ->
             bukkitAudiences.sender(context.commandContext.sender).sendMessage(
                 text("Confirmation required. Confirm using /land confirm.", NamedTextColor.RED)
             )
