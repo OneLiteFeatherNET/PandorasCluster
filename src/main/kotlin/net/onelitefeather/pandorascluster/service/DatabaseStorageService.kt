@@ -8,6 +8,7 @@ import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
+import net.onelitefeather.pandorascluster.land.flag.getDefaultFlag
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
@@ -90,16 +91,36 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         updateLand(land.copy(owner = landPlayer))
     }
 
+    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
+
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId AND f.name = :name",
+                    LandFlagEntity::class.java
+                )
+                flagOfLand.setParameter("landId", land.id)
+                flagOfLand.setParameter("name", landFlag.name)
+                return flagOfLand.uniqueResult()
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load landflag $landFlag", e)
+            Sentry.captureException(e)
+        }
+
+        return getDefaultFlag(landFlag)
+    }
+
     fun updateLandFlag(landFlag: LandFlag, value: String, land: Land) {
 
         var transaction: Transaction? = null
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
-                if (!pandorasClusterApi.getLandFlagService().existsFlagInLand(landFlag, land)) {
+                if (!land.hasFlag(landFlag)) {
                     session.persist(LandFlagEntity(null, landFlag.name, value, landFlag.type, landFlag.landFlagType, land))
                 } else {
-                    session.merge(pandorasClusterApi.getLandFlag(landFlag, land)?.copy(value = value))
+                    session.merge(getLandFlag(landFlag, land)?.copy(value = value))
                 }
 
                 transaction?.commit()
