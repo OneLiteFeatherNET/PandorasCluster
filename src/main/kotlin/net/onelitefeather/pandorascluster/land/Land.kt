@@ -6,6 +6,7 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
+import net.onelitefeather.pandorascluster.land.flag.getDefaultFlag
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
@@ -45,20 +46,10 @@ data class Land(
     val z: Int = -1
 ) {
 
-    fun isOwner(uniqueId: UUID): Boolean {
-        return owner?.getUniqueId() == uniqueId
-    }
+    fun isOwner(uniqueId: UUID): Boolean = owner?.getUniqueId() == uniqueId
 
-    fun getLandFlag(landFlag: LandFlag): LandFlagEntity {
-
-        val result = LandFlagEntity(
-            null, landFlag.name,
-            landFlag.defaultValue.toString(), landFlag.type,
-            landFlag.landFlagType,
-            this)
-
-        return flags.find { it.name?.uppercase() == landFlag.name.uppercase() } ?: result
-    }
+    fun getLandFlag(landFlag: LandFlag): LandFlagEntity =
+        flags.find { it.name?.uppercase() == landFlag.name.uppercase() } ?: getDefaultFlag(landFlag).copy(land = this)
 
 
     fun getMergedChunk(chunkIndex: Long): ChunkPlaceholder? =
@@ -104,4 +95,5 @@ data class Land(
     }
 
     fun isMerged() = chunks.isNotEmpty()
+    fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
 }
