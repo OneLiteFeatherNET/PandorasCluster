@@ -56,10 +56,20 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         if (land.isOwner(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
-            pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
-            player.sendMessage(
-                miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, playerName, landRole.display)) }
-            )
+            if(landRole != LandRole.VISITOR) {
+                pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
+                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, playerName, landRole.display)) })
+            } else {
+
+                val member = land.getLandMember(playerId)
+                if(member == null) {
+                    player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.not-found", *arrayOf(pluginPrefix, playerName)) })
+                    return
+                }
+
+                pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
+                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.success", *arrayOf(pluginPrefix, playerName)) })
+            }
         }
     }
 
