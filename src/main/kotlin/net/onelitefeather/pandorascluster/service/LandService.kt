@@ -13,7 +13,16 @@ import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
-import net.onelitefeather.pandorascluster.listener.*
+import net.onelitefeather.pandorascluster.listener.LandContainerProtectionListener
+import net.onelitefeather.pandorascluster.listener.LandWorldListener
+import net.onelitefeather.pandorascluster.listener.block.LandBlockListener
+import net.onelitefeather.pandorascluster.listener.entity.LandEntityListener
+import net.onelitefeather.pandorascluster.listener.entity.LandHangingEntityListener
+import net.onelitefeather.pandorascluster.listener.entity.LandVehicleListener
+import net.onelitefeather.pandorascluster.listener.player.LandPlayerInteractListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerConnectionListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerInteractEntityListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerLocationListener
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -25,32 +34,39 @@ import java.util.function.Consumer
 import java.util.logging.Level
 
 
-class LandService(
-    private val pandorasClusterApi: PandorasClusterApi
-) {
+class LandService(private val pandorasClusterApi: PandorasClusterApi) {
 
-    val landCache: LoadingCache<Chunk, Land> = Caffeine.newBuilder().maximumSize(1000)
-        .expireAfterAccess(Duration.ofMinutes(15))
-        .expireAfterWrite(Duration.ofMinutes(15))
+    val landCache: LoadingCache<Chunk, Land> = Caffeine.newBuilder().maximumSize(10_000)
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .expireAfterWrite(Duration.ofMinutes(5))
         .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> getFullLand(key) }
 
     val unclaimedChunkCache: LoadingCache<Chunk, Boolean> = Caffeine.newBuilder().maximumSize(10_000)
-        .expireAfterAccess(Duration.ofMinutes(15))
-        .expireAfterWrite(Duration.ofMinutes(15))
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .expireAfterWrite(Duration.ofMinutes(5))
         .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> isChunkClaimed(key) }
 
     init {
 
         val pluginManager = pandorasClusterApi.getPlugin().server.pluginManager
+
+        //Blocks
         pluginManager.registerEvents(LandBlockListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Entities
         pluginManager.registerEvents(LandEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
-        pluginManager.registerEvents(LandPlayerListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandHangingEntityListener(pandorasClusterApi, this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandVehicleListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Players
         pluginManager.registerEvents(LandPlayerInteractListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerConnectionListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerInteractEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerLocationListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Misc
+        pluginManager.registerEvents(LandContainerProtectionListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(LandWorldListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
-        pluginManager.registerEvents(
-            LandContainerProtectionListener(pandorasClusterApi),
-            pandorasClusterApi.getPlugin()
-        )
     }
 
     fun getLands(): List<Land> {
