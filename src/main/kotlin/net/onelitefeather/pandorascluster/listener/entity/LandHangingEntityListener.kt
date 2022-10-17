@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.listener
+package net.onelitefeather.pandorascluster.listener.entity
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
@@ -17,27 +17,25 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
         if (event.cause == HangingBreakEvent.RemoveCause.ENTITY) return
         val entity = event.entity
         val land = pandorasClusterApi.getLand(entity.chunk) ?: return
-        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.HANGING_BREAK, land) ?: return
-        if (landFlag.getValue<Boolean>() == true) return
-        event.isCancelled = true
+        event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
     @EventHandler
     fun handleHangingBreakByEntity(event: HangingBreakByEntityEvent) {
         val entity = event.entity
         val land = pandorasClusterApi.getLand(entity.chunk) ?: return
-        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.HANGING_BREAK, land) ?: return
-        if(Permission.HANGING_BREAK.hasPermission(event.remover!!)) return
-        if (landFlag.getValue<Boolean>() == true) return
-        event.isCancelled = true
+        val remover = event.remover
+
+        if(remover != null && (Permission.HANGING_BREAK.hasPermission(remover) || land.hasAccess(remover.uniqueId))) return
+        event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
     @EventHandler
     fun handleHangingPlace(event: HangingPlaceEvent) {
         val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.HANGING_PLACE, land) ?: return
-        if(Permission.HANGING_PLACE.hasPermission(event.player!!)) return
-        if (landFlag.getValue<Boolean>() == true) return
-        event.isCancelled = true
+        val player = event.player
+
+        if(player != null && (Permission.HANGING_BREAK.hasPermission(player) || land.hasAccess(player.uniqueId))) return
+        event.isCancelled = land.getLandFlag(LandFlag.HANGING_PLACE).getValue<Boolean>() == false
     }
 }
