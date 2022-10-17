@@ -1,5 +1,6 @@
-package net.onelitefeather.pandorascluster.listener
+package net.onelitefeather.pandorascluster.listener.block
 
+import io.papermc.paper.event.block.PlayerShearBlockEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
@@ -11,6 +12,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerBucketFillEvent
 
 class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Listener {
 
@@ -138,5 +141,29 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
                 event.isCancelled = true
             }
         }
+    }
+
+    @EventHandler
+    fun handlePlayerBlockShear(event: PlayerShearBlockEvent) {
+        val land = pandorasClusterApi.getLand(event.block.chunk)
+        if (Permission.SHEAR_BLOCK.hasPermission(event.player)) return
+        if (land == null || !land.hasAccess(event.player.uniqueId)) return
+        event.isCancelled = true
+    }
+
+    @EventHandler
+    fun handlePlayerBucketUse(event: PlayerBucketFillEvent) {
+        val land = pandorasClusterApi.getLand(event.blockClicked.chunk)
+        if (Permission.BUCKET_USE.hasPermission(event.player)) return
+        if (land == null || !land.hasAccess(event.player.uniqueId)) return
+        event.isCancelled = true
+    }
+
+    @EventHandler
+    fun handlePlayerBucketUse(event: PlayerBucketEmptyEvent) {
+        val land = pandorasClusterApi.getLand(event.blockClicked.chunk)
+        if (Permission.BUCKET_USE.hasPermission(event.player)) return
+        if (land == null || !land.hasAccess(event.player.uniqueId)) return
+        event.isCancelled = true
     }
 }
