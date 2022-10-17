@@ -4,7 +4,6 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.hasSameOwner
-import org.bukkit.Location
 import org.bukkit.event.*
 import org.bukkit.event.block.BlockFertilizeEvent
 import org.bukkit.event.block.LeavesDecayEvent
@@ -25,52 +24,19 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
     @EventHandler
     fun handleLeavesDecay(event: LeavesDecayEvent) {
         val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        val landFlag = pandorasClusterApi.getLandFlag(LandFlag.LEAVES_DECAY, land) ?: return
+        val landFlag = land.getLandFlag(LandFlag.LEAVES_DECAY)
         if (landFlag.getValue<Boolean>() == false) return
         event.isCancelled = true
     }
 
     @EventHandler
     fun handleBlockFertilize(event: BlockFertilizeEvent) {
-        val blocks = event.blocks
-        if (blocks.isEmpty()) return
-
-        var location: Location?
-        val originChunk = blocks.first().chunk
-        val area = pandorasClusterApi.getLand(originChunk)
-
-        if (area == null) {
-            for (i in blocks.indices.reversed()) {
-                location = blocks[i].location
-                if (pandorasClusterApi.getLand(location.chunk) == null) {
-                    blocks.removeAt(i)
-                }
-            }
-        } else {
-            handle(event)
-        }
+        handle(event)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleStructureGrow(event: StructureGrowEvent) {
-
-        val blocks = event.blocks
-        if (blocks.isEmpty()) return
-
-        var location: Location?
-        val originChunk = blocks.first().chunk
-        val area = pandorasClusterApi.getLand(originChunk)
-
-        if (area == null) {
-            for (i in blocks.indices.reversed()) {
-                location = blocks[i].location
-                if (pandorasClusterApi.getLand(location.chunk) == null) {
-                    blocks.removeAt(i)
-                }
-            }
-        } else {
-            handle(event)
-        }
+        handle(event)
     }
 
     private fun handle(event: Event) {
