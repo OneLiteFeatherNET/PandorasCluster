@@ -26,7 +26,6 @@ enum class LandFlag(val flagName: String,
     LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, 2),
     ENTITY_CHANGE_BLOCK("entity-change-block", false, LandFlagType.ENTITY, 2),
     EXPLOSIONS("explosions", true, LandFlagType.EXPLOSION, 2),
-    FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, 2),
     MOB_GRIEFING("mob-griefing", true, LandFlagType.ENTITY, 2),
     ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
     BEE_INTERACT("bee-interact", false, LandFlagType.ENTITY, 2),
@@ -34,9 +33,12 @@ enum class LandFlag(val flagName: String,
     TURTLE_EGG_DESTROY("turtle-egg-destroy", false, LandFlagType.ENTITY, 2),
     ENTITY_INTERACT("entity-interact", false, LandFlagType.ENTITY, 2),
     UNKNOWN("unknown", false, LandFlagType.ENTITY, 2),
-    LIQUID_FLOW("liquid-flow", false, LandFlagType.WORLD_TICK, 2);
+    LIQUID_FLOW("liquid-flow", false, LandFlagType.WORLD_TICK, 2),
+    INTERACT_CROPS("interact-crops", false, LandFlagType.PLAYER, 2);
 }
 
 val LAND_FLAGS = LandFlag.values()
 fun findByName(name: String): LandFlag? =
-    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase()  }
+    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase() || landFlag.flagName.equals(name, true)  }
+
+fun getDefaultFlagNames(): List<String> = LAND_FLAGS.map { it.name }
