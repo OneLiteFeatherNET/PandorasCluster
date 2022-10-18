@@ -6,6 +6,8 @@ import cloud.commandframework.annotations.CommandPermission
 import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.entity.Player
@@ -27,12 +29,27 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if(landFlag == LandFlag.UNKNOWN) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.not-found", *arrayOf(pluginPrefix)) })
+        if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_FLAG)) {
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            return
+        }
+
+        if (landFlag == LandFlag.UNKNOWN) {
+            player.sendMessage(miniMessage {
+                pandorasClusterApi.i18n(
+                    "command.set-flag.not-found",
+                    *arrayOf(pluginPrefix)
+                )
+            })
             return
         }
 
         pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.success", *arrayOf(pluginPrefix, landFlag.name, value)) })
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.set-flag.success",
+                *arrayOf(pluginPrefix, landFlag.name, value)
+            )
+        })
     }
 }

@@ -37,7 +37,11 @@ enum class Permission(val permissionNode: String) {
     TAME_ENTITY("pandorascluster.bypass.entity.tame"),
     PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
 
-    SET_LAND_ROLE("pandorascluster.admin.set.role");
+    SET_LAND_ROLE("pandorascluster.admin.set.role"),
+    REMOVE_PLAYER_OTHER_LAND("pandorascluster.land.remove.others"),
+    SET_LAND_FLAG("pandorascluster.admin.set.flags"),
+    SET_LAND_HOME("pandorascluster.admin.set.home"),
+    SET_LAND_OWNER("pandorascluster.admin.set.owner");
 
     fun hasPermission(permissible: Permissible): Boolean {
         return permissible.hasPermission("pandorascluster.bypass.*") || permissible.hasPermission(permissionNode)

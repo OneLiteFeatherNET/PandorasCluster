@@ -95,4 +95,8 @@ data class Land(
     }
 
     fun isMerged() = chunks.isNotEmpty()
+    fun isAdmin(playerId: UUID): Boolean {
+        val member = getLandMember(playerId) ?: return false
+        return member.role == LandRole.ADMIN
+    }
 }
