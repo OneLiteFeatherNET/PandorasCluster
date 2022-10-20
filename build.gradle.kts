@@ -54,6 +54,9 @@ dependencies {
     implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
     implementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
 
+    //Misc
+    bukkitLibrary("org.apache.commons:commons-lang3:3.12.0")
+
     testImplementation("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
     testImplementation(libs.faweCore)
     testImplementation(libs.fawe) {
