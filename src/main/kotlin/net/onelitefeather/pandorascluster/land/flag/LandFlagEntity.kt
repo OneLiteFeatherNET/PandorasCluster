@@ -2,6 +2,8 @@ package net.onelitefeather.pandorascluster.land.flag
 
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.land.Land
+import org.apache.commons.lang3.BooleanUtils
+import org.apache.commons.lang3.StringUtils
 import org.hibernate.Hibernate
 
 @Entity
@@ -12,7 +14,7 @@ data class LandFlagEntity(
     @Column
     val name: String? = null,
     @Column
-    val value: String? = null,
+    var value: String? = null,
     @Column
     val type: Byte? = null,
     @Column
@@ -50,6 +52,19 @@ data class LandFlagEntity(
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , name = $name , value = $value , type = $type , flagType = $flagType )"
+    }
+}
+
+fun isValidValue(landFlag: LandFlag, value: String): Boolean {
+    return when(landFlag.type.toInt()) {
+        0 -> !StringUtils.isNumeric(value) && !BooleanUtils.isNotFalse(value.toBoolean()) && !BooleanUtils.isNotTrue(value.toBoolean())
+        1 -> value.toIntOrNull() != null
+        2 -> value.toBooleanStrictOrNull() != null
+        3 -> value.toDoubleOrNull() != null
+        4 -> value.toFloatOrNull() != null
+        5 -> value.toShortOrNull() != null
+        6 -> value.toByteOrNull() != null
+        else -> false
     }
 }
 
