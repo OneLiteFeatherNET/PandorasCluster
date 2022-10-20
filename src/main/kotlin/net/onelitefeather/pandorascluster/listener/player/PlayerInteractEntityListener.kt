@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.listener.player;
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.entity.Tameable
@@ -17,10 +16,18 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
 
     @EventHandler
     fun handlePlayerBucketUse(event: PlayerBucketEntityEvent) {
+
         val land = pandorasClusterApi.getLand(event.entity.chunk)
-        if (Permission.BUCKET_USE.hasPermission(event.player)) return
-        if (land == null || !land.hasAccess(event.player.uniqueId)) return
-        event.isCancelled = true
+        val landFlag = LandFlag.BUCKET_INTERACT
+
+        if(land == null) {
+            event.isCancelled = !event.player.hasPermission(landFlag)
+            return
+        }
+
+        if (land.hasAccess(event.player.uniqueId)) return
+        if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
+        event.isCancelled = !event.player.hasPermission(landFlag)
     }
 
     @EventHandler
@@ -29,17 +36,17 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
         val player = event.player
         val entity = event.rightClicked
         val land = this.pandorasClusterApi.getLand(entity.chunk) ?: return
+        val landFlag = LandFlag.ENTITY_INTERACT
 
-        if(player.hasPermission(Permission.ENTITY_INTERACT)) return
         if(land.hasAccess(player.uniqueId)) return
-        if(land.getLandFlag(LandFlag.ENTITY_INTERACT).getValue<Boolean>() == true) return
-        event.isCancelled = true
+        if(land.getLandFlag(landFlag).getValue<Boolean>() == true) return
+        event.isCancelled = !player.hasPermission(landFlag)
     }
 
     @EventHandler
     fun handlePlayerEntityShear(event: PlayerShearEntityEvent) {
         val land = pandorasClusterApi.getLand(event.entity.chunk)
-        if (Permission.SHEAR_ENTITY.hasPermission(event.player)) return
+        if (event.player.hasPermission(LandFlag.SHEAR_ENTITY)) return
         if (land == null || !land.hasAccess(event.player.uniqueId)) return
         event.isCancelled = true
     }
@@ -47,7 +54,7 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
     @EventHandler
     fun handlePlayerLeashEntity(event: PlayerLeashEntityEvent) {
         val land = pandorasClusterApi.getLand(event.entity.chunk)
-        if (Permission.LEASH_ENTITY.hasPermission(event.player)) return
+        if (event.player.hasPermission(LandFlag.ENTITY_LEASH)) return
         if (event.entity is Tameable && (event.entity as Tameable).ownerUniqueId == event.player.uniqueId) return
         if (land == null || !land.hasAccess(event.player.uniqueId)) return
         event.isCancelled = true
@@ -56,7 +63,7 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
     @EventHandler
     fun handlePlayerUnleashEntity(event: PlayerUnleashEntityEvent) {
         val land = pandorasClusterApi.getLand(event.entity.chunk)
-        if (Permission.UNLEASH_ENTITY.hasPermission(event.player)) return
+        if (event.player.hasPermission(LandFlag.ENTITY_LEASH)) return
         if (event.entity is Tameable && (event.entity as Tameable).ownerUniqueId == event.player.uniqueId) return
         if (land == null || !land.hasAccess(event.player.uniqueId)) return
         event.isCancelled = true

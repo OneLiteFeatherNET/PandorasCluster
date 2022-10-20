@@ -20,15 +20,16 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
     fun handlePlayerHarvestBlock(event: PlayerHarvestBlockEvent) {
 
         val land = pandorasClusterApi.getLand(event.harvestedBlock.chunk)
+        val landFlag = LandFlag.INTERACT_CROPS
 
         if (land == null) {
-            event.isCancelled = !Permission.INTERACT_CROPS.hasPermission(event.player)
+            event.isCancelled = !event.player.hasPermission(landFlag)
             return
         }
 
         if (land.hasAccess(event.player.uniqueId)) return
-        if (land.getLandFlag(LandFlag.INTERACT_CROPS).getValue<Boolean>() == true) return
-        event.isCancelled = !Permission.INTERACT_CROPS.hasPermission(event.player)
+        if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
+        event.isCancelled = !event.player.hasPermission(landFlag)
     }
 
     @EventHandler
@@ -39,22 +40,25 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         val land = pandorasClusterApi.getLand(clickedBlock.chunk)
         val blockData = clickedBlock.blockData
 
+        val interactCropsFlag = LandFlag.INTERACT_CROPS
+        val turtleEggDestroyFlag = LandFlag.TURTLE_EGG_DESTROY
+
         event.isCancelled = if (event.action == Action.PHYSICAL) {
             if (blockData is TurtleEgg) {
                 if (land != null) {
                     if (land.hasAccess(player.uniqueId)) return
-                    if (land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY).getValue<Boolean>() == true) return
-                    !Permission.PVE.hasPermission(event.player)
+                    if (land.getLandFlag(turtleEggDestroyFlag).getValue<Boolean>() == true) return
+                    !event.player.hasPermission(turtleEggDestroyFlag)
                 } else {
-                    !Permission.PVE.hasPermission(event.player)
+                    !event.player.hasPermission(turtleEggDestroyFlag)
                 }
             } else if (blockData is Farmland) {
                 if (land != null) {
                     if (land.hasAccess(player.uniqueId)) return
-                    if (land.getLandFlag(LandFlag.INTERACT_CROPS).getValue<Boolean>() == true) return
-                    !Permission.INTERACT_CROPS.hasPermission(event.player)
+                    if (land.getLandFlag(interactCropsFlag).getValue<Boolean>() == true) return
+                    !event.player.hasPermission(interactCropsFlag)
                 } else {
-                    !Permission.INTERACT_CROPS.hasPermission(event.player)
+                    !event.player.hasPermission(interactCropsFlag)
                 }
             } else {
                 false
@@ -69,14 +73,15 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
 
         val player = event.player
         val clickedBlock = event.clickedBlock ?: return
+        val interactCropsFlag = LandFlag.INTERACT_CROPS
 
         event.isCancelled = if (event.material == Material.BONE_MEAL) {
             val land = pandorasClusterApi.getLand(clickedBlock.chunk)
             if (land != null) {
                 if (land.hasAccess(player.uniqueId)) return
-                !player.hasPermission(Permission.FERTILIZE_BLOCK)
+                !event.player.hasPermission(interactCropsFlag)
             } else {
-                !player.hasPermission(Permission.FERTILIZE_BLOCK)
+                !event.player.hasPermission(interactCropsFlag)
             }
         } else {
             false
@@ -100,20 +105,20 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
                 //Preventing un-trusted for opening containers
                 if (land != null) {
                     if (land.hasAccess(player.uniqueId)) return
-                    if (land.getLandFlag(LandFlag.INTERACT_CONTAINERS).getValue<Boolean>() == true) return
-                    !Permission.INTERACT_CONTAINERS.hasPermission(player)
+                    !land.isAllowUse(material)
                 } else {
                     !Permission.INTERACT_CONTAINERS.hasPermission(player)
                 }
             } else if (blockData is RespawnAnchor && action == Action.RIGHT_CLICK_BLOCK) {
                 //Preventing respawnanchors for explode
+                val explosionFlag = LandFlag.EXPLOSIONS
                 if (land != null) {
                     if (land.hasAccess(player.uniqueId)) return
-                    if (land.getLandFlag(LandFlag.EXPLOSIONS).getValue<Boolean>() == true) return
-                    if (Permission.EXPLOSION.hasPermission(player)) return
+                    if (land.getLandFlag(explosionFlag).getValue<Boolean>() == true) return
+                    if (player.hasPermission(explosionFlag)) return
                     blockData.charges == blockData.maximumCharges
                 } else {
-                    !Permission.EXPLOSION.hasPermission(player)
+                    !player.hasPermission(explosionFlag)
                 }
             } else {
                 false
@@ -125,25 +130,30 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
 
     @EventHandler
     fun handlePlayerEnterBed(event: PlayerBedEnterEvent) {
+
         val land = pandorasClusterApi.getLand(event.bed.chunk)
+        val landFlag = LandFlag.USE_BED
+
         if (land == null) {
-            event.isCancelled = !Permission.ENTER_BED.hasPermission(event.player)
+            event.isCancelled = !event.player.hasPermission(landFlag)
             return
         }
 
-        event.isCancelled = !land.hasAccess(event.player.uniqueId)
+        event.isCancelled = !land.hasAccess(event.player.uniqueId) || land.getLandFlag(landFlag).getValue<Boolean>() == false
     }
 
     @EventHandler
     fun handlePlayerLeaveBed(event: PlayerBedLeaveEvent) {
 
         val land = pandorasClusterApi.getLand(event.bed.chunk)
+        val landFlag = LandFlag.USE_BED
+
         if (land == null) {
-            event.isCancelled = !Permission.LEAVE_BED.hasPermission(event.player)
+            event.isCancelled = !event.player.hasPermission(landFlag)
             return
         }
 
-        event.isCancelled = !land.hasAccess(event.player.uniqueId)
+        event.isCancelled = !land.hasAccess(event.player.uniqueId) || land.getLandFlag(landFlag).getValue<Boolean>() == false
     }
 
     @EventHandler
@@ -151,7 +161,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
 
         val land = pandorasClusterApi.getLand(event.lectern.chunk)
         if (land == null) {
-            event.isCancelled = !Permission.TAKE_LECTERN.hasPermission(event.player)
+            event.isCancelled = !event.player.hasPermission(LandFlag.TAKE_LECTERN)
             return
         }
 

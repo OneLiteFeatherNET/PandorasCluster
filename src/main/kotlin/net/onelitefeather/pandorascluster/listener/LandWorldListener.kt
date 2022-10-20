@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.event.*
@@ -15,9 +14,14 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
 
     @EventHandler
     fun handleRaidStart(event: RaidTriggerEvent) {
+
         val land = pandorasClusterApi.getLand(event.player.chunk)
-        if (Permission.TRIGGER_RAID.hasPermission(event.player)) return
-        if (land == null || !land.hasAccess(event.player.uniqueId)) return
+        if(land == null) {
+            event.isCancelled = true
+            return
+        }
+
+        if (land.hasAccess(event.player.uniqueId)) return
         event.isCancelled = true
     }
 
