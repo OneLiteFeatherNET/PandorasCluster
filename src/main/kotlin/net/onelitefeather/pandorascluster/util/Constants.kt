@@ -6,6 +6,7 @@ import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.flag.LandFlagType
 import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import java.util.*
 
@@ -56,9 +57,8 @@ val DUMMY_FLAG_ENTITY = LandFlagEntity(
     DUMMY_LAND
 )
 
-
+val MATERIALS = Material.values()
 val BLOCK_FACES = BlockFace.values()
-
 val CHUNK_ROTATIONS = ChunkRotation.values()
 
 fun getChunkRotation(facing: BlockFace) : ChunkRotation? {
