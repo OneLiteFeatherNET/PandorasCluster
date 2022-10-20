@@ -2,7 +2,6 @@ package net.onelitefeather.pandorascluster.listener.entity
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.block.data.type.CaveVinesPlant
@@ -37,39 +36,39 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val target = event.entity
         var attacker = event.damager
 
+        val pvpFlag = LandFlag.PVP
+        val pveFlag = LandFlag.PVE
+
         if (attacker is Projectile) {
             attacker = attacker.shooter as Entity
         }
 
         val land = pandorasClusterApi.getLand(target.chunk) ?: pandorasClusterApi.getLand(attacker.chunk) ?: return
-
         event.isCancelled = if (target is Player && attacker is Player) {
-            val flag = land.getLandFlag(LandFlag.PVP)
-            val value = flag.getValue<Boolean>() == true
-            if (attacker.hasPermission(Permission.PVP)) return
+            if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
             if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
-            !value
+            !attacker.hasPermission(pvpFlag)
         } else {
-            val flag = land.getLandFlag(LandFlag.PVE)
-            val value = flag.getValue<Boolean>() == true
-            if (target.hasPermission(Permission.PVE) || attacker.hasPermission(Permission.PVE)) return
+            if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
             if (land.hasAccess(target.uniqueId) || land.hasAccess(attacker.uniqueId)) return
-            !value
+            !target.hasPermission(pveFlag) || !attacker.hasPermission(pveFlag)
         }
     }
 
     @EventHandler
     fun handleEntityExplode(event: TNTPrimeEvent) {
+
         val block = event.block
         val land = pandorasClusterApi.getLand(block.chunk)
         val primerEntity = event.primerEntity
+        val landFlag = LandFlag.EXPLOSIONS
+
         if (land != null) {
-            val landFlag = land.getLandFlag(LandFlag.EXPLOSIONS)
-            event.isCancelled = if (landFlag.getValue<Boolean>() == false) {
+            event.isCancelled = if (land.getLandFlag(landFlag).getValue<Boolean>() == false) {
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
-                if (primerEntity.hasPermission(Permission.EXPLOSION)) return
+                if (primerEntity.hasPermission(landFlag)) return
                 true
             } else false
         }
@@ -97,14 +96,11 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val land = pandorasClusterApi.getLand(block.chunk) ?: return
         val blockData = block.blockData
 
-        if (blockData is TurtleEgg) {
-            val turtleEggDestroyFlag = land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY)
-            if (turtleEggDestroyFlag.getValue<Boolean>() == false) {
-                event.isCancelled = true
-                event.entity.velocity =
-                    event.entity.velocity.subtract(event.entity.location.direction).normalize().multiply(0.4)
-                return
-            }
+        if (blockData is TurtleEgg && land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY).getValue<Boolean>() == false) {
+            event.isCancelled = true
+            event.entity.velocity =
+                event.entity.velocity.subtract(event.entity.location.direction).normalize().multiply(0.4)
+            return
         }
 
         val farmLandDestroyFlag = land.getLandFlag(LandFlag.INTERACT_CROPS)
@@ -123,10 +119,11 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
             if (mount.isTamed && tamer != null && tamer.uniqueId == entity.uniqueId) return
         }
 
+        val landFlag = LandFlag.ENTITY_MOUNT
         val land = this.pandorasClusterApi.getLand(mount.getChunk()) ?: return
         if (land.hasAccess(entity.uniqueId)) return
-        if (Permission.ENTITY_MOUNT.hasPermission(entity)) return
-        event.isCancelled = true
+        if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
+        event.isCancelled = entity.hasPermission(landFlag)
     }
 
     @EventHandler
@@ -135,35 +132,42 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val block = event.block
         val entity = event.entity
         val blockData = block.blockData
-        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        val land = pandorasClusterApi.getLand(event.block.chunk)
 
-        event.isCancelled = if(blockData is CaveVinesPlant) {
-            if(land.hasAccess(entity.uniqueId)) return
-            if(land.getLandFlag(LandFlag.INTERACT_CROPS).getValue<Boolean>() == true) return
-            !entity.hasPermission(Permission.INTERACT_CROPS)
+        event.isCancelled = if (blockData is CaveVinesPlant) {
+            val landFlag = LandFlag.INTERACT_CROPS
+            if (land != null) {
+                if (land.hasAccess(entity.uniqueId)) return
+                if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
+                !entity.hasPermission(landFlag)
+            } else {
+                !entity.hasPermission(landFlag) && entity is Player
+            }
         } else {
-            if(land.hasAccess(entity.uniqueId)) return
-            if(land.getLandFlag(LandFlag.ENTITY_CHANGE_BLOCK).getValue<Boolean>() == true) return
-            !entity.hasPermission(Permission.ENTITY_CHANGE_BLOCK)
+            val landFlagECB = LandFlag.ENTITY_CHANGE_BLOCK
+            if (land != null) {
+                if (land.hasAccess(entity.uniqueId)) return
+                if (land.getLandFlag(landFlagECB).getValue<Boolean>() == true) return
+                !entity.hasPermission(landFlagECB)
+            } else {
+                !entity.hasPermission(landFlagECB) && entity is Player
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun handlePotionSplash(event: ProjectileLaunchEvent) {
-
         val projectile = event.entity
-
         if (projectile is ThrownPotion) {
 
+            val landFlag = LandFlag.POTION_SPLASH
             val source = projectile.getShooter()
             if (source is Entity) {
                 val land = pandorasClusterApi.getLand(source.chunk)
-
                 if (land != null) {
-
-                    if (land.getLandFlag(LandFlag.POTION_SPLASH).getValue<Boolean>() == true) return
+                    if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
                     if (land.hasAccess(source.uniqueId)) return
-                    if (Permission.POTION_SPLASH.hasPermission(source)) return
+                    if (source.hasPermission(landFlag)) return
                     event.isCancelled = true
                 }
             }
@@ -172,17 +176,11 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
 
     @EventHandler
     fun handleEntityTame(event: EntityTameEvent) {
-        val land = pandorasClusterApi.getLand(event.entity.chunk)
+        val land = pandorasClusterApi.getLand(event.entity.chunk) ?: return
+        if (land.getLandFlag(LandFlag.ENTITY_TAME).getValue<Boolean>() == true) return
         val owner = event.owner
         if (owner !is Permissible) return
-        if (Permission.TAME_ENTITY.hasPermission(owner)) return
-        if (land == null || !land.isBanned(event.owner.uniqueId)) return
-        event.isCancelled = true
-    }
-
-    @EventHandler
-    fun handleEntityEnterBlock(event: EntityEnterBlockEvent) {
-        event.isCancelled = pandorasClusterApi.getLand(event.block.chunk)?.
-        getLandFlag(LandFlag.BEE_INTERACT)?.getValue<Boolean>() == false
+        if (land.hasAccess(owner.uniqueId)) return
+        event.isCancelled = !owner.hasPermission(LandFlag.ENTITY_TAME)
     }
 }
