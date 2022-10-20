@@ -13,7 +13,9 @@ import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.toHomePosition
+import org.apache.commons.lang3.StringUtils
 import org.bukkit.Chunk
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import org.hibernate.Transaction
@@ -91,6 +93,25 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         updateLand(land.copy(owner = landPlayer))
     }
 
+    fun addUseMaterial(land: Land, material: String) {
+
+        val list = land.getUseMaterials()
+        val builder = StringBuilder()
+
+        if(list.isNotEmpty()) {
+            val lastElement = list.last()
+            for (currentMaterial in list) {
+                if (currentMaterial != lastElement) {
+                    builder.append(currentMaterial.name).append(",")
+                } else {
+                    builder.append(currentMaterial.name).append(",").append(material)
+                }
+            }
+
+            updateLandFlag(LandFlag.USE, builder.toString(), land)
+        }
+    }
+
     fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
 
         try {
@@ -111,6 +132,13 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         return getDefaultFlag(landFlag)
     }
 
+    fun removeUseMaterial(land: Land, material: Material) {
+        val lastElement = land.getUseMaterials().last()
+        val currentValue = land.getLandFlag(LandFlag.USE).value
+        val toRemove = if (lastElement != material) material.name + "," else material.name
+        updateLandFlag(LandFlag.USE, StringUtils.remove(currentValue, toRemove), land)
+    }
+
     fun updateLandFlag(landFlag: LandFlag, value: String, land: Land) {
 
         var transaction: Transaction? = null
@@ -118,7 +146,16 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
                 if (!land.hasFlag(landFlag)) {
-                    session.persist(LandFlagEntity(null, landFlag.name, value, landFlag.type, landFlag.landFlagType, land))
+                    session.persist(
+                        LandFlagEntity(
+                            null,
+                            landFlag.name,
+                            value,
+                            landFlag.type,
+                            landFlag.landFlagType,
+                            land
+                        )
+                    )
                 } else {
                     session.merge(getLandFlag(landFlag, land)?.copy(value = value))
                 }
@@ -174,7 +211,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
     }
 
     fun createLand(owner: LandPlayer, player: Player, chunk: Chunk) {
-        if(pandorasClusterApi.hasPlayerLand(player.uniqueId)) return
+        if (pandorasClusterApi.hasPlayerLand(player.uniqueId)) return
 
         CompletableFuture.runAsync {
             var transaction: Transaction? = null
