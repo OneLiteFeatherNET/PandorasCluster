@@ -4,41 +4,93 @@ import org.bukkit.permissions.Permissible
 
 enum class Permission(val permissionNode: String) {
 
-    ACCESS("pandorascluster.access.other"),
-    BLOCK_BREAK("pandorascluster.bypass.block.break"),
-    BLOCK_PLACE("pandorascluster.bypass.block.place"),
-    ENTITY_MOUNT("pandorascluster.bypass.mount"),
-    LAND_ENTRY_DENIED("pandorascluster.bypass.entry.denied"),
-    PVP("pandorascluster.bypass.attack.player"),
-    PVE("pandorascluster.bypass.attack.entity"),
-    VEHICLE_ENTER("pandorascluster.bypass.vehicle.use"),
-    VEHICLE_DAMAGE("pandorascluster.bypass.vehicle.damage"),
-    VEHICLE_DESTROY("pandorascluster.bypass.vehicle.destroy"),
-    EXPLOSION("pandorascluster.bypass.explosion"),
-    INTERACT_CONTAINERS("pandorascluster.bypass.interact.container"),
-    INTERACT_CROPS("pandorascluster.bypass.interact.crops"),
-    INTERACT_USE("pandorascluster.bypass.interact.use"),
-    BUCKET_USE("pandorascluster.bypass.use.bucket"),
-    ENTER_BED("pandorascluster.bypass.bed.enter"),
-    LEAVE_BED("pandorascluster.bypass.bed.leave"),
-    TAME_ENTITY("pandorascluster.bypass.entity.tame"),
-    POTION_SPLASH("pandorascluster.bypass.potion.splash"),
-    SHEAR_ENTITY("pandorascluster.bypass.shear.entity"),
-    SHEAR_BLOCK("pandorascluster.bypass.shear.block"),
-    TAKE_LECTERN("pandorascluster.bypass.lectern.take"),
-    LEASH_ENTITY("pandorascluster.bypass.entity.leash"),
-    UNLEASH_ENTITY("pandorascluster.bypass.entity.unleash"),
-    TRIGGER_RAID("pandorascluster.bypass.raid.trigger"),
-    HANGING_BREAK("pandorascluster.bypass.hanging.break"),
-    HANGING_PLACE("pandorascluster.bypass.hanging.place"),
-    PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
-    ENTITY_INTERACT("pandorascluster.bypass.interact.entity"),
     SET_LAND_ROLE("pandorascluster.admin.set.role"),
+    UNOWNED_CHUNK("pandorascluster.unowned.access"),
+    BLOCK_BREAK("pandorascluster.unowned.block.break"),
+    BLOCK_PLACE("pandorascluster.unowned.block.place"),
+    OWNED_CHUNK("pandorascluster.owned.access"),
+    LAND_ENTRY_DENIED("pandorascluster.owned.entry.denied"),
+    INTERACT_CONTAINERS("pandorascluster.owned.interact.container"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    ENTITY_MOUNT("pandorascluster.bypass.mount"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    PVP("pandorascluster.bypass.attack.player"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    PVE("pandorascluster.bypass.attack.entity"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    VEHICLE_ENTER("pandorascluster.bypass.vehicle.use"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    VEHICLE_DAMAGE("pandorascluster.bypass.vehicle.damage"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    VEHICLE_DESTROY("pandorascluster.bypass.vehicle.destroy"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    EXPLOSION("pandorascluster.bypass.explosion"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    INTERACT_CROPS("pandorascluster.bypass.interact.crops"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    INTERACT_USE("pandorascluster.bypass.interact.use"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    BUCKET_USE("pandorascluster.bypass.use.bucket"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    ENTER_BED("pandorascluster.bypass.bed.enter"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    LEAVE_BED("pandorascluster.bypass.bed.leave"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    TAME_ENTITY("pandorascluster.bypass.entity.tame"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    POTION_SPLASH("pandorascluster.bypass.potion.splash"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    SHEAR_ENTITY("pandorascluster.bypass.shear.entity"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    SHEAR_BLOCK("pandorascluster.bypass.shear.block"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    TAKE_LECTERN("pandorascluster.bypass.lectern.take"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    LEASH_ENTITY("pandorascluster.bypass.entity.leash"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    UNLEASH_ENTITY("pandorascluster.bypass.entity.unleash"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    TRIGGER_RAID("pandorascluster.bypass.raid.trigger"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    HANGING_BREAK("pandorascluster.bypass.hanging.break"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    HANGING_PLACE("pandorascluster.bypass.hanging.place"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    PROJECTILE_HIT_ENTITY("pandorascluster.bypass.projectile.hit"),
+
+    @Deprecated(message = "This field will be removed in future releases")
+    ENTITY_INTERACT("pandorascluster.bypass.interact.entity"),
+
+    @Deprecated(message = "This field will be removed in future releases")
     FERTILIZE_BLOCK("pandorascluster.bypass.interact.fertilize"),
+
+    @Deprecated(message = "This field will be removed in future releases")
     ENTITY_CHANGE_BLOCK("pandorascluster.bypass.block.change");
 
     fun hasPermission(permissible: Permissible): Boolean {
         return permissible.hasPermission("pandorascluster.bypass.*") || permissible.hasPermission(permissionNode)
     }
-
 }
