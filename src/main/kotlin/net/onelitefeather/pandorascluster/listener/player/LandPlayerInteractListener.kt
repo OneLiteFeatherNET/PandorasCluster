@@ -1,11 +1,12 @@
 package net.onelitefeather.pandorascluster.listener.player
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.Material
 import org.bukkit.block.Container
+import org.bukkit.block.Jukebox
+import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.RespawnAnchor
 import org.bukkit.block.data.type.TurtleEgg
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.*
 
+@Suppress("kotlin:S1874")
 class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : Listener {
 
     @EventHandler
@@ -32,6 +34,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         event.isCancelled = !event.player.hasPermission(landFlag)
     }
 
+    @Suppress("DEPRECATION")
     @EventHandler
     fun handlePlayerPhysicalInteract(event: PlayerInteractEvent) {
 
@@ -61,13 +64,14 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
                     !event.player.hasPermission(interactCropsFlag)
                 }
             } else {
-                false
+                event.isCancelled
             }
         } else {
-            false
+            event.isCancelled
         }
     }
 
+    @Suppress("DEPRECATION")
     @EventHandler
     fun handlePlayerUseBoneMeal(event: PlayerInteractEvent) {
 
@@ -84,10 +88,11 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
                 !event.player.hasPermission(interactCropsFlag)
             }
         } else {
-            false
+            event.isCancelled
         }
     }
 
+    @Suppress("DEPRECATION")
     @EventHandler
     fun handlePlayerInteract(event: PlayerInteractEvent) {
 
@@ -98,19 +103,18 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         val action = event.action
         val material = clickedBlock.type
         val blockData = clickedBlock.blockData
+        val blockState = clickedBlock.state
 
         event.isCancelled = if (material.isInteractable) {
-
-            if (clickedBlock.state is Container) {
-                //Preventing un-trusted for opening containers
+            if (blockState is Container || blockState is Jukebox) {
                 if (land != null) {
-                    if (land.hasAccess(player.uniqueId)) return
-                    !land.isAllowUse(material)
+                    if(land.hasAccess(player.uniqueId)) return
+                    if(land.isAllowUse(material)) return
+                    !player.hasPermission(LandFlag.USE)
                 } else {
-                    !Permission.INTERACT_CONTAINERS.hasPermission(player)
+                    !player.hasPermission(LandFlag.USE)
                 }
             } else if (blockData is RespawnAnchor && action == Action.RIGHT_CLICK_BLOCK) {
-                //Preventing respawnanchors for explode
                 val explosionFlag = LandFlag.EXPLOSIONS
                 if (land != null) {
                     if (land.hasAccess(player.uniqueId)) return
@@ -120,11 +124,19 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
                 } else {
                     !player.hasPermission(explosionFlag)
                 }
+            } else if(blockData is Powerable){
+                val redstoneFlag = LandFlag.REDSTONE
+                if(land != null) {
+                    if(land.hasAccess(player.uniqueId)) return
+                    if(land.getLandFlag(redstoneFlag).getValue<Boolean>() == true) return
+                    !player.hasPermission(redstoneFlag)
+                }
+                !player.hasPermission(redstoneFlag)
             } else {
-                false
+                event.isCancelled
             }
         } else {
-            false
+            event.isCancelled
         }
     }
 
