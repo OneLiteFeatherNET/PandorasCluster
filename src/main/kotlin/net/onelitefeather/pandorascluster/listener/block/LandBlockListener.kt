@@ -71,10 +71,10 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         event.isCancelled = if (blockChunk != toBlockChunk) {
             val land = pandorasClusterApi.getLand(event.toBlock.chunk)
             val toLand = pandorasClusterApi.getLand(event.block.chunk)
-            if (toLand != null && land != null) {
-                toLand.getLandFlag(LandFlag.LIQUID_FLOW).getValue<Boolean>() == false && !hasSameOwner(land, toLand)
+            if(toLand != null && land == null || land != null && toLand == null) {
+                true
             } else {
-                false
+                toLand != null && land != null && !hasSameOwner(land, toLand)
             }
         } else {
             false
