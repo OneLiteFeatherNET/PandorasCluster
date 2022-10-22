@@ -29,9 +29,7 @@ enum class LandFlag(val flagName: String,
     ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
     BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2),
     TURTLE_EGG_DESTROY("turtle-egg-destroy", false, LandFlagType.ENTITY, 2),
-    ENTITY_INTERACT("entity-interact", false, LandFlagType.ENTITY, 2),
     UNKNOWN("unknown", false, LandFlagType.ENTITY, 2),
-    LIQUID_FLOW("liquid-flow", false, LandFlagType.WORLD_TICK, 2),
     INTERACT_CROPS("interact-crops", false, LandFlagType.PLAYER, 2),
     ENTITY_MOUNT("entity-mount", false, LandFlagType.ENTITY, 2),
     ENTITY_TAME("entity-tame", false, LandFlagType.ENTITY, 2),
@@ -40,7 +38,8 @@ enum class LandFlag(val flagName: String,
     SHEAR_ENTITY("shear-entity", false, LandFlagType.PLAYER, 2),
     TAKE_LECTERN("take-lectern", false, LandFlagType.PLAYER, 2),
     ENTITY_LEASH("entity-leash", false, LandFlagType.PLAYER, 2),
-    USE_BED("use-bed", false, LandFlagType.PLAYER, 2);
+    USE_BED("use-bed", false, LandFlagType.PLAYER, 2),
+    VILLAGER_INTERACT("villager-interact", false, LandFlagType.PLAYER, 2);
 }
 
 val LAND_FLAGS = LandFlag.values()
