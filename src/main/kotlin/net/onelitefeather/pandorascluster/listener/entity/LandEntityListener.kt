@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.util.isPetOwner
 import org.bukkit.block.data.type.CaveVinesPlant
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.TurtleEgg
@@ -68,8 +69,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
-                if (primerEntity.hasPermission(landFlag)) return
-                true
+                !primerEntity.hasPermission(landFlag)
             } else false
         }
     }
@@ -113,17 +113,16 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val mount = event.mount
         val entity = event.entity
 
-        if (mount !is Vehicle) return
-        if (mount is Tameable) {
-            val tamer = mount.owner
-            if (mount.isTamed && tamer != null && tamer.uniqueId == entity.uniqueId) return
-        }
-
         val landFlag = LandFlag.ENTITY_MOUNT
-        val land = this.pandorasClusterApi.getLand(mount.getChunk()) ?: return
+        val land = this.pandorasClusterApi.getLand(mount.chunk) ?: return
         if (land.hasAccess(entity.uniqueId)) return
         if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
-        event.isCancelled = entity.hasPermission(landFlag)
+
+        event.isCancelled = if (mount is Tameable && entity is AnimalTamer) {
+            !mount.isTamed || !isPetOwner(mount, entity)
+        } else {
+            !entity.hasPermission(landFlag)
+        }
     }
 
     @EventHandler
