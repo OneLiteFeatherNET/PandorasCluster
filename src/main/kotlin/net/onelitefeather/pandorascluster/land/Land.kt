@@ -120,4 +120,9 @@ data class Land(
         chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey }}.isNotEmpty()
     
     fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
+    fun isMerged() = chunks.isNotEmpty()
+    fun isAdmin(playerId: UUID): Boolean {
+        val member = getLandMember(playerId) ?: return false
+        return member.role == LandRole.ADMIN
+    }
 }

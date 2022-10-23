@@ -5,6 +5,9 @@ import org.bukkit.permissions.Permissible
 enum class Permission(val permissionNode: String) {
 
     SET_LAND_ROLE("pandorascluster.admin.set.role"),
+    SET_LAND_FLAG("pandorascluster.admin.set.flags"),
+    SET_LAND_HOME("pandorascluster.admin.set.home"),
+    SET_LAND_OWNER("pandorascluster.admin.set.owner"),
     UNOWNED_CHUNK("pandorascluster.unowned.access"),
     BLOCK_BREAK("pandorascluster.unowned.block.break"),
     BLOCK_PLACE("pandorascluster.unowned.block.place"),

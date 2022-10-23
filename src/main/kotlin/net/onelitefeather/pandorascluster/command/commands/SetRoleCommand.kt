@@ -32,16 +32,21 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
     ) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
-        val playerId = landPlayer.getUniqueId()
+        val targetPlayerId = landPlayer.getUniqueId()
 
         if (land == null) {
             player.sendMessage(miniMessage {  pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
             return
         }
 
-        val playerName = landPlayer.name ?: "not found"
-        if (playerId == null) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, playerName)) })
+        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_ROLE)) {
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            return
+        }
+
+        val targetName = landPlayer.name ?: "not found"
+        if (targetPlayerId == null) {
+            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, targetName)) })
             return
         }
 
@@ -50,12 +55,12 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if (land.isOwner(playerId)) {
+        if (land.isOwner(targetPlayerId)) {
             player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-role.cannot-change-the-land-owner", *arrayOf(pluginPrefix)) })
             return
         }
 
-        if (land.isOwner(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
+        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
                 pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
                 player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, playerName, landRole.display)) })
