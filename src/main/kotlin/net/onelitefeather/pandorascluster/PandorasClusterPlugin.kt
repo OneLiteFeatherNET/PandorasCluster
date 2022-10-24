@@ -37,6 +37,8 @@ class PandorasClusterPlugin : JavaPlugin() {
         try {
 
             saveDefaultConfig()
+            config.options().copyDefaults(true)
+            saveConfig()
 
             bukkitAudiences = BukkitAudiences.create(this)
             api = PandorasClusterApiImpl(this)
