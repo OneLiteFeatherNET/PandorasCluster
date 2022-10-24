@@ -99,7 +99,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (blockData is TurtleEgg && land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY).getValue<Boolean>() == false) {
             event.isCancelled = true
             event.entity.velocity =
-                event.entity.velocity.subtract(event.entity.location.direction).normalize().multiply(0.4)
+                event.entity.velocity.subtract(event.entity.location.direction).normalize().multiply(pandorasClusterApi.getPlugin().config.getDouble("zombie-velocity-multiplier"))
             return
         }
 
