@@ -16,7 +16,7 @@ enum class Permission(val permissionNode: String) {
     LAND_ENTRY_DENIED("pandorascluster.owned.entry.denied"),
     INTERACT_CONTAINERS("pandorascluster.owned.interact.container"),
 
-    @Deprecated(message = "This field will be removed in version 1.2.0")
+    @Deprecated(message = "This field will be removed in future releases")
     @ScheduledForRemoval(inVersion = "1.2.0")
     ENTITY_MOUNT("pandorascluster.bypass.mount"),
 
