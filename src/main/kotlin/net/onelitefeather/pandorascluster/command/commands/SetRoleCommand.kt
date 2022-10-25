@@ -60,10 +60,22 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
-        player.sendMessage(
-            miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, targetName, landRole.display)) }
-        )
+        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
+            if(landRole != LandRole.VISITOR) {
+                pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
+                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, targetName, landRole.display)) })
+            } else {
+
+                val member = land.getLandMember(targetPlayerId)
+                if(member == null) {
+                    player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.not-found", *arrayOf(pluginPrefix, targetName)) })
+                    return
+                }
+
+                pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
+                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.success", *arrayOf(pluginPrefix, targetName)) })
+            }
+        }
     }
 
     @Parser(name = "landRole", suggestions = "landRoles")

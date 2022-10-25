@@ -1,51 +1,80 @@
 package net.onelitefeather.pandorascluster.service
 
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion
 import io.sentry.Sentry
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
-import net.onelitefeather.pandorascluster.listener.*
+import net.onelitefeather.pandorascluster.listener.LandContainerProtectionListener
+import net.onelitefeather.pandorascluster.listener.LandWorldListener
+import net.onelitefeather.pandorascluster.listener.block.LandBlockListener
+import net.onelitefeather.pandorascluster.listener.entity.LandEntityListener
+import net.onelitefeather.pandorascluster.listener.entity.LandHangingEntityListener
+import net.onelitefeather.pandorascluster.listener.entity.LandVehicleListener
+import net.onelitefeather.pandorascluster.listener.player.LandPlayerInteractListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerConnectionListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerInteractEntityListener
+import net.onelitefeather.pandorascluster.listener.player.PlayerLocationListener
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
-import net.onelitefeather.pandorascluster.util.getChunkIndex
+import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
+import java.time.Duration
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Level
 
 
-class LandService(
-    private val pandorasClusterApi: PandorasClusterApi
-) {
+class LandService(private val pandorasClusterApi: PandorasClusterApi) {
+
+    val landCache: LoadingCache<Chunk, Land> = Caffeine.newBuilder().maximumSize(10_000)
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .expireAfterWrite(Duration.ofMinutes(5))
+        .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> getFullLand(key) }
+
+    val unclaimedChunkCache: LoadingCache<Chunk, Boolean> = Caffeine.newBuilder().maximumSize(10_000)
+        .expireAfterAccess(Duration.ofMinutes(5))
+        .expireAfterWrite(Duration.ofMinutes(5))
+        .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> isChunkClaimed(key) }
 
     init {
+
         val pluginManager = pandorasClusterApi.getPlugin().server.pluginManager
+
+        //Blocks
         pluginManager.registerEvents(LandBlockListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Entities
         pluginManager.registerEvents(LandEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
-        pluginManager.registerEvents(LandPlayerListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandHangingEntityListener(pandorasClusterApi, this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandVehicleListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Players
+        pluginManager.registerEvents(LandPlayerInteractListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerConnectionListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerInteractEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(PlayerLocationListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        //Misc
+        pluginManager.registerEvents(LandContainerProtectionListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
         pluginManager.registerEvents(LandWorldListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
-        pluginManager.registerEvents(
-            LandContainerProtectionListener(pandorasClusterApi),
-            pandorasClusterApi.getPlugin()
-        )
     }
 
     fun getLands(): List<Land> {
-        val lands: MutableList<Land> = ArrayList()
+        var lands = emptyList<Land>()
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val query = session.createQuery("SELECT l FROM Land l", Land::class.java)
-                lands.addAll(query.list())
+                lands = query.list()
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e)
@@ -101,27 +130,43 @@ class LandService(
     }
 
     fun isChunkClaimed(chunk: Chunk): Boolean {
-        return this.getFullLand(chunk) != null
+
+        val claimed = unclaimedChunkCache.getIfPresent(chunk)
+        if (claimed == true) return true
+
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val query = session.createQuery(
+                    "SELECT ch FROM ChunkPlaceholder ch WHERE chunkIndex = :chunkIndex",
+                    ChunkPlaceholder::class.java
+                )
+                query.maxResults = 1
+                query.setParameter("chunkIndex", chunk.chunkKey)
+                return query.uniqueResult() != null
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e)
+            Sentry.captureException(e)
+            return false
+        }
     }
 
-    fun findConnectedChunk(player: Player, consumer: Consumer<Land?>) = runBlocking {
-        launch {
-            val chunk = player.chunk
-            var land: Land? = null
-            for(facing in AVAILABLE_CHUNK_ROTATIONS) {
-                val connectedChunk = player.world.getChunkAt(
-                    chunk.x + facing.modX,
-                    chunk.z + facing.modZ
-                )
+    fun findConnectedChunk(player: Player, consumer: Consumer<Land?>) {
+        val chunk = player.chunk
+        var land: Land? = null
+        for (facing in AVAILABLE_CHUNK_ROTATIONS) {
+            val connectedChunk = player.world.getChunkAt(
+                chunk.x + facing.modX,
+                chunk.z + facing.modZ
+            )
 
-                val fullLand = getFullLand(connectedChunk)
-                if (fullLand != null) {
-                    land = fullLand
-                }
+            val fullLand = getFullLand(connectedChunk)
+            if (fullLand != null) {
+                land = fullLand
             }
-
-            consumer.accept(land)
         }
+
+        consumer.accept(land)
     }
 
     fun getLand(owner: LandPlayer): Land? {
@@ -139,22 +184,28 @@ class LandService(
             Sentry.captureException(e)
         }
 
-        return null;
+        return null
     }
 
     fun getFullLand(chunk: Chunk): Land? {
 
-        var land: Land? = null
+        var land = landCache.getIfPresent(chunk)
+        if (land != null) return land
+
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
                 val query = session.createQuery(
                     "SELECT ch FROM ChunkPlaceholder ch JOIN FETCH ch.land WHERE ch.chunkIndex = :chunkIndex",
                     ChunkPlaceholder::class.java
                 )
-                query.setParameter("chunkIndex", getChunkIndex(chunk))
+                query.setParameter("chunkIndex", chunk.chunkKey)
                 val chunkHolder = query.uniqueResult()
                 if (chunkHolder != null) {
                     land = chunkHolder.land
+                }
+
+                if(land != null) {
+                    landCache.put(chunk, land)
                 }
             }
         } catch (e: HibernateException) {
@@ -202,6 +253,38 @@ class LandService(
 
         val regions = regionManager?.regions?.values
         return region.getIntersectingRegions(regions).isNotEmpty()
+    }
+
+    fun loadChunk(chunk: Chunk) {
+        val land = getFullLand(chunk) ?: return
+        landCache.put(chunk, land)
+    }
+
+    fun getChunksByLand(land: Land): Long {
+        var chunks = 0L
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val query = session.createNativeQuery("SELECT COUNT(chunkIndex) FROM ChunkPlaceholder WHERE land_id = :landId", Long::class.java)
+                query.setParameter("landId", land.id)
+                chunks = query.singleResult as Long
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot count chunks by land $land", e)
+            Sentry.captureException(e)
+
+        }
+
+        return chunks
+    }
+
+    fun updateLoadedChunks(land: Land) {
+        val world = Bukkit.getWorld(land.world) ?: return
+        landCache.invalidateAll(land.chunks.map { world.getChunkAt(it.chunkIndex) })
+    }
+
+    fun claimChunk(chunk: Chunk, land: Land) {
+        unclaimedChunkCache.invalidate(chunk)
+        landCache.put(chunk, land)
     }
 }
 

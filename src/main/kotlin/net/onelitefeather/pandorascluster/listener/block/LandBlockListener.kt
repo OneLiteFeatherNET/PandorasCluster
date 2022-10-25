@@ -1,5 +1,6 @@
-package net.onelitefeather.pandorascluster.listener
+package net.onelitefeather.pandorascluster.listener.block
 
+import io.papermc.paper.event.block.PlayerShearBlockEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
@@ -11,13 +12,15 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerBucketFillEvent
 
 class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Listener {
 
     @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
 
-        if (event.player.hasPermission(Permission.BLOCK_PLACE)) return
+        if (event.player.hasPermission(Permission.BLOCK_BREAK)) return
         val land = pandorasClusterApi.getLand(event.block.chunk)
         if (land == null) {
             event.isCancelled = true
@@ -41,28 +44,40 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
     }
 
     @EventHandler
-    fun handleBlockExplode(event: BlockExplodeEvent) {
-        val iterator = event.blockList().iterator()
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            val nextLand = pandorasClusterApi.getLand(next.chunk)
-            if (nextLand != null) {
-                val landFlag = pandorasClusterApi.getLandFlag(LandFlag.EXPLOSIONS, nextLand)
-                if (landFlag != null && landFlag.getValue<Boolean>() == false) {
-                    iterator.remove()
-                }
-            }
-        }
+    fun handleBlockForm(event: BlockFormEvent) {
+        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        if (event is EntityBlockFormEvent) return
+        event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
+    }
+
+    @EventHandler
+    fun handleEntityBlockForm(event: EntityBlockFormEvent) {
+
+        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        val landFlag = LandFlag.ICE_FORM
+
+        event.isCancelled = if (land.getLandFlag(landFlag).getValue<Boolean>() == false) {
+            false
+        } else if (!land.hasAccess(event.entity.uniqueId)) {
+            false
+        } else !event.entity.hasPermission(landFlag)
     }
 
     @EventHandler
     fun handleBlockFromTo(event: BlockFromToEvent) {
-        val block = event.block
-        val toBlock = event.toBlock
-        val blockChunk = pandorasClusterApi.getLand(block.chunk)
-        val toBlockChunk = pandorasClusterApi.getLand(toBlock.chunk)
-        if (blockChunk != null && toBlockChunk != null && !hasSameOwner(blockChunk, toBlockChunk)) {
-            event.isCancelled = true
+
+        val blockChunk = event.block.chunk
+        val toBlockChunk = event.toBlock.chunk
+        event.isCancelled = if (blockChunk != toBlockChunk) {
+            val land = pandorasClusterApi.getLand(event.toBlock.chunk)
+            val toLand = pandorasClusterApi.getLand(event.block.chunk)
+            if(toLand != null && land == null || land != null && toLand == null) {
+                true
+            } else {
+                toLand != null && land != null && !hasSameOwner(land, toLand)
+            }
+        } else {
+            false
         }
     }
 
@@ -71,8 +86,10 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         val block = event.block
         val land = pandorasClusterApi.getLand(block.chunk)
         if (land != null) {
-            val landFlag = pandorasClusterApi.getLandFlag(LandFlag.REDSTONE, land) ?: return
-            event.newCurrent = if (landFlag.getValue<Boolean>() == false) 0 else event.oldCurrent
+            val landFlag = land.getLandFlag(LandFlag.REDSTONE)
+            if (landFlag.getValue<Boolean>() == false) {
+                event.newCurrent = 0
+            }
         }
     }
 
@@ -140,6 +157,39 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
             if (blockFaceLand != null && !hasSameOwner(blockFaceLand, land)) {
                 event.isCancelled = true
             }
+        }
+    }
+
+    @EventHandler
+    fun handlePlayerBlockShear(event: PlayerShearBlockEvent) {
+        val land = pandorasClusterApi.getLand(event.block.chunk)
+        event.isCancelled = if (land != null) {
+            if (land.hasAccess(event.player.uniqueId)) return
+            !event.player.hasPermission(LandFlag.SHEAR_BLOCK)
+        } else {
+            !event.player.hasPermission(LandFlag.SHEAR_BLOCK)
+        }
+    }
+
+    @EventHandler
+    fun handlePlayerBucketUse(event: PlayerBucketFillEvent) {
+        val land = pandorasClusterApi.getLand(event.blockClicked.chunk)
+        event.isCancelled = if (land != null) {
+            if (land.hasAccess(event.player.uniqueId)) return
+            !event.player.hasPermission(LandFlag.BUCKET_INTERACT)
+        } else {
+            !event.player.hasPermission(LandFlag.BUCKET_INTERACT)
+        }
+    }
+
+    @EventHandler
+    fun handlePlayerBucketUse(event: PlayerBucketEmptyEvent) {
+        val land = pandorasClusterApi.getLand(event.blockClicked.chunk)
+        event.isCancelled = if (land != null) {
+            if (land.hasAccess(event.player.uniqueId)) return
+            !event.player.hasPermission(LandFlag.BUCKET_INTERACT)
+        } else {
+            !event.player.hasPermission(LandFlag.BUCKET_INTERACT)
         }
     }
 }

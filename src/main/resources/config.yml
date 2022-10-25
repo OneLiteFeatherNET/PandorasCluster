@@ -1,3 +1,4 @@
+zombie-velocity-multiplier: 0.4
 database:
   jdbcUrl: 'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'
   username: 'pandorascluster'

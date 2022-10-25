@@ -15,7 +15,6 @@ import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
 import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
 import net.onelitefeather.pandorascluster.extensions.sentry
-import net.onelitefeather.pandorascluster.listener.PlayerConnectionListener
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
@@ -38,13 +37,12 @@ class PandorasClusterPlugin : JavaPlugin() {
         try {
 
             saveDefaultConfig()
+            config.options().copyDefaults(true)
+            saveConfig()
 
             bukkitAudiences = BukkitAudiences.create(this)
             api = PandorasClusterApiImpl(this)
             server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
-
-            val pluginManager = server.pluginManager
-            pluginManager.registerEvents(PlayerConnectionListener(api), this)
 
             buildCommandSystem()
             registerCommands()
@@ -66,7 +64,6 @@ class PandorasClusterPlugin : JavaPlugin() {
         annotationParser.parse(ClaimCommand(api))
         annotationParser.parse(SetOwnerCommand(api))
         annotationParser.parse(SetRoleCommand(api))
-        annotationParser.parse(LandRemovePlayerCommand(api))
         annotationParser.parse(LandInfoCommand(api))
 
         val builder = paperCommandManager.commandBuilder("land")

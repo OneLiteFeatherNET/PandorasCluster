@@ -6,11 +6,13 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
+import net.onelitefeather.pandorascluster.land.flag.getDefaultFlag
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.hibernate.Hibernate
 import java.util.*
 
@@ -45,12 +47,11 @@ data class Land(
     val z: Int = -1
 ) {
 
-    fun isOwner(uniqueId: UUID): Boolean {
-        return owner?.getUniqueId() == uniqueId
-    }
+    fun isOwner(uniqueId: UUID): Boolean = owner?.getUniqueId() == uniqueId
 
-    fun getLandFlag(landFlag: LandFlag): LandFlagEntity? =
-        flags.firstOrNull { landFlagEntity -> landFlagEntity.name?.uppercase() == landFlag.name.uppercase() }
+    fun getLandFlag(landFlag: LandFlag): LandFlagEntity =
+        flags.find { it.name?.uppercase() == landFlag.name.uppercase() } ?: getDefaultFlag(landFlag).copy(land = this)
+
 
     fun getMergedChunk(chunkIndex: Long): ChunkPlaceholder? =
         chunks.firstOrNull { chunkPlaceholder -> chunkPlaceholder.chunkIndex == chunkIndex }
@@ -65,7 +66,7 @@ data class Land(
 
     fun hasAccess(uuid: UUID): Boolean {
         if(isOwner(uuid)) return true
-        if(hasMemberPermission(uuid, Permission.ACCESS)) return true
+        if(hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return true
         val landOwner = owner ?: return false
         val landMember = getLandMember(uuid) ?: return false
         if (landMember.role == LandRole.MEMBER && !landOwner.isOnline()) return false
@@ -94,7 +95,32 @@ data class Land(
         return member.role == LandRole.BANNED
     }
 
-    fun isMerged() = chunks.isNotEmpty()
+    fun isAllowUse(material: Material): Boolean = getUseMaterials().contains(material)
+
+    fun getUseMaterials(): List<Material> {
+        if(!hasFlag(LandFlag.USE)) return emptyList()
+        val value = getLandFlag(LandFlag.USE).getValue<String>() ?: return emptyList()
+
+        if(!value.contains(",")) {
+            val material = Material.matchMaterial(value)
+            return if(material != null) listOf(material) else emptyList()
+        } else {
+            val args = value.split(",")
+            val list = arrayListOf<Material>()
+            for(materialName in args) {
+                val material = Material.matchMaterial(materialName.uppercase()) ?: continue
+                list.add(material)
+            }
+        }
+
+        return emptyList()
+    }
+
+    fun isMerged() = chunks.map { chunkPlaceholder -> {
+        chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey }}.isNotEmpty()
+    
+    fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
+
     fun isAdmin(playerId: UUID): Boolean {
         val member = getLandMember(playerId) ?: return false
         return member.role == LandRole.ADMIN

@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.listener
+package net.onelitefeather.pandorascluster.listener.player
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import org.bukkit.event.EventHandler
@@ -6,7 +6,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-class PlayerConnectionListener(private val api: PandorasClusterApi) : Listener {
+class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
 
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
