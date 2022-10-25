@@ -19,4 +19,16 @@ fun chunkCorners(chunk: Chunk): List<Block> {
     )
 }
 
+fun Chunk.corners(): List<Block> {
+    val world = this.world
+    val chunkX = this.x
+    val chunkZ = this.z
+    return listOf(
+        world.getHighestBlockAt(chunkX * 16, chunkZ * 16),
+        world.getHighestBlockAt(chunkX * 16 + 15, chunkZ * 16),
+        world.getHighestBlockAt(chunkX * 16, chunkZ * 16 + 15),
+        world.getHighestBlockAt(chunkX * 16 + 15, chunkZ * 16 + 15)
+    )
+}
+
 fun getPlayersInChunk(chunk: Chunk): List<Player> = chunk.entities.filterIsInstance<Player>()
