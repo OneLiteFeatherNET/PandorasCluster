@@ -5,6 +5,9 @@ import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
 enum class Permission(val permissionNode: String) {
 
+    NO_CLAIM_LIMIT("pandorascluster.unlimit.claim"),
+    FLAG_PERMISSION("pandorascluster.flags.flag.%s"),
+    CLAIM_LIMIT("pandorascluster.limit.claim"),
     SET_LAND_ROLE("pandorascluster.admin.set.role"),
     SET_LAND_FLAG("pandorascluster.admin.set.flags"),
     SET_LAND_HOME("pandorascluster.admin.set.home"),
