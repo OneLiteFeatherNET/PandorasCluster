@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Function
 import java.util.logging.Level
 
-
 fun PandorasClusterPlugin.buildCommandSystem() {
     try {
         paperCommandManager = PaperCommandManager(
@@ -55,7 +54,8 @@ fun PandorasClusterPlugin.buildCommandSystem() {
             )
         },
         { sender: CommandSender ->
-            bukkitAudiences.sender(sender).sendMessage(text("You do not have any pending commands.", NamedTextColor.RED))
+            bukkitAudiences.sender(sender)
+                .sendMessage(text("You do not have any pending commands.", NamedTextColor.RED))
         }
     )
 
