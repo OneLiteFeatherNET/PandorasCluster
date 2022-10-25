@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.command.commands
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.getHighestClaimLimit
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.hasSameOwner
@@ -63,6 +64,12 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
                 if (!it.isOwner(player.uniqueId)) {
                     player.sendMessage(miniMessage { pandorasClusterApi.i18n("invalid-land-owner", *arrayOf(pluginPrefix)) })
+                    return@findConnectedChunk
+                }
+
+                val claimLimit = player.getHighestClaimLimit()
+                if(claimLimit != -2 && (pandorasClusterApi.getLandService().getChunksByLand(it) + 1) > claimLimit) {
+                    player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk.claim-limit-reached", *arrayOf(pluginPrefix)) })
                     return@findConnectedChunk
                 }
 
