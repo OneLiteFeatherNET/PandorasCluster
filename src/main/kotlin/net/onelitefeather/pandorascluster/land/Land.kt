@@ -12,9 +12,11 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Material
 import org.hibernate.Hibernate
 import java.util.*
+import kotlin.jvm.Transient
 
 @Entity
 data class Land(
@@ -44,7 +46,10 @@ data class Land(
     val x: Int = -1,
 
     @Column
-    val z: Int = -1
+    val z: Int = -1,
+
+    @Transient
+    val borderChunks: List<Chunk> = emptyList()
 ) {
 
     fun isOwner(uniqueId: UUID): Boolean = owner?.getUniqueId() == uniqueId
