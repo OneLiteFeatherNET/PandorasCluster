@@ -111,5 +111,7 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
                 if (stringBuilder.isNotEmpty()) stringBuilder.toString() else pandorasClusterApi.i18n("command.info.flags.none")
             )
         })
+
+        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.info.total-chunk-count", *arrayOf(pluginPrefix, pandorasClusterApi.getLandService().getChunksByLand(land))) })
     }
 }
