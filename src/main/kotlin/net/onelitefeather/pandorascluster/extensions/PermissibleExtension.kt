@@ -2,11 +2,12 @@ package net.onelitefeather.pandorascluster.extensions
 
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
 import org.apache.commons.lang3.StringUtils
 import org.bukkit.permissions.Permissible
 
 fun Permissible.getHighestClaimLimit(): Int {
-    if(this.hasPermission(Permission.NO_CLAIM_LIMIT)) return -2
+    if(this.hasPermission(Permission.NO_CLAIM_LIMIT)) return IGNORE_CLAIM_LIMIT
     val permissionAttach =
         this.effectivePermissions.filter { it.permission.startsWith(Permission.CLAIM_LIMIT.permissionNode) }.maxByOrNull{
             val last = it.permission.substringAfterLast(".")
