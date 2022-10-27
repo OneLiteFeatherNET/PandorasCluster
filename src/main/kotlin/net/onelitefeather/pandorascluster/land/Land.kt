@@ -125,11 +125,7 @@ data class Land(
         return emptyList()
     }
 
-    fun isMerged() = chunks.map { chunkPlaceholder ->
-        {
-            chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey
-        }
-    }.isNotEmpty()
+    fun isMerged() = chunks.map { chunkPlaceholder -> { chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey } }.isNotEmpty()
 
     fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
 
