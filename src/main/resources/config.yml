@@ -1,4 +1,7 @@
 zombie-velocity-multiplier: 0.4
+particle-border-max-distance: 64
+tasks:
+  show-border-multiplier: 1
 database:
   jdbcUrl: 'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'
   username: 'pandorascluster'
