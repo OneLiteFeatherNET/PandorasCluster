@@ -1,5 +1,27 @@
 zombie-velocity-multiplier: 0.4
-particle-border-max-distance: 64
+
+trusted-particle: REDSTONE
+untrusted-particle: FLAME
+particle-data:
+  radius: 64
+  speed: 1
+  offX: 0
+  offY: 0
+  offZ: 0
+  trusted-particle-data:
+    red: 85
+    green: 255
+    blue: 85
+    size: 2.5
+    material: AIR
+  untrusted-particle-data:
+    red: 170
+    green: 0
+    blue: 0
+    size: 2.5
+    material: AIR
+
+
 tasks:
   show-border-multiplier: 1
 database:
