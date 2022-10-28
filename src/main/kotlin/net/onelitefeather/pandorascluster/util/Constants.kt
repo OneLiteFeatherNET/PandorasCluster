@@ -12,6 +12,7 @@ import java.util.*
 
 const val PREFIX = "[§aPandorasLand§r]"
 const val PLUGIN_NAME = "PandorasCluster"
+const val CHUNK_LENGTH = 16
 
 val SERVER_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
