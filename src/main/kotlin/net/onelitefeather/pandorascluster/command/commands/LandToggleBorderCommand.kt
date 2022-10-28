@@ -6,9 +6,9 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import org.bukkit.entity.Player
 
-class LandShowBorderCommand(val pandorasClusterApi: PandorasClusterApi) {
+class LandToggleBorderCommand(val pandorasClusterApi: PandorasClusterApi) {
 
-    @CommandMethod("land showborder")
+    @CommandMethod("land toggleborder")
     @CommandDescription("Shows the border of the land you standing on")
     fun execute(player: Player) {
 
