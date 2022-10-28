@@ -196,7 +196,7 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 session.persist(chunkPlaceholder)
                 transaction?.commit()
                 if (land != null) {
-                    pandorasClusterApi.getLandService().claimChunk(chunk, land)
+                    pandorasClusterApi.getLandService().claimChunk(chunk)
                 }
             }
         } catch (e: HibernateException) {

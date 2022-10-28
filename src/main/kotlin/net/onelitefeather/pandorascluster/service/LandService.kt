@@ -24,8 +24,13 @@ import net.onelitefeather.pandorascluster.listener.player.PlayerConnectionListen
 import net.onelitefeather.pandorascluster.listener.player.PlayerInteractEntityListener
 import net.onelitefeather.pandorascluster.listener.player.PlayerLocationListener
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
+import net.onelitefeather.pandorascluster.util.CHUNK_LENGTH
+import net.onelitefeather.pandorascluster.util.DEFAULT_PARTICLE_DATA
+import net.onelitefeather.pandorascluster.util.ParticleData
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
+import org.bukkit.Location
+import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import java.time.Duration
@@ -46,6 +51,9 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         .expireAfterWrite(Duration.ofMinutes(5))
         .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> isChunkClaimed(key) }
 
+    val showBorderOfLand: MutableList<Player> = mutableListOf()
+    var particleData: ParticleData = DEFAULT_PARTICLE_DATA
+
     init {
 
         val pluginManager = pandorasClusterApi.getPlugin().server.pluginManager
@@ -55,7 +63,10 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
 
         //Entities
         pluginManager.registerEvents(LandEntityListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
-        pluginManager.registerEvents(LandHangingEntityListener(pandorasClusterApi, this), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(
+            LandHangingEntityListener(pandorasClusterApi, this),
+            pandorasClusterApi.getPlugin()
+        )
         pluginManager.registerEvents(LandVehicleListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
 
         //Players
@@ -65,8 +76,85 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         pluginManager.registerEvents(PlayerLocationListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
 
         //Misc
-        pluginManager.registerEvents(LandContainerProtectionListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(
+            LandContainerProtectionListener(pandorasClusterApi),
+            pandorasClusterApi.getPlugin()
+        )
         pluginManager.registerEvents(LandWorldListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+
+        val config = pandorasClusterApi.getPlugin().config
+
+        particleData = ParticleData(
+            Particle.valueOf(config.getString("trusted-particle", "FLAME")?.uppercase()!!),
+            Particle.valueOf(config.getString("untrusted-particle", "FLAME")?.uppercase()!!),
+            config.getInt("particle-data.radius"),
+            config.getDouble("particle-data.speed"),
+            config.getDouble("particle-data.offX"),
+            config.getDouble("particle-data.offY"),
+            config.getDouble("particle-data.offZ"),
+            null
+        )
+
+        pandorasClusterApi.getPlugin().server.scheduler.runTaskTimerAsynchronously(
+            pandorasClusterApi.getPlugin(),
+            showBorder(),
+            0L,
+            pandorasClusterApi.getPlugin().config.getLong("tasks.show-border-multiplier") * 20L
+        )
+    }
+
+    fun showBorder() = Runnable {
+
+        showBorderOfLand.forEach { player ->
+
+            val land = getFullLand(player.chunk) ?: return@forEach
+            val world = Bukkit.getWorld(land.world) ?: return@forEach
+            val access = land.hasMemberAccess(player.uniqueId)
+
+            val playerLocation = player.location
+            val chunks = land.chunks.map { world.getChunkAt(it.chunkIndex) }
+            for (chunk in chunks) {
+
+                val chunkX = chunk.x
+                val chunkZ = chunk.z
+
+                val minX = chunkX * CHUNK_LENGTH
+                val minZ = chunkZ * CHUNK_LENGTH
+
+                val north = world.getChunkAt(chunkX, chunkZ - 1)
+                val south = world.getChunkAt(chunkX, chunkZ + 1)
+                val west = world.getChunkAt(chunkX - 1, chunkZ)
+                val east = world.getChunkAt(chunkX + 1, chunkZ)
+
+                if (!land.isMergedChunk(north)) {
+                    (minX until minX + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(it, playerLocation.blockY, minZ).location }
+                        .forEach { spawnParticle(player, access, it) }
+                }
+
+                if (!land.isMergedChunk(south)) {
+                    (minX until minX + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(it, playerLocation.blockY, (minZ + CHUNK_LENGTH)).location }
+                        .forEach { spawnParticle(player, access, it) }
+                }
+
+                if (!land.isMergedChunk(west)) {
+                    (minZ until minZ + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(minX, playerLocation.blockY, it).location }
+                        .forEach { spawnParticle(player, access, it) }
+                }
+
+                if (!land.isMergedChunk(east)) {
+                    (minZ until minZ + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt((minX + CHUNK_LENGTH), playerLocation.blockY, it).location }
+                        .forEach { spawnParticle(player, access, it) }
+                }
+            }
+        }
     }
 
     fun getLands(): List<Land> {
@@ -204,7 +292,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                     land = chunkHolder.land
                 }
 
-                if(land != null) {
+                if (land != null) {
                     landCache.put(chunk, land)
                 }
             }
@@ -264,7 +352,10 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         var chunks = 0L
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
-                val query = session.createNativeQuery("SELECT COUNT(chunkIndex) FROM ChunkPlaceholder WHERE land_id = :landId", Long::class.java)
+                val query = session.createNativeQuery(
+                    "SELECT COUNT(chunkIndex) FROM ChunkPlaceholder WHERE land_id = :landId",
+                    Long::class.java
+                )
                 query.setParameter("landId", land.id)
                 chunks = query.singleResult as Long
             }
@@ -282,9 +373,46 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         landCache.invalidateAll(land.chunks.map { world.getChunkAt(it.chunkIndex) })
     }
 
-    fun claimChunk(chunk: Chunk, land: Land) {
+    fun claimChunk(chunk: Chunk) {
         unclaimedChunkCache.invalidate(chunk)
-        landCache.put(chunk, land)
+        landCache.invalidate(chunk)
+    }
+
+    fun toggleShowBorder(player: Player): Boolean {
+        var currentState = showBorderOfLand.contains(player)
+        if (currentState) {
+            showBorderOfLand.remove(player)
+        } else {
+            showBorderOfLand.add(player)
+        }
+        currentState = showBorderOfLand.contains(player)
+        return currentState
+    }
+
+    fun disableBorderView(player: Player) {
+        showBorderOfLand.remove(player)
+    }
+
+    private fun spawnParticle(player: Player, trusted: Boolean, location: Location) {
+        val radius = particleData.radius*particleData.radius
+        if (player.location.distanceSquared(location) < radius) {
+            val sectionKey =
+                if (trusted) "particle-data.trusted-particle-data" else "particle-data.untrusted-particle-data"
+
+            val particle = if (trusted) particleData.trustedParticle else particleData.untrustedParticle
+            val section = pandorasClusterApi.getPlugin().config.getConfigurationSection(sectionKey)
+            val data = if (section != null) particleData.getExtraData(trusted, section) else null
+            player.spawnParticle(
+                particle,
+                location,
+                1,
+                particleData.offX,
+                particleData.offY,
+                particleData.offZ,
+                particleData.speed,
+                data
+            )
+        }
     }
 }
 

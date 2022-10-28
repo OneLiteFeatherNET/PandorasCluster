@@ -20,5 +20,6 @@ class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val landPlayer = api.getLandPlayer(event.player.uniqueId) ?: return
         api.getLandPlayerService().updateLandPlayer(landPlayer)
+        api.getLandService().disableBorderView(event.player)
     }
 }

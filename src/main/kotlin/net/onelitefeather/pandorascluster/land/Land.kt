@@ -12,6 +12,7 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Material
 import org.hibernate.Hibernate
 import java.util.*
@@ -44,7 +45,7 @@ data class Land(
     val x: Int = -1,
 
     @Column
-    val z: Int = -1
+    val z: Int = -1,
 ) {
 
     fun isOwner(uniqueId: UUID): Boolean = owner?.getUniqueId() == uniqueId
@@ -64,9 +65,17 @@ data class Land(
         return bukkitPlayer.hasPermission(permission)
     }
 
+    fun hasMemberAccess(uuid: UUID): Boolean {
+        if (isOwner(uuid)) return true
+        val landOwner = owner ?: return false
+        val landMember = getLandMember(uuid) ?: return false
+        if (landMember.role == LandRole.MEMBER && !landOwner.isOnline()) return false
+        return landMember.role.access
+    }
+
     fun hasAccess(uuid: UUID): Boolean {
-        if(isOwner(uuid)) return true
-        if(hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return true
+        if (isOwner(uuid)) return true
+        if (hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return true
         val landOwner = owner ?: return false
         val landMember = getLandMember(uuid) ?: return false
         if (landMember.role == LandRole.MEMBER && !landOwner.isOnline()) return false
@@ -98,16 +107,16 @@ data class Land(
     fun isAllowUse(material: Material): Boolean = getUseMaterials().contains(material)
 
     fun getUseMaterials(): List<Material> {
-        if(!hasFlag(LandFlag.USE)) return emptyList()
+        if (!hasFlag(LandFlag.USE)) return emptyList()
         val value = getLandFlag(LandFlag.USE).getValue<String>() ?: return emptyList()
 
-        if(!value.contains(",")) {
+        if (!value.contains(",")) {
             val material = Material.matchMaterial(value)
-            return if(material != null) listOf(material) else emptyList()
+            return if (material != null) listOf(material) else emptyList()
         } else {
             val args = value.split(",")
             val list = arrayListOf<Material>()
-            for(materialName in args) {
+            for (materialName in args) {
                 val material = Material.matchMaterial(materialName.uppercase()) ?: continue
                 list.add(material)
             }
@@ -116,13 +125,14 @@ data class Land(
         return emptyList()
     }
 
-    fun isMerged() = chunks.map { chunkPlaceholder -> {
-        chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey }}.isNotEmpty()
-    
+    fun isMerged() = chunks.map { chunkPlaceholder -> { chunkPlaceholder.chunkIndex != Bukkit.getWorld(world)?.getChunkAt(x, z)?.chunkKey } }.isNotEmpty()
+
     fun hasFlag(landFlag: LandFlag): Boolean = flags.any { landFlagEntity -> landFlagEntity.name == landFlag.name }
 
     fun isAdmin(playerId: UUID): Boolean {
         val member = getLandMember(playerId) ?: return false
         return member.role == LandRole.ADMIN
     }
+
+    fun isMergedChunk(chunk: Chunk): Boolean = getMergedChunk(chunk.chunkKey) != null
 }
