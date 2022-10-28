@@ -24,11 +24,13 @@ import net.onelitefeather.pandorascluster.listener.player.PlayerConnectionListen
 import net.onelitefeather.pandorascluster.listener.player.PlayerInteractEntityListener
 import net.onelitefeather.pandorascluster.listener.player.PlayerLocationListener
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
+import net.onelitefeather.pandorascluster.util.CHUNK_LENGTH
+import net.onelitefeather.pandorascluster.util.DEFAULT_PARTICLE_DATA
+import net.onelitefeather.pandorascluster.util.ParticleData
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
-import org.bukkit.Color
+import org.bukkit.Location
 import org.bukkit.Particle
-import org.bukkit.Particle.DustOptions
 import org.bukkit.entity.Player
 import org.hibernate.HibernateException
 import java.time.Duration
@@ -50,6 +52,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> isChunkClaimed(key) }
 
     val showBorderOfLand: MutableList<Player> = mutableListOf()
+    var particleData: ParticleData = DEFAULT_PARTICLE_DATA
 
     init {
 
@@ -79,6 +82,19 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         )
         pluginManager.registerEvents(LandWorldListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
 
+        val config = pandorasClusterApi.getPlugin().config
+
+        particleData = ParticleData(
+            Particle.valueOf(config.getString("trusted-particle", "FLAME")?.uppercase()!!),
+            Particle.valueOf(config.getString("untrusted-particle", "FLAME")?.uppercase()!!),
+            config.getInt("particle-data.radius"),
+            config.getDouble("particle-data.speed"),
+            config.getDouble("particle-data.offX"),
+            config.getDouble("particle-data.offY"),
+            config.getDouble("particle-data.offZ"),
+            null
+        )
+
         pandorasClusterApi.getPlugin().server.scheduler.runTaskTimerAsynchronously(
             pandorasClusterApi.getPlugin(),
             showBorder(),
@@ -87,21 +103,13 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         )
     }
 
-    val space = 2.5
-    val normalLandDustColor = DustOptions(Color.LIME, 2.5F)
-    val otherLandDustColor = DustOptions(Color.RED, 2.5F)
-
     fun showBorder() = Runnable {
 
         showBorderOfLand.forEach { player ->
 
-            val borderParticleDistance =
-                (player.viewDistance*player.viewDistance) * pandorasClusterApi.getPlugin().config.getDouble("particle-border-max-distance")
-
-            val y = player.eyeLocation.y.toInt()
             val land = getFullLand(player.chunk) ?: return@forEach
             val world = Bukkit.getWorld(land.world) ?: return@forEach
-            val dustOptions = if (land.hasMemberAccess(player.uniqueId)) normalLandDustColor else otherLandDustColor
+            val access = land.hasMemberAccess(player.uniqueId)
 
             val playerLocation = player.location
             val chunks = land.chunks.map { world.getChunkAt(it.chunkIndex) }
@@ -110,8 +118,8 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 val chunkX = chunk.x
                 val chunkZ = chunk.z
 
-                val minX = chunkX * 16
-                val minZ = chunkZ * 16
+                val minX = chunkX * CHUNK_LENGTH
+                val minZ = chunkZ * CHUNK_LENGTH
 
                 val north = world.getChunkAt(chunkX, chunkZ - 1)
                 val south = world.getChunkAt(chunkX, chunkZ + 1)
@@ -119,39 +127,31 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 val east = world.getChunkAt(chunkX + 1, chunkZ)
 
                 if (!land.isMergedChunk(north)) {
-                    for (x in minX until minX + 16) {
-                        val location = world.getBlockAt(x, y, minZ).location
-                        if (playerLocation.distanceSquared(location) < borderParticleDistance) {
-                            player.spawnParticle(Particle.REDSTONE, location, 1, dustOptions)
-                        }
-                    }
+                    (minX until minX + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(it, playerLocation.blockY, minZ).location }
+                        .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(south)) {
-                    for (x in minX until minX + 16) {
-                        val location = world.getBlockAt(x, y, (minZ + 16)).location
-                        if (playerLocation.distanceSquared(location) < borderParticleDistance) {
-                            player.spawnParticle(Particle.REDSTONE, location, 1, dustOptions)
-                        }
-                    }
+                    (minX until minX + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(it, playerLocation.blockY, (minZ + CHUNK_LENGTH)).location }
+                        .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(west)) {
-                    for (z in minZ until minZ + 16) {
-                        val location = world.getBlockAt(minX, y, z).location
-                        if (playerLocation.distanceSquared(location) < borderParticleDistance) {
-                            player.spawnParticle(Particle.REDSTONE, location, 1, dustOptions)
-                        }
-                    }
+                    (minZ until minZ + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt(minX, playerLocation.blockY, it).location }
+                        .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(east)) {
-                    for (z in minZ until minZ + 16) {
-                        val location = world.getBlockAt((minX + 16), y, z).location
-                        if (playerLocation.distanceSquared(location) < borderParticleDistance) {
-                            player.spawnParticle(Particle.REDSTONE, location, 1, dustOptions)
-                        }
-                    }
+                    (minZ until minZ + CHUNK_LENGTH)
+                        .asSequence()
+                        .map { world.getBlockAt((minX + CHUNK_LENGTH), playerLocation.blockY, it).location }
+                        .forEach { spawnParticle(player, access, it) }
                 }
             }
         }
@@ -391,6 +391,28 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
 
     fun disableBorderView(player: Player) {
         showBorderOfLand.remove(player)
+    }
+
+    private fun spawnParticle(player: Player, trusted: Boolean, location: Location) {
+        val radius = particleData.radius*particleData.radius
+        if (player.location.distanceSquared(location) < radius) {
+            val sectionKey =
+                if (trusted) "particle-data.trusted-particle-data" else "particle-data.untrusted-particle-data"
+
+            val particle = if (trusted) particleData.trustedParticle else particleData.untrustedParticle
+            val section = pandorasClusterApi.getPlugin().config.getConfigurationSection(sectionKey)
+            val data = if (section != null) particleData.getExtraData(trusted, section) else null
+            player.spawnParticle(
+                particle,
+                location,
+                1,
+                particleData.offX,
+                particleData.offY,
+                particleData.offZ,
+                particleData.speed,
+                data
+            )
+        }
     }
 }
 
