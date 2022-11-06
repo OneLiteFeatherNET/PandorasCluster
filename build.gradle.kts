@@ -137,7 +137,7 @@ bukkit {
 }
 sonarqube {
     properties {
-        property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYImhlbRTSfGYIFfefLS")
+        property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYROmm2vwVDHzVoeOyoE")
     }
 }
 version = if (System.getenv().containsKey("CI")) {
