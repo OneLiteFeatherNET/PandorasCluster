@@ -5,6 +5,7 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
+import net.onelitefeather.pandorascluster.land.Land
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
@@ -49,6 +50,30 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             )
         })
 
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.members",
+                pluginPrefix,
+                displayMembers(land)
+            )
+        })
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.flags",
+                pluginPrefix,
+                displayFlags(land)
+            )
+        })
+
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.total-chunk-count",
+                *arrayOf(pluginPrefix, pandorasClusterApi.getLandService().getChunksByLand(land))
+            )
+        })
+    }
+
+    private fun displayMembers(land: Land): String {
         val out = StringBuilder()
         val separator = ", "
         for (landMember in land.landMembers) {
@@ -62,15 +87,11 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             ).append(separator)
         }
 
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.info.members",
-                pluginPrefix,
-                if (out.isNotEmpty()) out.removeSuffix(separator)
-                    .toString() else pandorasClusterApi.i18n("command.info.members.nobody")
-            )
-        })
+        return if (out.isNotEmpty()) out.removeSuffix(separator)
+            .toString() else pandorasClusterApi.i18n("command.info.members.nobody")
+    }
 
+    private fun displayFlags(land: Land): String {
         val symbol = pandorasClusterApi.i18n("command.info.flag.symbol")
         val stringBuilder = StringBuilder()
 
@@ -104,14 +125,6 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             )
         }
 
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.info.flags",
-                pluginPrefix,
-                if (stringBuilder.isNotEmpty()) stringBuilder.toString() else pandorasClusterApi.i18n("command.info.flags.none")
-            )
-        })
-
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.info.total-chunk-count", *arrayOf(pluginPrefix, pandorasClusterApi.getLandService().getChunksByLand(land))) })
+        return if (stringBuilder.isNotEmpty()) stringBuilder.toString() else pandorasClusterApi.i18n("command.info.flags.none")
     }
 }
