@@ -103,6 +103,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         )
     }
 
+    @Suppress("kotlin:S3776")
     fun showBorder() = Runnable {
 
         showBorderOfLand.forEach { player ->
