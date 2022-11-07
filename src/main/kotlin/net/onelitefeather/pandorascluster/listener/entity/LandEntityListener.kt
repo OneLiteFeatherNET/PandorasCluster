@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.listener.entity
 import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.isPetOwner
 import org.bukkit.block.data.type.CaveVinesPlant
@@ -134,14 +135,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val land = pandorasClusterApi.getLand(event.block.chunk)
 
         event.isCancelled = if (blockData is CaveVinesPlant) {
-            val landFlag = LandFlag.INTERACT_CROPS
-            if (land != null) {
-                if (land.hasAccess(entity.uniqueId)) return
-                if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
-                !entity.hasPermission(landFlag)
-            } else {
-                !entity.hasPermission(landFlag) && entity is Player
-            }
+            cancelCropInteract(entity, land)
         } else {
             val landFlagECB = LandFlag.ENTITY_CHANGE_BLOCK
             if (land != null) {
@@ -166,8 +160,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
                 if (land != null) {
                     if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
                     if (land.hasAccess(source.uniqueId)) return
-                    if (source.hasPermission(landFlag)) return
-                    event.isCancelled = true
+                    event.isCancelled = !source.hasPermission(landFlag)
                 }
             }
         }
@@ -181,5 +174,18 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (owner !is Permissible) return
         if (land.hasAccess(owner.uniqueId)) return
         event.isCancelled = !owner.hasPermission(LandFlag.ENTITY_TAME)
+    }
+
+    private fun cancelCropInteract(entity: Entity, land: Land?): Boolean {
+        val landFlag = LandFlag.INTERACT_CROPS
+        if (land != null) {
+            if (land.hasAccess(entity.uniqueId)) return false
+            if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return false
+            !entity.hasPermission(landFlag)
+        } else {
+            !entity.hasPermission(landFlag) && entity is Player
+        }
+
+        return true
     }
 }
