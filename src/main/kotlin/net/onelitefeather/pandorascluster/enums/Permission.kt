@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.enums
 import org.bukkit.permissions.Permissible
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 
+@Suppress("kotlin:S1133")
 enum class Permission(val permissionNode: String) {
 
     NO_CLAIM_LIMIT("pandorascluster.unlimit.claim"),
