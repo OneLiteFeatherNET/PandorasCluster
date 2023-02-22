@@ -112,7 +112,7 @@ tasks {
             xml.required.set(true)
         }
     }
-    getByName<org.sonarqube.gradle.SonarQubeTask>("sonarqube") {
+    getByName<org.sonarqube.gradle.SonarQubeTask>("sonar") {
         dependsOn(rootProject.tasks.test)
     }
 
