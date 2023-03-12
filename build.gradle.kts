@@ -5,7 +5,7 @@ plugins {
 
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.liquibase.gradle") version "2.1.0"
-    id("org.sonarqube") version "3.4.0.2513"
+    id("org.sonarqube") version "4.0.0.2929"
     jacoco
 }
 
@@ -112,7 +112,7 @@ tasks {
             xml.required.set(true)
         }
     }
-    getByName<org.sonarqube.gradle.SonarQubeTask>("sonarqube") {
+    getByName<org.sonarqube.gradle.SonarTask>("sonar") {
         dependsOn(rootProject.tasks.test)
     }
 
