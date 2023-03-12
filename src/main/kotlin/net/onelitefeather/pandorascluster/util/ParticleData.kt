@@ -11,7 +11,8 @@ class ParticleData(
     val trustedParticle: Particle,
     val untrustedParticle: Particle,
     val radius: Int,
-    val speed: Double,
+    val trustedSpeed: Double,
+    val untrustedSpeed: Double,
     val offX: Double,
     val offY: Double,
     val offZ: Double,
@@ -54,6 +55,10 @@ class ParticleData(
             else -> return null
         }
     }
+
+    fun getSpeed(trusted: Boolean): Double {
+        return if(trusted) this.trustedSpeed else this.untrustedSpeed
+    }
 }
 
-val DEFAULT_PARTICLE_DATA = ParticleData(Particle.REDSTONE, Particle.FLAME, 64, 3.0, 0.0, 0.0, 0.0, null)
+val DEFAULT_PARTICLE_DATA = ParticleData(Particle.REDSTONE, Particle.FLAME, 64, 1.0, 0.0, 0.0, 0.0, 0.0, null)

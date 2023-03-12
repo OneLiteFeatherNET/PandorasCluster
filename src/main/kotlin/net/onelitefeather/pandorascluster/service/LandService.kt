@@ -23,10 +23,7 @@ import net.onelitefeather.pandorascluster.listener.player.LandPlayerInteractList
 import net.onelitefeather.pandorascluster.listener.player.PlayerConnectionListener
 import net.onelitefeather.pandorascluster.listener.player.PlayerInteractEntityListener
 import net.onelitefeather.pandorascluster.listener.player.PlayerLocationListener
-import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
-import net.onelitefeather.pandorascluster.util.CHUNK_LENGTH
-import net.onelitefeather.pandorascluster.util.DEFAULT_PARTICLE_DATA
-import net.onelitefeather.pandorascluster.util.ParticleData
+import net.onelitefeather.pandorascluster.util.*
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
@@ -88,7 +85,8 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             Particle.valueOf(config.getString("trusted-particle", "FLAME")?.uppercase()!!),
             Particle.valueOf(config.getString("untrusted-particle", "FLAME")?.uppercase()!!),
             config.getInt("particle-data.radius"),
-            config.getDouble("particle-data.speed"),
+            config.getDouble("particle-data.trusted-speed"),
+            config.getDouble("particle-data.untrusted-speed"),
             config.getDouble("particle-data.offX"),
             config.getDouble("particle-data.offY"),
             config.getDouble("particle-data.offZ"),
@@ -410,7 +408,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 particleData.offX,
                 particleData.offY,
                 particleData.offZ,
-                particleData.speed,
+                particleData.getSpeed(trusted),
                 data
             )
         }
