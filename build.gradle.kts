@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "net.onelitefeather"
-val baseVersion = "1.0.0-SNAPSHOT"
+val baseVersion = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -134,6 +134,70 @@ bukkit {
 
     authors = listOf("UniqueGame", "OneLiteFeather")
     softDepend = listOf("WorldGuard")
+    permissions {
+
+        listOf(
+            "pandorascluster.command.land.info",
+            "pandorascluster.command.land.visit",
+            "pandorascluster.command.land.flag.set",
+            "pandorascluster.command.land.set.home",
+            "pandorascluster.flags.flag.pvp",
+            "pandorascluster.flags.flag.pve",
+            "pandorascluster.flags.flag.use",
+            "pandorascluster.flags.flag.redstone",
+            "pandorascluster.flags.flag.potion-splash",
+            "pandorascluster.flags.flag.hanging-break",
+            "pandorascluster.flags.flag.hanging-place",
+            "pandorascluster.flags.flag.vehicle-use",
+            "pandorascluster.flags.flag.vehicle-create",
+            "pandorascluster.flags.flag.vehicle-damage",
+            "pandorascluster.flags.flag.leaves-decay",
+            "pandorascluster.flags.flag.entitiy-change-block",
+            "pandorascluster.flags.flag.explosions",
+            "pandorascluster.flags.flag.mob-griefing",
+            "pandorascluster.flags.flag.ice-form",
+            "pandorascluster.flags.flag.block-form",
+            "pandorascluster.flags.flag.turtle-egg-destroy",
+            "pandorascluster.flags.flag.unknown",
+            "pandorascluster.flags.flag.interact-crops",
+            "pandorascluster.flags.flag.entity-mount",
+            "pandorascluster.flags.flag.entity-tame",
+            "pandorascluster.flags.flag.bucket-interact",
+            "pandorascluster.flags.flag.shear-block",
+            "pandorascluster.flags.flag.shear-entity",
+            "pandorascluster.flags.flag.take-lectern",
+            "pandorascluster.flags.flag.entity-leash",
+            "pandorascluster.flags.flag.villager-interact",
+            "pandorascluster.flags.flag.fire-protection",
+            "pandorascluster.flags.flag.sponge-absorb",
+            "pandorascluster.limit.claim",
+            "pandorascluster.owned.access",
+            "pandorascluster.owned.block.break",
+            "pandorascluster.owned.block.place",
+            "pandorascluster.owned.entry.denied",
+            "pandorascluster.owned.interact.container",
+
+            ).forEach { perm ->
+            register(perm) {
+                default = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.TRUE
+            }
+        }
+        listOf(
+            "pandorascluster.unlimit.claim",
+            "pandorascluster.command.land.setowner",
+            "pandorascluster.admin.set.role",
+            "pandorascluster.admin.set.flags",
+            "pandorascluster.admin.set.home",
+            "pandorascluster.admin.set.owner",
+            "pandorascluster.unowned.access",
+            "pandorascluster.unowned.block.break",
+            "pandorascluster.unowned.block.place",
+        ).forEach { perm ->
+            register(perm) {
+                default = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.OP
+            }
+        }
+    }
 }
 sonarqube {
     properties {
