@@ -18,6 +18,41 @@ import org.bukkit.event.player.PlayerBucketFillEvent
 class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Listener {
 
     @EventHandler
+    fun handleSpongeAbsorb(event: SpongeAbsorbEvent) {
+        event.blocks.groupBy { it.chunk }.filter {
+            pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.SPONGE_ABSORB)?.getValue<Boolean>() == true
+        }.forEach { event.blocks.removeAll(it.value) }
+    }
+
+    @EventHandler
+    fun handleBlockIgnite(event: BlockIgniteEvent) {
+
+        val block = event.block
+        val ignitedBlock = event.ignitingBlock
+
+        val land = pandorasClusterApi.getLand(ignitedBlock?.chunk ?: block.chunk) ?: return
+        val landFlag = land.getLandFlag(LandFlag.FIRE_PROTECTION)
+
+        val ignitingEntity = event.ignitingEntity
+        event.isCancelled = if(ignitingEntity != null) {
+            !land.hasAccess(ignitingEntity.uniqueId)
+        } else {
+            landFlag.getValue<Boolean>() == false
+        }
+    }
+
+    @EventHandler
+    fun handleBlockBurn(event: BlockBurnEvent) {
+
+        val block = event.block
+        val ignitedBlock = event.ignitingBlock
+
+        val land = pandorasClusterApi.getLand(ignitedBlock?.chunk ?: block.chunk) ?: return
+        val landFlag = land.getLandFlag(LandFlag.FIRE_PROTECTION)
+        event.isCancelled = landFlag.getValue<Boolean>() == false
+    }
+
+    @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
 
         if (event.player.hasPermission(Permission.BLOCK_BREAK)) return
@@ -71,7 +106,7 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         event.isCancelled = if (blockChunk != toBlockChunk) {
             val land = pandorasClusterApi.getLand(event.toBlock.chunk)
             val toLand = pandorasClusterApi.getLand(event.block.chunk)
-            if(toLand != null && land == null || land != null && toLand == null) {
+            if (toLand != null && land == null || land != null && toLand == null) {
                 true
             } else {
                 toLand != null && land != null && !hasSameOwner(land, toLand)
