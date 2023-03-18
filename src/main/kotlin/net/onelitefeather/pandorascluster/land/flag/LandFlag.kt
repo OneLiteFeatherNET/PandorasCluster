@@ -39,7 +39,9 @@ enum class LandFlag(val flagName: String,
     TAKE_LECTERN("take-lectern", false, LandFlagType.PLAYER, 2),
     ENTITY_LEASH("entity-leash", false, LandFlagType.PLAYER, 2),
     USE_BED("use-bed", false, LandFlagType.PLAYER, 2),
-    VILLAGER_INTERACT("villager-interact", false, LandFlagType.PLAYER, 2);
+    VILLAGER_INTERACT("villager-interact", false, LandFlagType.PLAYER, 2),
+    FIRE_PROTECTION("fire-protection", false, LandFlagType.WORLD_TICK, 2),
+    SPONGE_ABSORB("sponge-absorb", false, LandFlagType.WORLD_TICK, 2);
 }
 
 val LAND_FLAGS = LandFlag.values()
