@@ -35,13 +35,9 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if (landFlag == LandFlag.UNKNOWN) {
-            player.sendMessage(miniMessage {
-                pandorasClusterApi.i18n(
-                    "command.set-flag.not-found",
-                    *arrayOf(pluginPrefix)
-                )
-            })
+        if(!isValidValue(landFlag, value)) {
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n(
+                "command.set-flag.invalid-value", *arrayOf(pluginPrefix, value, landFlag)) } )
             return
         }
 

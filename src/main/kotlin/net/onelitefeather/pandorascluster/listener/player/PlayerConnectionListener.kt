@@ -18,7 +18,7 @@ class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
         }
 
         if(api.registerPlayer(player.uniqueId, player.name)) {
-            player.sendMessage("Your playerdata was successfully created!")
+            player.sendMessage(api.i18n("player-data-created", *arrayOf(api.pluginPrefix())))
         }
 
     }
