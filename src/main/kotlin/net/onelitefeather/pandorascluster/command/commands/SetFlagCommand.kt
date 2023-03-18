@@ -36,7 +36,8 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         if(!isValidValue(landFlag, value)) {
-            player.sendMessage(miniMessage { "The value $value is not valid for flag $landFlag" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n(
+                "command.set-flag.invalid-value", *arrayOf(pluginPrefix, value, landFlag)) } )
             return
         }
 
