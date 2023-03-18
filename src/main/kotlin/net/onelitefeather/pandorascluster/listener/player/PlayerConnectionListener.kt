@@ -11,9 +11,16 @@ class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
     @EventHandler
     fun handlePlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
+
+        val landPlayer = api.getLandPlayer(player.uniqueId)
+        if(landPlayer != null && !landPlayer.name.equals(player.name, true)) {
+            api.getLandPlayerService().updateLandPlayer(landPlayer.copy(name = player.name))
+        }
+
         if(api.registerPlayer(player.uniqueId, player.name)) {
             player.sendMessage("Your playerdata was successfully created!")
         }
+
     }
 
     @EventHandler
