@@ -41,7 +41,10 @@ enum class LandFlag(val flagName: String,
     USE_BED("use-bed", false, LandFlagType.PLAYER, 2),
     VILLAGER_INTERACT("villager-interact", false, LandFlagType.PLAYER, 2),
     FIRE_PROTECTION("fire-protection", false, LandFlagType.WORLD_TICK, 2),
+    FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, 2),
+    INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, 2),
     SPONGE_ABSORB("sponge-absorb", false, LandFlagType.WORLD_TICK, 2);
+
 }
 
 val LAND_FLAGS = LandFlag.values()
