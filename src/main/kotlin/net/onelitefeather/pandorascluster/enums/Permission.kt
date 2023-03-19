@@ -6,8 +6,10 @@ enum class Permission(val permissionNode: String) {
 
     BLOCK_BREAK("pandorascluster.unowned.block.break"),
     BLOCK_PLACE("pandorascluster.unowned.block.place"),
-    ENTITY_MOUNT("pandorascluster.unowned.mount"),
-    LAND_ENTRY_DENIED("pandorascluster.unowned.entry.denied"),
+    OWNED_CHUNK("pandorascluster.owned.access"),
+    LAND_ENTRY_DENIED("pandorascluster.owned.entry.denied"),
+    INTERACT_CONTAINERS("pandorascluster.owned.interact.container"),
+    INTERACT_FARMLAND("pandorascluster.unowned.interact.farmland"),
 
     PVP("pandorascluster.unowned.attack.player"),
     PVE("pandorascluster.unowned.attack.entity"),
