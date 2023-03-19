@@ -217,7 +217,111 @@ class LandService(
         val regions = regionManager?.regions?.values
         return region.getIntersectingRegions(regions).isNotEmpty()
     }
+
+    fun loadChunk(chunk: Chunk) {
+        val land = getFullLand(chunk) ?: return
+        landCache.put(chunk, land)
+    }
+
+    fun getChunksByLand(land: Land): Long {
+        var chunks = 0L
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val query = session.createNativeQuery(
+                    "SELECT COUNT(chunkIndex) FROM ChunkPlaceholder WHERE land_id = :landId",
+                    Long::class.java
+                )
+                query.setParameter("landId", land.id)
+                chunks = query.singleResult as Long
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot count chunks by land $land", e)
+            Sentry.captureException(e)
+
+        }
+
+        return chunks
+    }
+
+    fun updateLoadedChunks(land: Land) {
+        val world = Bukkit.getWorld(land.world) ?: return
+        landCache.invalidateAll(land.chunks.map { world.getChunkAt(it.chunkIndex) })
+    }
+
+    fun claimChunk(chunk: Chunk) {
+        unclaimedChunkCache.invalidate(chunk)
+        landCache.invalidate(chunk)
+    }
+
+    fun toggleShowBorder(player: Player): Boolean {
+        var currentState = showBorderOfLand.contains(player)
+        if (currentState) {
+            showBorderOfLand.remove(player)
+        } else {
+            showBorderOfLand.add(player)
+        }
+        currentState = showBorderOfLand.contains(player)
+        return currentState
+    }
+
+    fun disableBorderView(player: Player) {
+        showBorderOfLand.remove(player)
+    }
+    fun getFlagsByLand(land: Land): List<LandFlagEntity> {
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagsOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId",
+                    LandFlagEntity::class.java
+                )
+                flagsOfLand.setParameter("landId", land.id)
+                return flagsOfLand.list()
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, CANNOT_LOAD_FLAG, e)
+        }
+        return listOf()
+    }
+
+    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId AND f.name = :name",
+                    LandFlagEntity::class.java
+                )
+                flagOfLand.setParameter("landId", land.id)
+                flagOfLand.setParameter("name", landFlag.name)
+                return flagOfLand.uniqueResult()
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, CANNOT_LOAD_FLAG, e)
+        }
+        return null
+    }
+
+    private fun spawnParticle(player: Player, trusted: Boolean, location: Location) {
+        val radius = particleData.radius*particleData.radius
+        if (player.location.distanceSquared(location) < radius) {
+            val sectionKey =
+                if (trusted) "particle-data.trusted-particle-data" else "particle-data.untrusted-particle-data"
+
+            val particle = if (trusted) particleData.trustedParticle else particleData.untrustedParticle
+            val section = pandorasClusterApi.getPlugin().config.getConfigurationSection(sectionKey)
+            val data = if (section != null) particleData.getExtraData(trusted, section) else null
+            player.spawnParticle(
+                particle,
+                location,
+                1,
+                particleData.offX,
+                particleData.offY,
+                particleData.offZ,
+                particleData.getSpeed(trusted),
+                data
+            )
+        }
+    }
 }
 
-private const val cannotLoadFlags = "Cannot load flags by land"
+private const val CANNOT_LOAD_FLAG = "Cannot load flags by land"
 private const val cannotUpdateLand = "Cannot update land"
