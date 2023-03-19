@@ -10,6 +10,8 @@ import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
 import net.onelitefeather.pandorascluster.land.player.LandMember
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
@@ -391,6 +393,38 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
     fun disableBorderView(player: Player) {
         showBorderOfLand.remove(player)
     }
+    fun getFlagsByLand(land: Land): List<LandFlagEntity> {
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagsOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId",
+                    LandFlagEntity::class.java
+                )
+                flagsOfLand.setParameter("landId", land.id)
+                return flagsOfLand.list()
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, CANNOT_LOAD_FLAG, e)
+        }
+        return listOf()
+    }
+
+    fun getLandFlag(landFlag: LandFlag, land: Land): LandFlagEntity? {
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                val flagOfLand = session.createQuery(
+                    "SELECT f FROM LandFlagEntity f JOIN FETCH f.land l WHERE l.id = :landId AND f.name = :name",
+                    LandFlagEntity::class.java
+                )
+                flagOfLand.setParameter("landId", land.id)
+                flagOfLand.setParameter("name", landFlag.name)
+                return flagOfLand.uniqueResult()
+            }
+        } catch (e: HibernateException) {
+            pandorasClusterApi.getLogger().log(Level.SEVERE, CANNOT_LOAD_FLAG, e)
+        }
+        return null
+    }
 
     private fun spawnParticle(player: Player, trusted: Boolean, location: Location) {
         val radius = particleData.radius*particleData.radius
@@ -415,5 +449,5 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
     }
 }
 
-
+private const val CANNOT_LOAD_FLAG = "Cannot load flags by land"
 private const val cannotUpdateLand = "Cannot update land"
