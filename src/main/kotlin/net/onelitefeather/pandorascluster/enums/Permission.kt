@@ -19,6 +19,7 @@ enum class Permission(val permissionNode: String) {
     OWNED_CHUNK("pandorascluster.owned.access"),
     LAND_ENTRY_DENIED("pandorascluster.owned.entry.denied"),
     INTERACT_CONTAINERS("pandorascluster.owned.interact.container"),
+    INTERACT_FARMLAND("pandorascluster.unowned.interact.farmland"),
 
     @Deprecated(message = "This field will be removed in future releases")
     @ScheduledForRemoval(inVersion = "1.2.0")
