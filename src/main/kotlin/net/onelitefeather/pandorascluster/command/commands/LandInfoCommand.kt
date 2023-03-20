@@ -31,15 +31,7 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             )
         })
 
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.info.home",
-                pluginPrefix,
-                Location.locToBlock(land.homePosition.posX),
-                Location.locToBlock(land.homePosition.posY),
-                Location.locToBlock(land.homePosition.posZ)
-            )
-        })
+        displayLandHome(player, land)
 
         player.sendMessage(miniMessage {
             pandorasClusterApi.i18n(
@@ -50,25 +42,45 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             )
         })
 
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.info.members",
-                pluginPrefix,
-                displayMembers(land)
-            )
-        })
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.info.flags",
-                pluginPrefix,
-                displayFlags(land)
-            )
-        })
+        displayMembers(player, land)
+        displayFlags(player, land)
 
         player.sendMessage(miniMessage {
             pandorasClusterApi.i18n(
                 "command.info.total-chunk-count",
                 *arrayOf(pluginPrefix, pandorasClusterApi.getLandService().getChunksByLand(land))
+            )
+        })
+    }
+
+    private fun displayLandHome(player: Player, land: Land) {
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.home",
+                pandorasClusterApi.pluginPrefix(),
+                Location.locToBlock(land.homePosition.posX),
+                Location.locToBlock(land.homePosition.posY),
+                Location.locToBlock(land.homePosition.posZ)
+            )
+        })
+    }
+
+    private fun displayMembers(player: Player, land: Land) {
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.members",
+                pandorasClusterApi.pluginPrefix(),
+                displayMembers(land)
+            )
+        })
+    }
+
+    private fun displayFlags(player: Player, land: Land) {
+        player.sendMessage(miniMessage {
+            pandorasClusterApi.i18n(
+                "command.info.flags",
+                pandorasClusterApi.pluginPrefix(),
+                displayFlags(land)
             )
         })
     }
