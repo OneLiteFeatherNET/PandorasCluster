@@ -1,70 +1,72 @@
 package net.onelitefeather.pandorascluster.listener
 
-import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.service.LandService
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.event.*
+import org.bukkit.event.block.BlockFertilizeEvent
 import org.bukkit.event.block.LeavesDecayEvent
+import org.bukkit.event.raid.RaidTriggerEvent
 import org.bukkit.event.world.StructureGrowEvent
 
-class LandWorldListener(private val landService: LandService) : Listener {
+class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
+    Listener {
+
+    @EventHandler
+    fun handleRaidStart(event: RaidTriggerEvent) {
+
+        val land = pandorasClusterApi.getLand(event.player.chunk)
+        if(land == null) {
+            event.isCancelled = true
+            return
+        }
+
+        if (land.hasAccess(event.player.uniqueId)) return
+        event.isCancelled = true
+    }
 
     @EventHandler
     fun handleLeavesDecay(event: LeavesDecayEvent) {
-        val land: Land = landService.getFullLand(event.block.chunk) ?: return
-        val landFlag = landService.getLandFlag(LandFlag.LEAVES_DECAY, land)?: return
+        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
+        val landFlag = land.getLandFlag(LandFlag.LEAVES_DECAY)
         if (landFlag.getValue<Boolean>() == false) return
         event.isCancelled = true
     }
 
-    @Suppress("kotlin:S3776")
+    @EventHandler
+    fun handleBlockFertilize(event: BlockFertilizeEvent) {
+        handle(event)
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun handleStructureGrow(event: StructureGrowEvent) {
+        handle(event)
+    }
 
-        val blocks = event.blocks
-        if (blocks.isEmpty()) return
+    private fun handle(event: Event) {
 
-        val originChunk = blocks.first().chunk
-        val area = landService.getFullLand(originChunk)
-
-        if (area == null) {
-            blocks.reversed().forEachIndexed index@{ index, blockState ->
-                val chunk = blockState.chunk
-                if (landService.getFullLand(chunk) == null) {
-                    blocks.removeAt(index)
-                }
-            }
-            return
-        } else {
-            val origin = landService.getFullLand(originChunk)
-            if (origin == null) {
-                event.isCancelled = true
-                return
-            }
-            blocks.reversed().forEachIndexed index@ { index, blockState ->
-                val chunk = blockState.chunk
-                if (landService.getFullLand(chunk) == null) {
-                    blocks.removeAt(index)
-                    return@index
-                }
-                val plot = landService.getFullLand(chunk)
-                if (plot != origin) {
-                    event.blocks.removeAt(index)
-                }
-            }
+        val blocks = when (event) {
+            is BlockFertilizeEvent -> event.blocks
+            is StructureGrowEvent -> event.blocks
+            else -> listOf()
         }
-        val origin = landService.getFullLand(originChunk)
-        if (origin == null) {
+
+        if (blocks.isEmpty()) return
+        val blocksByChunks = blocks.groupBy { it.chunk }
+        val firstChunk = blocks.first().chunk
+        val origin = pandorasClusterApi.getLand(firstChunk)
+        if (origin == null && event is Cancellable) {
             event.isCancelled = true
             return
         }
-        blocks.reversed().forEachIndexed { index, blockState ->
-            val land = landService.getFullLand(blockState.chunk)
-            if (land != null && land != origin && !land.isMerged() && !origin.isMerged()) {
-                event.blocks.removeAt(index)
-            }
+
+        val result = blocksByChunks.filter { entry ->
+            val plot = pandorasClusterApi.getLand(entry.key)
+            plot == null || !hasSameOwner(plot, origin!!)
+        }.values.reduceOrNull { acc, blockStates -> acc + blockStates }
+        result?.forEach {
+            if(event is BlockFertilizeEvent) event.blocks.remove(it)
+            if(event is StructureGrowEvent) event.blocks.remove(it)
         }
     }
 }

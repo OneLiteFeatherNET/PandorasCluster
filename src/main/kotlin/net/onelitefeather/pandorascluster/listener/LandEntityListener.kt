@@ -2,7 +2,6 @@ package net.onelitefeather.pandorascluster.listener
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent
-import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
@@ -40,11 +39,11 @@ class LandEntityListener(private val landService: LandService) :
             val cancel = if (hitEntity !is Player) {
                 val flag = landService.getLandFlag(LandFlag.PVE, land) ?: return
                 val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && shooter.hasPermission(Permission.PVE) || !value || shooter is Entity
+                shooter is Permissible && shooter.hasPermission(LandFlag.PVE) || !value || shooter is Entity
             } else {
                 val flag = landService.getLandFlag(LandFlag.PVP, land) ?: return
                 val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && shooter.hasPermission(Permission.PVP) || !value || shooter is Entity
+                shooter is Permissible && shooter.hasPermission(LandFlag.PVP) || !value || shooter is Entity
             }
 
             event.isCancelled = cancel
@@ -68,11 +67,11 @@ class LandEntityListener(private val landService: LandService) :
             event.isCancelled = if (target !is Player) {
                 val flag = landService.getLandFlag(LandFlag.PVE, land) ?: return
                 val value = flag.getValue<Boolean>()
-                attacker.hasPermission(Permission.PVE) || value == false
+                attacker.hasPermission(LandFlag.PVE) || value == false
             } else {
                 val flag = landService.getLandFlag(LandFlag.PVP, land) ?: return
                 val value = flag.getValue<Boolean>()
-                attacker.hasPermission(Permission.PVP) || value == false
+                attacker.hasPermission(LandFlag.PVP) || value == false
             }
         }
     }
@@ -88,7 +87,7 @@ class LandEntityListener(private val landService: LandService) :
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
-                if (Permission.EXPLOSION.hasPermission(primerEntity)) return
+                if (primerEntity.hasPermission(LandFlag.EXPLOSIONS)) return
                 true
             } else false
         }
@@ -163,7 +162,7 @@ class LandEntityListener(private val landService: LandService) :
 
         val land = this.landService.getFullLand(mount.getChunk()) ?: return
         if (land.hasAccess(entity.uniqueId)) return
-        if (Permission.ENTITY_MOUNT.hasPermission(entity)) return
+        if (entity.hasPermission(LandFlag.ENTITY_MOUNT)) return
         event.isCancelled = true
     }
 
@@ -185,7 +184,7 @@ class LandEntityListener(private val landService: LandService) :
             if (landFlag.getValue<Boolean>() == true) return
             if (attacker != null) {
                 if (land.hasAccess(attacker.uniqueId)) return
-                if (Permission.VEHICLE_DESTROY.hasPermission(attacker)) return
+                if (attacker.hasPermission(LandFlag.VEHICLE_DAMAGE)) return
                 event.isCancelled = true
                 return
             }
@@ -201,7 +200,7 @@ class LandEntityListener(private val landService: LandService) :
         if (land != null) {
             if (attacker != null) {
                 if (land.hasAccess(attacker.uniqueId)) return
-                if (Permission.VEHICLE_DAMAGE.hasPermission(attacker)) return
+                if (attacker.hasPermission(LandFlag.VEHICLE_DAMAGE)) return
             }
             val landFlag = landService.getLandFlag(LandFlag.VEHICLE_DAMAGE, land) ?: return
             if (landFlag.getValue<Boolean>() == true) return
@@ -239,9 +238,9 @@ class LandEntityListener(private val landService: LandService) :
 
         if (projectile is ThrownPotion) {
 
-            val source = projectile.getShooter()
-            if (source is Entity) {
-                val land = landService.getFullLand(source.chunk)
+            val projectileShooter = projectile.getShooter()
+            if (projectileShooter is Entity) {
+                val land = landService.getFullLand(projectileShooter.chunk)
 
                 if (land != null) {
 
@@ -249,7 +248,7 @@ class LandEntityListener(private val landService: LandService) :
                     if (landFlag.getValue<Boolean>() == true) return
 
                     if (land.hasAccess(projectile.uniqueId)) return
-                    if (Permission.POTION_SPLASH.hasPermission(projectile)) return
+                    if (projectileShooter.hasPermission(LandFlag.POTION_SPLASH)) return
                     event.isCancelled = true
                 }
             }
@@ -282,7 +281,7 @@ class LandEntityListener(private val landService: LandService) :
             val landFlag = landService.getLandFlag(LandFlag.VEHICLE_USE, land)
             if (landFlag != null && landFlag.getValue()!!) return
             if (land.hasAccess(entered.uniqueId)) return
-            if (Permission.VEHICLE_ENTER.hasPermission(entered)) return
+            if (entered.hasPermission(LandFlag.VEHICLE_USE)) return
             event.isCancelled = true
         }
     }
