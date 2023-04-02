@@ -35,7 +35,7 @@ dependencies {
     // Commands
     bukkitLibrary("cloud.commandframework", "cloud-paper", "1.8.0")
     bukkitLibrary("cloud.commandframework", "cloud-annotations", "1.8.0")
-    bukkitLibrary("cloud.commandframework", "cloud-minecraft-extras", "1.8.0")
+    bukkitLibrary("cloud.commandframework", "cloud-minecraft-extras", "1.8.3")
     bukkitLibrary("net.kyori:adventure-platform-bukkit:4.1.2")
     bukkitLibrary("me.lucko:commodore:2.2") {
         isTransitive = false
@@ -72,7 +72,7 @@ dependencies {
     // Commands
     testImplementation("cloud.commandframework", "cloud-paper", "1.7.0")
     testImplementation("cloud.commandframework", "cloud-annotations", "1.7.0")
-    testImplementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
+    testImplementation("cloud.commandframework", "cloud-minecraft-extras", "1.8.3")
     testImplementation("net.kyori:adventure-platform-bukkit:4.1.2")
     testImplementation("me.lucko:commodore:2.2") {
         isTransitive = false
