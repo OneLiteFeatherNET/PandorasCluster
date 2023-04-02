@@ -4,29 +4,47 @@ import cloud.commandframework.annotations.parsers.Parser
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.land.flag.LandFlagEntity
-import org.bukkit.entity.Player
-import java.util.*
+import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.findByName
-import net.onelitefeather.pandorascluster.util.DUMMY_FLAG_ENTITY
+import net.onelitefeather.pandorascluster.land.flag.getDefaultFlagNames
+import net.onelitefeather.pandorascluster.util.MATERIALS
+import org.bukkit.entity.Player
+import org.bukkit.util.StringUtil
+import java.util.*
 
 class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
 
     @Parser(name = "landFlag", suggestions = "landFlags")
-    fun parseLandFlags(commandContext: CommandContext<Player>, input: Queue<String>): LandFlagEntity {
-        val landPlayer =
-            pandorasClusterApi.getLandPlayer(commandContext.sender.uniqueId) ?: return DUMMY_FLAG_ENTITY
-        val land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return DUMMY_FLAG_ENTITY
-
-        val flag = findByName(input.remove()) ?: return DUMMY_FLAG_ENTITY
-
-        return pandorasClusterApi.getLandService().getLandFlag(flag, land) ?: return DUMMY_FLAG_ENTITY
+    fun parseLandFlags(commandContext: CommandContext<Player>, input: Queue<String>): LandFlag {
+        return findByName(input.remove().lowercase()) ?: LandFlag.UNKNOWN
     }
 
+    @Suggestions("flag_values")
+    fun flagSuggestions(commandContext: CommandContext<Player>, input: String): List<String> {
+        val landFlag = commandContext.get<LandFlag>("flag")
+
+        when(landFlag.type.toInt()) {
+            0 -> {
+                if (commandContext.get<LandFlag>("flag") == LandFlag.USE) {
+                    return MATERIALS.filter { StringUtil.startsWithIgnoreCase(it.name, input.lowercase()) }.filter { it.isInteractable }.map { it.name }
+                }
+            }
+
+            2 -> {
+                return listOf("true", "false")
+            }
+
+            else -> {
+                return emptyList()
+            }
+        }
+
+        return emptyList()
+    }
+
+
     @Suggestions("landFlags")
-    fun landPlayers(commandContext: CommandContext<Player>, input: String): List<String> {
-        val landPlayer = pandorasClusterApi.getLandPlayer(commandContext.sender.uniqueId) ?: return listOf()
-        val land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return listOf()
-        return pandorasClusterApi.getLandService().getFlagsByLand(land).mapNotNull { it.name }
+    fun landFlags(commandContext: CommandContext<Player>, input: String): List<String> {
+        return getDefaultFlagNames()
     }
 }

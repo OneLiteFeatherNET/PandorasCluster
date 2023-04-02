@@ -6,7 +6,7 @@ import cloud.commandframework.annotations.CommandPermission
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.land.position.HomePosition
+import net.onelitefeather.pandorascluster.land.position.fromHomePosition
 import org.bukkit.entity.Player
 
 class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
@@ -14,7 +14,9 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
     @CommandMethod("land home")
     fun executeHomeCommand(player: Player) {
         val homePosition = pandorasClusterApi.getLandService().getHome(player.uniqueId) ?: return
-        player.teleport(HomePosition.fromHomePosition(player.world, homePosition))
+        player.teleport(fromHomePosition(player.world, homePosition))
+        player.sendMessage(miniMessage { pandorasClusterApi.i18n(
+            "command.home.success", *arrayOf(pandorasClusterApi.pluginPrefix())) })
     }
 
     @CommandMethod("land visit <player>")
@@ -24,23 +26,25 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
         @Argument(value = "player", parserName = "landPlayer") landOwner: LandPlayer
     ) {
 
+        val pluginPrefix = pandorasClusterApi.pluginPrefix()
+        val playerName = landOwner.name ?: "null"
         if (landOwner.uuid == null) {
-            player.sendMessage(miniMessage { "Nichts gefunden" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, playerName)) })
             return
         }
 
-        val land = pandorasClusterApi.getLandService().getLand(landOwner)
+        val land = pandorasClusterApi.getLand(landOwner)
         if (land == null) {
-            player.sendMessage(miniMessage { "Nichts gefunden" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("player-has-no-land", *arrayOf(pluginPrefix)) })
             return
         }
 
         if(land.isBanned(player.uniqueId)) {
-            player.sendMessage(miniMessage { "Du bist auf diesem Land gebannt!" })
+            player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.visit.banned", *arrayOf(pluginPrefix)) })
             return
         }
 
-        player.teleport(HomePosition.fromHomePosition(player.world, land.homePosition))
-        player.sendMessage(miniMessage { "Du bist nun auf dem Land von ${land.owner?.name}" })
+        player.teleport(fromHomePosition(player.world, land.homePosition))
+        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.visit.success", *arrayOf(pluginPrefix, land.owner?.name ?: "null"))})
     }
 }

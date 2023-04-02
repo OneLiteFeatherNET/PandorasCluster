@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.hibernate.Hibernate
 import java.util.*
 
@@ -53,8 +54,11 @@ data class LandPlayer(
     }
 
     fun isOnline(): Boolean {
-        val playerId = getUniqueId() ?: return false
-        return Bukkit.getPlayer(playerId) != null
+        return getBukkitPlayer() != null
     }
 
+    fun getBukkitPlayer(): Player? {
+        val playerId = getUniqueId() ?: return null
+        return Bukkit.getPlayer(playerId)
+    }
 }

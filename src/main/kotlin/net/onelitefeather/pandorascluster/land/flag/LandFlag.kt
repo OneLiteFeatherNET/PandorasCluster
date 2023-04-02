@@ -14,19 +14,17 @@ enum class LandFlag(val flagName: String,
 
     PVP("pvp", false, LandFlagType.PLAYER, 2),
     PVE("pve", false, LandFlagType.PLAYER, 2),
+    USE("use", "", LandFlagType.PLAYER, 0),
     REDSTONE("redstone", true, LandFlagType.WORLD_TICK, 2),
     POTION_SPLASH("potion-splash", false, LandFlagType.ENTITY, 2),
     HANGING_BREAK("hanging-break", false, LandFlagType.ENTITY, 2),
-
+    HANGING_PLACE("hanging-place", false, LandFlagType.PLAYER, 2),
     VEHICLE_USE("vehicle-use", false, LandFlagType.ENTITY, 2),
     VEHICLE_CREATE("vehicle-create", false, LandFlagType.ENTITY, 2),
     VEHICLE_DAMAGE("vehicle-damage", false, LandFlagType.ENTITY, 2),
-
-    INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, 2),
     LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, 2),
-
+    ENTITY_CHANGE_BLOCK("entity-change-block", false, LandFlagType.ENTITY, 2),
     EXPLOSIONS("explosions", true, LandFlagType.EXPLOSION, 2),
-    FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, 2),
     MOB_GRIEFING("mob-griefing", true, LandFlagType.ENTITY, 2),
     ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
     BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2),
@@ -51,4 +49,6 @@ enum class LandFlag(val flagName: String,
 
 val LAND_FLAGS = LandFlag.values()
 fun findByName(name: String): LandFlag? =
-    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase()  }
+    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase() || landFlag.flagName.equals(name, true)  }
+
+fun getDefaultFlagNames(): List<String> = LAND_FLAGS.map { it.name }
