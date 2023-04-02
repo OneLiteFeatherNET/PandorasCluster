@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.extensions.hasPermission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.block.Container
@@ -49,7 +50,7 @@ class LandPlayerListener(private val landService: LandService) :
 
         val blockData = clickedBlock.blockData
         event.isCancelled = if (event.material.isInteractable) {
-            if (Permission.INTERACT_USE.hasPermission(event.player)) return
+            if (event.player.hasPermission(LandFlag.USE)) return
             true
         } else if (blockData is Farmland && event.action == Action.PHYSICAL) {
             val landFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
@@ -62,7 +63,7 @@ class LandPlayerListener(private val landService: LandService) :
         } else if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK && blockData.charges == blockData.maximumCharges) {
             val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
             if (landFlag.getValue<Boolean>() == true) return
-            if (Permission.EXPLOSION.hasPermission(event.player)) return
+            if (event.player.hasPermission(LandFlag.EXPLOSIONS)) return
             true
         } else false
     }

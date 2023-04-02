@@ -5,6 +5,5 @@ enum class LandFlagType {
     WORLD_TICK,
     ENTITY,
     EXPLOSION,
-    POWERED,
-    UNKNOWN;
+    POWERED;
 }
