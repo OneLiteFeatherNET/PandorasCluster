@@ -24,24 +24,7 @@ repositories {
 
 dependencies {
 
-    // Paper
-    compileOnly("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
-
-    // Commands
-    implementation("cloud.commandframework", "cloud-paper", "1.7.0")
-    implementation("cloud.commandframework", "cloud-annotations", "1.7.0")
-    implementation("cloud.commandframework", "cloud-minecraft-extras", "1.7.0")
-    implementation("net.kyori:adventure-platform-bukkit:4.1.1")
-    implementation("me.lucko:commodore:2.0") {
-        isTransitive = false
-    }
-
-    // Database
-    implementation("org.hibernate:hibernate-core:6.1.1.Final")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
-    implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.1.Final")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
 
     //WorldGuard
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
@@ -112,7 +95,8 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.1")
+        minecraftVersion("1.19.4")
+        jvmArgs("-Xmx4G")
     }
 
     shadowJar {
