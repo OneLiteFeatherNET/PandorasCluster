@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
 
-    compileOnly("io.papermc.paper:paper-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
 
     //WorldGuard
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
@@ -117,7 +117,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.2")
+        minecraftVersion("1.19.4")
         jvmArgs("-Xmx4G")
     }
 
