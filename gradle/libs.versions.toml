@@ -11,7 +11,7 @@ sentry = "6.0.0"
 shadow = "7.1.2"
 runPaper = "1.0.6"
 pluginYmlBukkit = "0.5.1"
-liquibase = "2.1.0"
+liquibase = "2.2.0"
 # Chat
 adventure = "4.13.1"
 # Commands
