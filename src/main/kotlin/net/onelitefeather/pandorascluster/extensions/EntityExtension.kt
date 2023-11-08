@@ -4,7 +4,11 @@ import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
 import org.apache.commons.lang3.StringUtils
+import org.bukkit.entity.AnimalTamer
+import org.bukkit.entity.Tameable
 import org.bukkit.permissions.Permissible
+
+fun AnimalTamer.isPetOwner(tameable: Tameable): Boolean = tameable.owner?.uniqueId == this.uniqueId
 
 fun Permissible.getHighestClaimLimit(): Int {
     if(this.hasPermission(Permission.NO_CLAIM_LIMIT)) return IGNORE_CLAIM_LIMIT
