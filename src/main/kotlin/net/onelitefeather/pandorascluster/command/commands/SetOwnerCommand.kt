@@ -19,64 +19,38 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", pluginPrefix) })
+            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'$pluginPrefix'>" })
             return
         }
 
         if (!land.isOwner(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_OWNER)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }
 
         val targetPlayerId = landPlayer.getUniqueId()
         val targetPlayerName = landPlayer.name ?: "null"
         if (targetPlayerId == null) {
-            player.sendMessage(miniMessage {
-                pandorasClusterApi.i18n(
-                    "player-data-not-found",
-                    *arrayOf(pluginPrefix, targetPlayerName)
-                )
-            })
+            player.sendMessage(miniMessage { "<lang:player-data-not-found:'$pluginPrefix':'$targetPlayerName'>" })
             return
         }
 
         if (pandorasClusterApi.hasPlayerLand(targetPlayerId)) {
-            player.sendMessage(miniMessage {
-                pandorasClusterApi.i18n(
-                    "target-player-already-has-land",
-                    *arrayOf(pluginPrefix, targetPlayerName)
-                )
-            })
+            player.sendMessage(miniMessage { "<lang:target-player-already-has-land:'$pluginPrefix':'$targetPlayerName'>" })
             return
         }
 
         if (land.isOwner(targetPlayerId)) {
-            player.sendMessage(miniMessage {
-                pandorasClusterApi.i18n(
-                    "command.set-owner.nothing-changed",
-                    *arrayOf(pluginPrefix, targetPlayerName)
-                )
-            })
+            player.sendMessage(miniMessage { "<lang:command.set-owner.nothing-changed:'$pluginPrefix':'$targetPlayerName'>" })
             return
         }
 
         if (land.getLandMember(targetPlayerId) != null) {
-            player.sendMessage(miniMessage {
-                pandorasClusterApi.i18n(
-                    "command.set-owner.player-is-member",
-                    *arrayOf(pluginPrefix, targetPlayerName)
-                )
-            })
+            player.sendMessage(miniMessage { "<lang:command.set-owner.player-is-member:'$pluginPrefix':'$targetPlayerName'>" })
             return
         }
 
         this.pandorasClusterApi.getDatabaseStorageService().setLandOwner(land, landPlayer)
-        player.sendMessage(miniMessage {
-            pandorasClusterApi.i18n(
-                "command.set-owner.success",
-                pluginPrefix,
-                targetPlayerName
-            )
-        })
+        player.sendMessage(miniMessage { "<lang:command.set-owner.success:'$pluginPrefix':'$targetPlayerName'>" })
     }
 }

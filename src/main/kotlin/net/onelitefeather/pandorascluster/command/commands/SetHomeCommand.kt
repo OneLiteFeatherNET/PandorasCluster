@@ -20,16 +20,16 @@ class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'$pluginPrefix'>" })
             return
         }
 
         if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_HOME)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }
 
         pandorasClusterApi.getDatabaseStorageService().updateLandHome(toHomePosition(player.location), player.uniqueId)
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-home.success", *arrayOf(pluginPrefix)) })
+        player.sendMessage(miniMessage { "<lang:command.set-home.success:'$pluginPrefix'>" })
     }
 }
