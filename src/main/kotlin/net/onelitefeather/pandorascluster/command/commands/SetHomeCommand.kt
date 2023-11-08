@@ -5,12 +5,12 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.position.toHomePosition
 import org.bukkit.entity.Player
 
-class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
 
     @CommandMethod("land set home")
     @CommandPermission("pandorascluster.command.land.set.home")
@@ -24,7 +24,7 @@ class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_HOME)) {
+        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_HOME)) {
             player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }

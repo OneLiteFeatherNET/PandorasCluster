@@ -3,7 +3,7 @@ package net.onelitefeather.pandorascluster.command.commands
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.getHighestClaimLimit
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
@@ -11,7 +11,7 @@ import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 
-class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
 
     @CommandMethod("land claim")
     @CommandDescription("Claim a free chunk")
@@ -65,7 +65,7 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
                     return@findConnectedChunk
                 }
 
-                val claimLimit = player.getHighestClaimLimit()
+                val claimLimit = getHighestClaimLimit(player)
 
                 // Add 1 to the current chunk count and check if the player can claim more chunks
                 val newChunkCount = (pandorasClusterApi.getLandService().getChunksByLand(it) + 1)

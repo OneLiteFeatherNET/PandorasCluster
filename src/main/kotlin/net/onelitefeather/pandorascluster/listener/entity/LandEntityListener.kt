@@ -2,8 +2,7 @@ package net.onelitefeather.pandorascluster.listener.entity
 
 import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.hasPermission
-import net.onelitefeather.pandorascluster.extensions.isPetOwner
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.block.data.type.CaveVinesPlant
@@ -17,7 +16,7 @@ import org.bukkit.event.entity.*
 import org.bukkit.permissions.Permissible
 import org.spigotmc.event.entity.EntityMountEvent
 
-class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener {
+class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
 
     @EventHandler
     fun handleProjectileBlockHit(event: ProjectileHitEvent) {
@@ -49,11 +48,11 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         event.isCancelled = if (target is Player && attacker is Player) {
             if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
             if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
-            !attacker.hasPermission(pvpFlag)
+            !hasPermission(attacker, pvpFlag)
         } else {
             if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
             if (land.hasAccess(target.uniqueId) || land.hasAccess(attacker.uniqueId)) return
-            !target.hasPermission(pveFlag) || !attacker.hasPermission(pveFlag)
+            !hasPermission(target, pveFlag) || !hasPermission(attacker, pveFlag)
         }
     }
 
@@ -70,7 +69,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
                 true
             } else if (primerEntity != null) {
                 if (land.hasAccess(primerEntity.uniqueId)) return
-                !primerEntity.hasPermission(landFlag)
+                !hasPermission(primerEntity, landFlag)
             } else false
         }
     }
@@ -120,9 +119,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
 
         event.isCancelled = if (mount is Tameable && entity is AnimalTamer) {
-            !mount.isTamed || !entity.isPetOwner(mount)
+            !mount.isTamed || !isPetOwner(mount, entity)
         } else {
-            !entity.hasPermission(landFlag)
+            !hasPermission(entity, landFlag)
         }
     }
 
@@ -141,9 +140,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
             if (land != null) {
                 if (land.hasAccess(entity.uniqueId)) return
                 if (land.getLandFlag(landFlagECB).getValue<Boolean>() == true) return
-                !entity.hasPermission(landFlagECB)
+                !hasPermission(entity, landFlagECB)
             } else {
-                !entity.hasPermission(landFlagECB) && entity is Player
+                !hasPermission(entity, landFlagECB) && entity is Player
             }
         }
     }
@@ -160,7 +159,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
                 if (land != null) {
                     if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
                     if (land.hasAccess(source.uniqueId)) return
-                    event.isCancelled = !source.hasPermission(landFlag)
+                    event.isCancelled = !hasPermission(source, landFlag)
                 }
             }
         }
@@ -173,7 +172,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val owner = event.owner
         if (owner !is Permissible) return
         if (land.hasAccess(owner.uniqueId)) return
-        event.isCancelled = !owner.hasPermission(LandFlag.ENTITY_TAME)
+        event.isCancelled = !hasPermission(owner, LandFlag.ENTITY_TAME)
     }
 
     private fun cancelCropInteract(entity: Entity, land: Land?): Boolean {
@@ -181,9 +180,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(entity.uniqueId)) return false
             if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return false
-            !entity.hasPermission(landFlag)
+            !hasPermission(entity, landFlag)
         } else {
-            !entity.hasPermission(landFlag) && entity is Player
+            !hasPermission(entity, landFlag) && entity is Player
         }
 
         return true

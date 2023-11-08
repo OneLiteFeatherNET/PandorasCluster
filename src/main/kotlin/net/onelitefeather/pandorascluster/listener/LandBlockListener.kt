@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import net.onelitefeather.pandorascluster.util.getBlockFace
@@ -12,12 +12,12 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 
-class LandBlockListener(private val landService: LandService) : Listener {
+class LandBlockListener(private val landService: LandService) : Listener, EntityUtils {
 
     @EventHandler
     fun handleBlockBreak(event: BlockBreakEvent) {
 
-        if(event.player.hasPermission(Permission.BLOCK_PLACE)) return
+        if(hasPermission(event.player, Permission.BLOCK_BREAK)) return
         val land = landService.getFullLand(event.block.chunk)
         if (land == null) {
             event.isCancelled = true
@@ -30,7 +30,7 @@ class LandBlockListener(private val landService: LandService) : Listener {
     @EventHandler
     fun handleBlockPlace(event: BlockPlaceEvent) {
 
-        if(event.player.hasPermission(Permission.BLOCK_PLACE)) return
+        if(hasPermission(event.player, Permission.BLOCK_PLACE)) return
         val land = landService.getFullLand(event.block.chunk)
         if (land == null) {
             event.isCancelled = true
