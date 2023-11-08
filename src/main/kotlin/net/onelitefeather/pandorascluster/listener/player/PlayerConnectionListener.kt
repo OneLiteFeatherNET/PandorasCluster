@@ -19,9 +19,8 @@ class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
         }
 
         if(api.registerPlayer(player.uniqueId, player.name)) {
-            player.sendMessage(miniMessage { api.i18n("player-data-created", *arrayOf(api.pluginPrefix())) })
+            player.sendMessage(miniMessage { "<lang:player-data-created:'${api.pluginPrefix()}'>" })
         }
-
     }
 
     @EventHandler
