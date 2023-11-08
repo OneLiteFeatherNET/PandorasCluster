@@ -3,9 +3,9 @@ package net.onelitefeather.pandorascluster.listener.entity
 import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.isPetOwner
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.isPetOwner
 import org.bukkit.block.data.type.CaveVinesPlant
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.TurtleEgg
@@ -120,7 +120,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
 
         event.isCancelled = if (mount is Tameable && entity is AnimalTamer) {
-            !mount.isTamed || !isPetOwner(mount, entity)
+            !mount.isTamed || !entity.isPetOwner(mount)
         } else {
             !entity.hasPermission(landFlag)
         }

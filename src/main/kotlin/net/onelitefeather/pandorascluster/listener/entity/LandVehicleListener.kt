@@ -2,8 +2,8 @@ package net.onelitefeather.pandorascluster.listener.entity;
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.isPetOwner
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.isPetOwner
 import org.bukkit.entity.AnimalTamer
 import org.bukkit.entity.Tameable
 import org.bukkit.event.EventHandler
@@ -71,7 +71,7 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
         val entered = event.entered
         val land = pandorasClusterApi.getLand(vehicle.chunk)
         if (land != null) {
-            if(vehicle is Tameable && entered is AnimalTamer && isPetOwner(vehicle, entered)) return
+            if(vehicle is Tameable && entered is AnimalTamer && entered.isPetOwner(vehicle)) return
             if (land.getLandFlag(LandFlag.VEHICLE_USE).getValue<Boolean>() == true) return
             if (land.hasAccess(entered.uniqueId)) return
             event.isCancelled = !entered.hasPermission(LandFlag.VEHICLE_USE)
