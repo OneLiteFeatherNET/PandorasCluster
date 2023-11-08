@@ -15,8 +15,7 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
     fun executeHomeCommand(player: Player) {
         val homePosition = pandorasClusterApi.getLandService().getHome(player.uniqueId) ?: return
         player.teleport(fromHomePosition(player.world, homePosition))
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n(
-            "command.home.success", *arrayOf(pandorasClusterApi.pluginPrefix())) })
+        player.sendMessage(miniMessage { "<lang:command.home.success:'${pandorasClusterApi.pluginPrefix()}'>" })
     }
 
     @CommandMethod("land visit <player>")
@@ -29,22 +28,22 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val playerName = landOwner.name ?: "null"
         if (landOwner.uuid == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, playerName)) })
+            player.sendMessage(miniMessage { "<lang:player-data-not-found:'$pluginPrefix':'$playerName'>" })
             return
         }
 
         val land = pandorasClusterApi.getLand(landOwner)
         if (land == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("player-has-no-land", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:player-has-no-land:'$pluginPrefix'>" })
             return
         }
 
         if(land.isBanned(player.uniqueId)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.visit.banned", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:command.visit.banned:'$pluginPrefix'>" })
             return
         }
 
         player.teleport(fromHomePosition(player.world, land.homePosition))
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.visit.success", *arrayOf(pluginPrefix, land.owner?.name ?: "null"))})
+        player.sendMessage(miniMessage { "<lang:command.visit.success:'$pluginPrefix':'${land.owner?.name ?: "null"}'>" })
     }
 }

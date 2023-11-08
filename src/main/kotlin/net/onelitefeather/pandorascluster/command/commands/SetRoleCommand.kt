@@ -35,45 +35,45 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val targetPlayerId = landPlayer.getUniqueId()
 
         if (land == null) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'${pluginPrefix}'>" })
             return
         }
 
         if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_ROLE)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:not-authorized:'${pluginPrefix}'>" })
             return
         }
 
         val targetName = landPlayer.name ?: "not found"
         if (targetPlayerId == null) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("player-data-not-found", *arrayOf(pluginPrefix, targetName)) })
+            player.sendMessage(miniMessage { "<lang:player-data-not-found:'${pluginPrefix}':'${targetName}'>" })
             return
         }
 
         if (!landRole.isGrantAble()) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-role.role-not.grantable", *arrayOf(pluginPrefix, landRole.display)) })
+            player.sendMessage(miniMessage { "<lang:command.set-role.role-not.grantable:'${pluginPrefix}':'${landRole.display}'>" })
             return
         }
 
         if (land.isOwner(targetPlayerId)) {
-            player.sendMessage(miniMessage {  pandorasClusterApi.i18n("command.set-role.cannot-change-the-land-owner", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:command.set-role.cannot-change-the-land-owner:'${pluginPrefix}'>" })
             return
         }
 
         if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
                 pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
-                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-role.access", *arrayOf(pluginPrefix, targetName, landRole.display)) })
+                player.sendMessage(miniMessage { "<lang:command.set-role.access:'${pluginPrefix}':'${targetName}':'${landRole.display}'>" })
             } else {
 
                 val member = land.getLandMember(targetPlayerId)
                 if(member == null) {
-                    player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.not-found", *arrayOf(pluginPrefix, targetName)) })
+                    player.sendMessage(miniMessage { "<lang:command.remove.not-found:'${pluginPrefix}':'${targetName}'>" })
                     return
                 }
 
                 pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
-                player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.remove.success", *arrayOf(pluginPrefix, targetName)) })
+                player.sendMessage(miniMessage { "<lang:command.remove.success:'${pluginPrefix}':'${targetName}'>" })
             }
         }
     }

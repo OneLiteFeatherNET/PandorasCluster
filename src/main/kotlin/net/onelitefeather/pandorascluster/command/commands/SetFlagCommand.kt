@@ -26,23 +26,22 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("chunk-is-not-claimed", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'$pluginPrefix'>" })
             return
         }
 
         if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_FLAG)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("not-authorized", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }
 
         if(!isValidValue(landFlag, value)) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n(
-                "command.set-flag.invalid-value", *arrayOf(pluginPrefix, value, landFlag)) } )
+            player.sendMessage(miniMessage { "<lang:command.set-flag.invalid-value:'$pluginPrefix':'$value':'$landFlag'>" })
             return
         }
 
         if(landFlag == LandFlag.UNKNOWN) {
-            player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.not-found", *arrayOf(pluginPrefix)) })
+            player.sendMessage(miniMessage { "<lang:command.set-flag.not-found:'$pluginPrefix'>" })
             return
         }
 
@@ -50,8 +49,8 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
             pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
         } else {
             pandorasClusterApi.getDatabaseStorageService().addUseMaterial(land, value)
-
         }
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.set-flag.success", *arrayOf(pluginPrefix, landFlag.name, value)) })
+
+        player.sendMessage(miniMessage { "<lang:command.set-flag.success:'$pluginPrefix':'${landFlag.name}':'$value'>" })
     }
 }
