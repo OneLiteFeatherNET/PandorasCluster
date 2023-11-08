@@ -13,7 +13,6 @@ import cloud.commandframework.paper.PaperCommandManager
 import io.sentry.Sentry
 import io.sentry.jul.SentryHandler
 import io.sentry.log4j2.SentryAppender
-import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import org.bukkit.command.CommandSender
@@ -24,12 +23,7 @@ import java.util.logging.Level
 
 fun PandorasClusterPlugin.buildCommandSystem() {
     try {
-        paperCommandManager = PaperCommandManager(
-            this,
-            CommandExecutionCoordinator.simpleCoordinator(),
-            Function.identity(),
-            Function.identity()
-        )
+        paperCommandManager = PaperCommandManager.createNative(this, CommandExecutionCoordinator.simpleCoordinator())
     } catch (e: Exception) {
         logger.log(Level.WARNING, "Failed to build command system", e)
         Sentry.captureException(e)
@@ -49,13 +43,10 @@ fun PandorasClusterPlugin.buildCommandSystem() {
 
     confirmationManager = CommandConfirmationManager(
         20L, TimeUnit.SECONDS, { context: CommandPostprocessingContext<CommandSender> ->
-            bukkitAudiences.sender(context.commandContext.sender).sendMessage(
-                text("Confirmation required. Confirm using /land confirm.", NamedTextColor.RED)
-            )
+            bukkitAudiences.sender(context.commandContext.sender).sendMessage(miniMessage { "<lang:command.confirm:'${api.pluginPrefix()}'>" })
         },
         { sender: CommandSender ->
-            bukkitAudiences.sender(sender)
-                .sendMessage(text("You do not have any pending commands.", NamedTextColor.RED))
+            bukkitAudiences.sender(sender).sendMessage(miniMessage { "<lang:command.confirm.no-pending-commands:'${api.pluginPrefix()}'>" })
         }
     )
 
@@ -69,10 +60,7 @@ fun PandorasClusterPlugin.buildCommandSystem() {
             ).build()
         }
 
-    annotationParser = AnnotationParser(
-        paperCommandManager,
-        CommandSender::class.java, commandMetaFunction
-    )
+    annotationParser = AnnotationParser(paperCommandManager, CommandSender::class.java, commandMetaFunction)
 }
 
 fun PandorasClusterPlugin.buildHelpSystem() {
@@ -89,7 +77,6 @@ fun PandorasClusterPlugin.buildHelpSystem() {
         NamedTextColor.AQUA
     )
 }
-
 
 fun JavaPlugin.sentry() {
     val dsn = System.getProperty("sentry.dsn", "https://b798943d3b7f4bb0a3b0c0ac14cfd376@sentry.themeinerlp.dev/3")
