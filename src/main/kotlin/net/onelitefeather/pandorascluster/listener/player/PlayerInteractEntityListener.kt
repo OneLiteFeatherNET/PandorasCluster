@@ -2,8 +2,8 @@ package net.onelitefeather.pandorascluster.listener.player;
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.isPetOwner
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.isPetOwner
 import org.bukkit.entity.AbstractVillager
 import org.bukkit.entity.Allay
 import org.bukkit.entity.Cow
@@ -32,7 +32,7 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
                     if(land.getLandFlag(LandFlag.ENTITY_MOUNT).getValue<Boolean>() == true) return
                     !player.hasPermission(LandFlag.ENTITY_MOUNT)
                 } else {
-                    !isPetOwner(entity, player)
+                    !player.isPetOwner(entity)
                 }
             }
 
