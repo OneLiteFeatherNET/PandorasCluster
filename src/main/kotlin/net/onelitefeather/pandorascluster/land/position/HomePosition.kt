@@ -29,6 +29,11 @@ data class HomePosition(
     val pitch: Float = 1.0F
 ) {
 
+    fun getBlockX(): Int = Location.locToBlock(this.posX)
+
+    fun getBlockY(): Int = Location.locToBlock(this.posY)
+
+    fun getBlockZ(): Int = Location.locToBlock(this.posZ)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
