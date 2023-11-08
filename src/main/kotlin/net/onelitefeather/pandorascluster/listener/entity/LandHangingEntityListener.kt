@@ -29,15 +29,11 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
         val remover = event.remover
 
         if(land == null) {
-            event.isCancelled = if(remover != null) {
-                !remover.hasPermission(Permission.UNOWNED_CHUNK)
-            } else {
-                false
-            }
+            event.isCancelled = !remover.hasPermission(Permission.UNOWNED_CHUNK)
             return
         }
 
-        if(remover != null && land.hasAccess(remover.uniqueId)) return
+        if(land.hasAccess(remover.uniqueId)) return
         event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
