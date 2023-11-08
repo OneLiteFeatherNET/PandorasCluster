@@ -3,12 +3,12 @@ package net.onelitefeather.pandorascluster.command.commands
 import cloud.commandframework.annotations.*
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.entity.Player
 
-class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
 
     @CommandMethod("land setowner <player>")
     @CommandPermission("pandorascluster.command.land.setowner")
@@ -23,7 +23,7 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if (!land.isOwner(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_OWNER)) {
+        if (!land.isOwner(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_OWNER)) {
             player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }

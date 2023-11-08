@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.listener.player
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import org.bukkit.Material
@@ -19,7 +19,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.*
 
 @Suppress("kotlin:S1874")
-class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : Listener {
+class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
 
     @EventHandler
     fun handlePlayerHarvestBlock(event: PlayerHarvestBlockEvent) {
@@ -28,13 +28,13 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         val landFlag = LandFlag.INTERACT_CROPS
 
         if (land == null) {
-            event.isCancelled = !event.player.hasPermission(landFlag)
+            event.isCancelled = !hasPermission(event.player, landFlag)
             return
         }
 
         if (land.hasAccess(event.player.uniqueId)) return
         if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
-        event.isCancelled = !event.player.hasPermission(landFlag)
+        event.isCancelled = !hasPermission(event.player, landFlag)
     }
 
     @Suppress("DEPRECATION")
@@ -71,9 +71,9 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
             val land = pandorasClusterApi.getLand(clickedBlock.chunk)
             if (land != null) {
                 if (land.hasAccess(player.uniqueId)) return
-                !event.player.hasPermission(interactCropsFlag)
+                !hasPermission(event.player, interactCropsFlag)
             } else {
-                !event.player.hasPermission(interactCropsFlag)
+                !hasPermission(event.player, interactCropsFlag)
             }
         } else {
             event.isCancelled
@@ -114,10 +114,10 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(player.uniqueId)) return false
             if (land.getLandFlag(redstoneFlag).getValue<Boolean>() == true) return false
-            return !player.hasPermission(redstoneFlag)
+            return !hasPermission(player, redstoneFlag)
         }
 
-        return !player.hasPermission(redstoneFlag)
+        return !hasPermission(player, redstoneFlag)
     }
 
     private fun cancelRespawnInteract(player: Player, land: Land?, respawnAnchor: RespawnAnchor): Boolean {
@@ -125,10 +125,10 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(player.uniqueId)) return false
             if (land.getLandFlag(explosionFlag).getValue<Boolean>() == true) return false
-            if (player.hasPermission(explosionFlag)) return false
+            if (hasPermission(player, explosionFlag)) return false
             return respawnAnchor.charges == respawnAnchor.maximumCharges
         } else {
-            return !player.hasPermission(explosionFlag)
+            return !hasPermission(player, explosionFlag)
         }
     }
 
@@ -136,9 +136,9 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(player.uniqueId)) return false
             if (land.isAllowUse(block.type)) return false
-            return !player.hasPermission(LandFlag.USE)
+            return !hasPermission(player, LandFlag.USE)
         } else {
-            return !player.hasPermission(LandFlag.USE)
+            return !hasPermission(player, LandFlag.USE)
         }
     }
 
@@ -149,7 +149,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         val landFlag = LandFlag.USE_BED
 
         if (land == null) {
-            event.isCancelled = !event.player.hasPermission(landFlag)
+            event.isCancelled = !hasPermission(event.player, landFlag)
             return
         }
 
@@ -164,7 +164,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         val landFlag = LandFlag.USE_BED
 
         if (land == null) {
-            event.isCancelled = !event.player.hasPermission(landFlag)
+            event.isCancelled = !hasPermission(event.player, landFlag)
             return
         }
 
@@ -177,7 +177,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
 
         val land = pandorasClusterApi.getLand(event.lectern.chunk)
         if (land == null) {
-            event.isCancelled = !event.player.hasPermission(LandFlag.TAKE_LECTERN)
+            event.isCancelled = !hasPermission(event.player, LandFlag.TAKE_LECTERN)
             return
         }
 
@@ -188,9 +188,9 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(player.uniqueId)) return false
             if (land.getLandFlag(LandFlag.INTERACT_CROPS).getValue<Boolean>() == true) return false
-            return !player.hasPermission(LandFlag.INTERACT_CROPS)
+            return !hasPermission(player, LandFlag.INTERACT_CROPS)
         } else {
-            return !player.hasPermission(LandFlag.INTERACT_CROPS)
+            return !hasPermission(player, LandFlag.INTERACT_CROPS)
         }
     }
 
@@ -198,9 +198,9 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
         if (land != null) {
             if (land.hasAccess(player.uniqueId)) return false
             if (land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY).getValue<Boolean>() == true) return false
-            return !player.hasPermission(LandFlag.TURTLE_EGG_DESTROY)
+            return !hasPermission(player, LandFlag.TURTLE_EGG_DESTROY)
         } else {
-            return !player.hasPermission(LandFlag.TURTLE_EGG_DESTROY)
+            return !hasPermission(player, LandFlag.TURTLE_EGG_DESTROY)
         }
     }
 }

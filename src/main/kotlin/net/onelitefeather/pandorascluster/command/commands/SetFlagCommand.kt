@@ -7,13 +7,13 @@ import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.isValidValue
 import org.bukkit.entity.Player
 
-class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
 
     @CommandMethod("land flag set <flag> <value>")
     @CommandPermission("pandorascluster.command.land.flag.set")
@@ -30,7 +30,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_FLAG)) {
+        if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_FLAG)) {
             player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
             return
         }

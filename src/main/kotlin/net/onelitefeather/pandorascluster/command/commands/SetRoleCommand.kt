@@ -13,14 +13,14 @@ import net.onelitefeather.pandorascluster.enums.LAND_ROLES
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.enums.getLandRole
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
-class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
 
     @CommandMethod("land role <player> <role>")
     @CommandDescription("Set a Role for a Player")
@@ -39,7 +39,7 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !player.hasPermission(Permission.SET_LAND_ROLE)) {
+        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_ROLE)) {
             player.sendMessage(miniMessage { "<lang:not-authorized:'${pluginPrefix}'>" })
             return
         }
@@ -60,7 +60,7 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || player.hasPermission(Permission.SET_LAND_ROLE)) {
+        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || hasPermission(player, Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
                 pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
                 player.sendMessage(miniMessage { "<lang:command.set-role.access:'${pluginPrefix}':'${targetName}':'${landRole.display}'>" })
