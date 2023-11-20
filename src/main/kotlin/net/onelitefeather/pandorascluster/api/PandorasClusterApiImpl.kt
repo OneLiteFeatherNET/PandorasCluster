@@ -48,12 +48,8 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         }
     }
 
-    override fun i18n(key: String, vararg objects: Any): String {
-        return MessageFormat(messages.getString(key)).format(objects)
-    }
-
     override fun pluginPrefix(): String {
-        return messages.getString("prefix")
+        return "<lang:prefix>"
     }
 
     override fun getPlugin(): PandorasClusterPlugin {
@@ -114,12 +110,6 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
 
     override fun getLogger(): Logger {
         return plugin.logger
-    }
-
-    override fun translateLegacyCodes(text: String): Component {
-        return miniMessage {
-            MiniMessage.miniMessage().serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text))
-        }
     }
 
     override fun getLand(chunk: Chunk): Land? {

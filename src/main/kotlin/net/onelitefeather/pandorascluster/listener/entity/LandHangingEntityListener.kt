@@ -2,7 +2,7 @@ package net.onelitefeather.pandorascluster.listener.entity
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.event.EventHandler
@@ -11,7 +11,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 
-class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterApi, private val landService: LandService) : Listener {
+class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterApi, private val landService: LandService) : Listener, EntityUtils {
 
     @EventHandler
     fun handleHangingBreak(event: HangingBreakEvent) {
@@ -29,15 +29,11 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
         val remover = event.remover
 
         if(land == null) {
-            event.isCancelled = if(remover != null) {
-                !remover.hasPermission(Permission.UNOWNED_CHUNK)
-            } else {
-                false
-            }
+            event.isCancelled = !hasPermission(remover, Permission.UNOWNED_CHUNK)
             return
         }
 
-        if(remover != null && land.hasAccess(remover.uniqueId)) return
+        if(land.hasAccess(remover.uniqueId)) return
         event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
@@ -49,11 +45,11 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
         val landFlag = LandFlag.HANGING_PLACE
 
         if(land == null && player != null) {
-            event.isCancelled = !player.hasPermission(Permission.UNOWNED_CHUNK)
+            event.isCancelled = !hasPermission(player, Permission.UNOWNED_CHUNK)
             return
         }
 
-        if(player != null && (player.hasPermission(landFlag) || land?.hasAccess(player.uniqueId) == true)) return
+        if(player != null && (hasPermission(player, landFlag) || land?.hasAccess(player.uniqueId) == true)) return
         event.isCancelled = land?.getLandFlag(landFlag)?.getValue<Boolean>() == false
     }
 }

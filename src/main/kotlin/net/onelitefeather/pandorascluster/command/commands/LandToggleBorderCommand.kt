@@ -13,12 +13,11 @@ class LandToggleBorderCommand(val pandorasClusterApi: PandorasClusterApi) {
     fun execute(player: Player) {
 
         val stateMessage = if(pandorasClusterApi.getLandService().toggleShowBorder(player)){
-            pandorasClusterApi.i18n("command.showborder.toggle.visible")
+            "<lang:command.showborder.toggle.visible>"
         } else {
-            pandorasClusterApi.i18n("command.showborder.toggle.hidden")
+            "<lang:command.showborder.toggle.hidden>"
         }
 
-        player.sendMessage(miniMessage { pandorasClusterApi.i18n("command.showborder.toggle",
-            *arrayOf(pandorasClusterApi.pluginPrefix(), stateMessage)) })
+        player.sendMessage(miniMessage { "<lang:command.showborder.toggle:'${pandorasClusterApi.pluginPrefix()}':'$stateMessage'>" })
     }
 }

@@ -6,7 +6,11 @@ import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
 import io.sentry.Sentry
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.translation.GlobalTranslator
+import net.kyori.adventure.translation.TranslationRegistry
+import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl
 import net.onelitefeather.pandorascluster.command.commands.*
@@ -15,12 +19,15 @@ import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
 import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
 import net.onelitefeather.pandorascluster.extensions.sentry
+import net.onelitefeather.pandorascluster.util.LynxWrapper
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.*
 
 class PandorasClusterPlugin : JavaPlugin() {
 
+    private val supportedLocals: Array<Locale> = arrayOf(Locale.US, Locale.GERMAN)
     lateinit var paperCommandManager: PaperCommandManager<CommandSender>
     lateinit var annotationParser: AnnotationParser<CommandSender>
     lateinit var minecraftHelp: MinecraftHelp<CommandSender>
@@ -47,6 +54,15 @@ class PandorasClusterPlugin : JavaPlugin() {
             buildCommandSystem()
             registerCommands()
             buildHelpSystem()
+
+            val registry = TranslationRegistry.create(Key.key("pandorascluster", "localization"))
+            supportedLocals.forEach { locale ->
+                val bundle = ResourceBundle.getBundle("pandorascluster", locale, UTF8ResourceBundleControl.get())
+                registry.registerAll(locale, bundle, false)
+            }
+            registry.defaultLocale(supportedLocals.first())
+            GlobalTranslator.translator().addSource(LynxWrapper(registry))
+
         } catch (e: Exception) {
             Sentry.captureException(e)
             e.printStackTrace()

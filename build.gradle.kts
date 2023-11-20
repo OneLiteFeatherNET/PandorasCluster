@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.7.10"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("xyz.jpenilla.run-paper") version "1.0.6"
 
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -23,66 +23,64 @@ repositories {
 
 dependencies {
 
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly(libs.paper)
 
     //WorldGuard
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+    compileOnly(libs.worldguard)
     compileOnly(libs.faweCore)
     compileOnly(libs.fawe) {
         isTransitive = false
     }
 
     // Commands
-    bukkitLibrary("cloud.commandframework", "cloud-paper", "1.8.3")
-    bukkitLibrary("cloud.commandframework", "cloud-annotations", "1.8.0")
-    bukkitLibrary("cloud.commandframework", "cloud-minecraft-extras", "1.8.3")
-    bukkitLibrary("net.kyori:adventure-platform-bukkit:4.1.2")
-    bukkitLibrary("me.lucko:commodore:2.2") {
+    implementation(libs.cloudPaper)
+    implementation(libs.cloudAnnotations)
+    implementation(libs.cloudMinecraftExtras)
+    implementation(libs.adventurePlatformBukkit)
+    implementation(libs.commodore) {
         isTransitive = false
     }
 
-    bukkitLibrary("com.github.ben-manes.caffeine:caffeine:3.1.1")
+    implementation(libs.caffeine)
 
     // Sentry
-    bukkitLibrary("org.apache.logging.log4j:log4j-core:2.19.0")
-    bukkitLibrary(libs.sentry)
-    bukkitLibrary(libs.sentryJul)
-    bukkitLibrary(libs.sentrylog4j2)
+    implementation(libs.apacheLog4j)
+    implementation(libs.sentry)
+    implementation(libs.sentryJul)
+    implementation(libs.sentrylog4j2)
 
     // Database
-    implementation("org.hibernate:hibernate-core:6.1.4.Final")
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
+    implementation(libs.hibernateCore)
+    implementation(libs.mariadbJavaClient)
+    implementation(libs.hibernateHikariCP)
 
-    //Misc
-    bukkitLibrary("org.apache.commons:commons-lang3:3.12.0")
 
-    testImplementation("com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT")
+    testImplementation(libs.worldguard)
     testImplementation(libs.faweCore)
     testImplementation(libs.fawe) {
         isTransitive = false
     }
 
     // Database
-    testImplementation("org.hibernate:hibernate-core:6.1.3.Final")
-    testImplementation("org.mariadb.jdbc:mariadb-java-client:3.0.6")
-    testImplementation("com.zaxxer:HikariCP:5.0.1")
-    testImplementation("org.hibernate.orm:hibernate-hikaricp:6.1.3.Final")
+    testImplementation(libs.hibernateCore)
+    testImplementation(libs.mariadbJavaClient)
+    testImplementation(libs.hibernateHikariCP)
 
     // Commands
-    testImplementation("cloud.commandframework", "cloud-paper", "1.8.3")
-    testImplementation("cloud.commandframework", "cloud-annotations", "1.8.3")
-    testImplementation("cloud.commandframework", "cloud-minecraft-extras", "1.8.3")
-    testImplementation("net.kyori:adventure-platform-bukkit:4.1.2")
-    testImplementation("me.lucko:commodore:2.2") {
+    testImplementation(libs.cloudPaper)
+    testImplementation(libs.cloudAnnotations)
+    testImplementation(libs.cloudMinecraftExtras)
+    testImplementation(libs.adventurePlatformBukkit)
+    testImplementation(libs.commodore) {
         isTransitive = false
     }
 
     // Testing
-    testImplementation("io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT")
+    testImplementation(libs.paper)
     testImplementation("io.mockk:mockk:1.12.7")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
 }
 
 kotlin {
@@ -117,7 +115,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.4")
+        minecraftVersion("1.20.2")
         jvmArgs("-Xmx4G")
     }
 
@@ -126,16 +124,32 @@ tasks {
     }
 }
 
-bukkit {
+paper {
+
+    if (System.getenv().containsKey("CI")) {
+        version = "${rootProject.version}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
+    }
+
     main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
-    apiVersion = "1.19"
-    name = "PandorasCluster"
+    apiVersion = "1.20"
+    name = rootProject.name
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
-    authors = listOf("UniqueGame", "OneLiteFeather")
-    softDepend = listOf("WorldGuard")
-    permissions {
+    author = "theShadowsDust"
+    authors = listOf("OneLiteFeather")
 
+    //Paper
+    hasOpenClassloader = false
+    generateLibrariesJson = false
+    foliaSupported = true
+
+    serverDependencies {
+        register("WorldGuard") {
+            required = false
+        }
+    }
+
+    permissions {
         listOf(
             "pandorascluster.command.land.info",
             "pandorascluster.command.land.visit",
@@ -199,11 +213,13 @@ bukkit {
         }
     }
 }
+
 sonarqube {
     properties {
         property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYROmm2vwVDHzVoeOyoE")
     }
 }
+
 version = if (System.getenv().containsKey("CI")) {
     "${baseVersion}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
 } else {

@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.extensions.hasPermission
+import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.block.Container
@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 
 class LandPlayerListener(private val landService: LandService) :
-    Listener {
+    Listener, EntityUtils {
 
     @EventHandler
     fun handlePlayerMovement(event: PlayerMoveEvent) {
@@ -23,7 +23,7 @@ class LandPlayerListener(private val landService: LandService) :
         if (!event.hasExplicitlyChangedBlock()) return
         val toLand = landService.getFullLand(event.to.chunk)
         if (toLand != null) {
-            if (Permission.LAND_ENTRY_DENIED.hasPermission(player)) return
+            if (hasPermission(player, Permission.LAND_ENTRY_DENIED)) return
             if (!toLand.isBanned(player.uniqueId)) return
             event.isCancelled = true
         }
@@ -50,7 +50,7 @@ class LandPlayerListener(private val landService: LandService) :
 
         val blockData = clickedBlock.blockData
         event.isCancelled = if (event.material.isInteractable) {
-            if (event.player.hasPermission(LandFlag.USE)) return
+            if (hasPermission(event.player, LandFlag.USE)) return
             true
         } else if (blockData is Farmland && event.action == Action.PHYSICAL) {
             val landFlag = landService.getLandFlag(LandFlag.FARMLAND_DESTROY, land) ?: return
@@ -63,7 +63,7 @@ class LandPlayerListener(private val landService: LandService) :
         } else if (blockData is RespawnAnchor && event.action == Action.RIGHT_CLICK_BLOCK && blockData.charges == blockData.maximumCharges) {
             val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land) ?: return
             if (landFlag.getValue<Boolean>() == true) return
-            if (event.player.hasPermission(LandFlag.EXPLOSIONS)) return
+            if (hasPermission(event.player, LandFlag.EXPLOSIONS)) return
             true
         } else false
     }

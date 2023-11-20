@@ -16,8 +16,6 @@ import java.util.logging.Logger
 
 interface PandorasClusterApi {
 
-    fun i18n(key: String, vararg objects: Any) : String
-
     fun pluginPrefix(): String
 
     fun getPlugin(): PandorasClusterPlugin
@@ -56,8 +54,6 @@ interface PandorasClusterApi {
     fun getLandService(): LandService
 
     fun getLogger(): Logger
-
-    fun translateLegacyCodes(text: String): Component
 
     fun getLand(chunk: Chunk): Land?
     fun getLand(landOwner: LandPlayer): Land?
