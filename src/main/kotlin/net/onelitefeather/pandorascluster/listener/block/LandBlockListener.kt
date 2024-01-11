@@ -86,19 +86,6 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
     }
 
     @EventHandler
-    fun handleEntityBlockForm(event: EntityBlockFormEvent) {
-
-        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        val landFlag = LandFlag.ICE_FORM
-
-        event.isCancelled = if (land.getLandFlag(landFlag).getValue<Boolean>() == false) {
-            false
-        } else if (!land.hasAccess(event.entity.uniqueId)) {
-            false
-        } else !hasPermission(event.entity, landFlag)
-    }
-
-    @EventHandler
     fun handleBlockFromTo(event: BlockFromToEvent) {
 
         val blockChunk = event.block.chunk
@@ -226,5 +213,30 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         } else {
             !hasPermission(event.player, LandFlag.BUCKET_INTERACT)
         }
+    }
+
+    @EventHandler
+    fun handleEntityExplode(event: TNTPrimeEvent) {
+        val block = event.primingBlock ?: event.block
+        val land = pandorasClusterApi.getLand(block.chunk)
+        val primerEntity = event.primingEntity
+        if (land != null) {
+            val landFlag = land.getLandFlag(LandFlag.EXPLOSIONS)
+            event.isCancelled = if (landFlag.getValue<Boolean>() == false) {
+                true
+            } else if (primerEntity != null) {
+                if (land.hasAccess(primerEntity.uniqueId)) return
+                if (hasPermission(primerEntity, LandFlag.EXPLOSIONS)) return
+                true
+            } else false
+        }
+    }
+
+
+    @EventHandler
+    fun handleBlockExplode(event: BlockExplodeEvent) {
+        event.blockList().groupBy { it.chunk }.filter {
+             pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
+        }.forEach { event.blockList().removeAll(it.value) }
     }
 }
