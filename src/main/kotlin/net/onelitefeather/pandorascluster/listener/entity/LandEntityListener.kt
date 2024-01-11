@@ -213,7 +213,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
                 false
             } else !hasPermission(event.entity, iceFormFlag)
         } else {
-            val blockFormFlag = land.getLandFlag(LandFlag.BLOCK_FORM) ?: return
+            val blockFormFlag = land.getLandFlag(LandFlag.BLOCK_FORM)
             if (land.hasAccess(event.entity.uniqueId)) return
             if (blockFormFlag.getValue<Boolean>() == true) return
             event.isCancelled = true
