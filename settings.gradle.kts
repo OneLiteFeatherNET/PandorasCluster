@@ -3,7 +3,7 @@ rootProject.name = "PandorasCluster"
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("paper", "io.papermc.paper", "paper-api").version("1.20.2-R0.1-SNAPSHOT")
+            library("paper", "io.papermc.paper", "paper-api").version("1.20.4-R0.1-SNAPSHOT")
 
             //Worldguard
             library("worldguard", "com.sk89q.worldguard", "worldguard-bukkit").version("7.1.0-SNAPSHOT")
