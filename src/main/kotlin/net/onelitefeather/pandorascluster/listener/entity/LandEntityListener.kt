@@ -84,7 +84,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
     @EventHandler
     fun handleEntityExplode(event: EntityExplodeEvent) {
         event.blockList().groupBy { it.chunk }.filter {
-            pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
+
+            event.entity is TNTPrimed && pandorasClusterApi.getLand(it.key) == null ||
+                    pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
         }.forEach { event.blockList().removeAll(it.value) }
     }
 
