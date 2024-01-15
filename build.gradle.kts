@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "net.onelitefeather"
-val baseVersion = "1.1.0"
+version = "1.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
