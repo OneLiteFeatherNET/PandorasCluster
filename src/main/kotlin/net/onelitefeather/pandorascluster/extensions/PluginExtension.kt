@@ -11,8 +11,6 @@ import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
 import io.sentry.Sentry
-import io.sentry.jul.SentryHandler
-import io.sentry.log4j2.SentryAppender
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import org.bukkit.command.CommandSender
@@ -85,17 +83,5 @@ fun JavaPlugin.sentry() {
         it.dsn = dsn
         it.environment = env
         it.release = this.description.version
-        val handler = SentryHandler(it)
-        logger.addHandler(handler)
     }
-    val appender = SentryAppender.createAppender(
-        "${description.name}-SentryBukkit",
-        null,
-        null,
-        dsn,
-        null,
-        null,
-        null
-    )
-    appender?.start()
 }
