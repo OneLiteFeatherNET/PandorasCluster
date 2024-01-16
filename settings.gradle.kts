@@ -14,7 +14,7 @@ dependencyResolutionManagement {
             version("paper", "1.20.1-R0.1-SNAPSHOT")
             version("plugin.yml", "0.6.0")
             version("run-paper", "2.0.0")
-            version("publishdata", "1.2.5")
+            version("publishdata", "1.2.5-DEV")
             version("shadow", "8.1.1")
             version("liquibase", "2.1.0")
 
