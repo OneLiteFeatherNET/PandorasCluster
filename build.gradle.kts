@@ -56,8 +56,7 @@ dependencies {
 
 publishData {
     addBuildData()
-    addRepo(Repo(Regex(".*"), "SNAPSHOT", "https://gitlab.themeinerlp.dev/api/v4/projects/66/packages/maven", false, Repo.Type.SNAPSHOT))
-    addRepo(Repo(Regex("master"), "", "https://gitlab.themeinerlp.dev/api/v4/projects/66/packages/maven", false, Repo.Type.STABLE))
+    useGitlabReposForProject("66", "https://gitlab.themeinerlp.dev/")
     publishTask("shadowJar")
 }
 
