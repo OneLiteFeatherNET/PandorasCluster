@@ -7,7 +7,10 @@ import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.getBlockFace
 import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.Chunk
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -221,13 +224,17 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         val land = pandorasClusterApi.getLand(block.chunk)
         val primerEntity = event.primingEntity
         if (land != null) {
+
             val landFlag = land.getLandFlag(LandFlag.EXPLOSIONS)
-            event.isCancelled = if (landFlag.getValue<Boolean>() == false) {
+            val explosionsDisallowed = landFlag.getValue<Boolean>() == false
+            val hasNoAccessAndNoPermissions = { entity: Entity ->
+                !land.hasAccess(entity.uniqueId) && !hasPermission(entity, LandFlag.EXPLOSIONS)
+            }
+
+            event.isCancelled = if (explosionsDisallowed) {
                 true
             } else if (primerEntity != null) {
-                if (land.hasAccess(primerEntity.uniqueId)) return
-                if (hasPermission(primerEntity, LandFlag.EXPLOSIONS)) return
-                true
+                hasNoAccessAndNoPermissions(primerEntity)
             } else false
         }
     }
@@ -235,8 +242,11 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
 
     @EventHandler
     fun handleBlockExplode(event: BlockExplodeEvent) {
-        event.blockList().groupBy { it.chunk }.filter {
-             pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
-        }.forEach { event.blockList().removeAll(it.value) }
+        event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands).forEach { event.blockList().removeAll(it.value) }
     }
+
+    private fun filterForNoExplosiveLands(land: Map.Entry<Chunk, List<Block>>): Boolean {
+        return pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
+    }
+
 }
