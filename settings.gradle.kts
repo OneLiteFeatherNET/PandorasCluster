@@ -1,9 +1,30 @@
 rootProject.name = "PandorasCluster"
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://eldonexus.de/repository/maven-public/")
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            library("paper", "io.papermc.paper", "paper-api").version("1.20.4-R0.1-SNAPSHOT")
+
+            version("paper", "1.20.4-R0.1-SNAPSHOT")
+            version("plugin.yml", "0.6.0")
+            version("run-paper", "2.0.0")
+            version("publishdata", "1.2.5-DEV")
+            version("shadow", "8.1.1")
+            version("liquibase", "2.1.0")
+
+            plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
+            plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
+            plugin("publishdata", "de.chojo.publishdata").versionRef("publishdata")
+            plugin("shadow", "com.github.johnrengelman.shadow").versionRef("shadow")
+            plugin("liquibase", "org.liquibase.gradle").versionRef("liquibase")
+
+            library("paper", "io.papermc.paper", "paper-api").versionRef("paper")
 
             //Worldguard
             library("worldguard", "com.sk89q.worldguard", "worldguard-bukkit").version("7.1.0-SNAPSHOT")
@@ -26,7 +47,7 @@ dependencyResolutionManagement {
             library("sentrylog4j2", "io.sentry", "sentry-log4j2").version("6.0.0")
 
             // Database
-            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.1.5.Final")
+            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.4.0.Final")
             library("mariadbJavaClient","org.mariadb.jdbc", "mariadb-java-client").version("3.0.6")
             library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.1.5.Final")
         }

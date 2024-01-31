@@ -1,16 +1,17 @@
-plugins {
-    kotlin("jvm") version "1.7.10"
-    id("net.minecrell.plugin-yml.paper") version "0.6.0"
-    id("xyz.jpenilla.run-paper") version "1.0.6"
+import de.chojo.Repo
 
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.liquibase.gradle") version "2.1.0"
-    id("org.sonarqube") version "4.0.0.2929"
-    jacoco
+plugins {
+    kotlin("jvm") version "1.9.22"
+    alias(libs.plugins.run.paper)
+    alias(libs.plugins.plugin.yml)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.liquibase)
+    alias(libs.plugins.publishdata)
+    `maven-publish`
 }
 
 group = "net.onelitefeather"
-val baseVersion = "1.1.0"
+version = "1.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -44,43 +45,19 @@ dependencies {
     implementation(libs.caffeine)
 
     // Sentry
-    implementation(libs.apacheLog4j)
     implementation(libs.sentry)
-    implementation(libs.sentryJul)
-    implementation(libs.sentrylog4j2)
 
     // Database
     implementation(libs.hibernateCore)
     implementation(libs.mariadbJavaClient)
     implementation(libs.hibernateHikariCP)
 
+}
 
-    testImplementation(libs.worldguard)
-    testImplementation(libs.faweCore)
-    testImplementation(libs.fawe) {
-        isTransitive = false
-    }
-
-    // Database
-    testImplementation(libs.hibernateCore)
-    testImplementation(libs.mariadbJavaClient)
-    testImplementation(libs.hibernateHikariCP)
-
-    // Commands
-    testImplementation(libs.cloudPaper)
-    testImplementation(libs.cloudAnnotations)
-    testImplementation(libs.cloudMinecraftExtras)
-    testImplementation(libs.adventurePlatformBukkit)
-    testImplementation(libs.commodore) {
-        isTransitive = false
-    }
-
-    // Testing
-    testImplementation(libs.paper)
-    testImplementation("io.mockk:mockk:1.12.7")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
+publishData {
+    addBuildData()
+    useGitlabReposForProject("66", "https://gitlab.themeinerlp.dev/")
+    publishTask("shadowJar")
 }
 
 kotlin {
@@ -90,46 +67,20 @@ kotlin {
 }
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
     compileKotlin {
         kotlinOptions {
             jvmTarget = "17"
         }
     }
 
-    test {
-        finalizedBy(rootProject.tasks.jacocoTestReport)
-        useJUnitPlatform()
-    }
-
-    jacocoTestReport {
-        dependsOn(rootProject.tasks.test)
-        reports {
-            xml.required.set(true)
-        }
-    }
-    getByName<org.sonarqube.gradle.SonarTask>("sonar") {
-        dependsOn(rootProject.tasks.test)
-    }
-
     runServer {
         minecraftVersion("1.20.4")
         jvmArgs("-Xmx4G")
     }
-
-    shadowJar {
-        archiveFileName.set("${rootProject.name}.${archiveExtension.getOrElse("jar")}")
-    }
 }
 
 paper {
-
-    if (System.getenv().containsKey("CI")) {
-        version = "${rootProject.version}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
-    }
-
+    version = publishData.getVersion(true)
     main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
     apiVersion = "1.20"
     name = rootProject.name
@@ -214,14 +165,27 @@ paper {
     }
 }
 
-sonarqube {
-    properties {
-        property("sonar.projectKey", "onelitefeather_projects_pandoras-cluster_AYROmm2vwVDHzVoeOyoE")
+publishing {
+    publications.create<MavenPublication>("maven") {
+        // configure the publication as defined previously.
+        publishData.configurePublication(this)
+        version = publishData.getVersion(false)
     }
-}
 
-version = if (System.getenv().containsKey("CI")) {
-    "${baseVersion}+${System.getenv("CI_COMMIT_SHORT_SHA")}"
-} else {
-    baseVersion
+    repositories {
+        maven {
+            credentials(HttpHeaderCredentials::class) {
+                name = "Job-Token"
+                value = System.getenv("CI_JOB_TOKEN")
+            }
+            authentication {
+                create("header", HttpHeaderAuthentication::class)
+            }
+
+
+            name = "Gitlab"
+            // Get the detected repository from the publish data
+            url = uri(publishData.getRepository())
+        }
+    }
 }
