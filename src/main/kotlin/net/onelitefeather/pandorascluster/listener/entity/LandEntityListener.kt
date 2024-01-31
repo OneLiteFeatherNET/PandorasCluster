@@ -6,6 +6,8 @@ import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.Chunk
+import org.bukkit.block.Block
 import org.bukkit.block.data.type.CaveVinesPlant
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.TurtleEgg
@@ -83,11 +85,14 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
 
     @EventHandler
     fun handleEntityExplode(event: EntityExplodeEvent) {
-        event.blockList().groupBy { it.chunk }.filter {
+        if(event.entity is TNTPrimed) {
+            event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands).forEach { event.blockList().removeAll(it.value) }
+        }
+    }
 
-            event.entity is TNTPrimed && pandorasClusterApi.getLand(it.key) == null ||
-                    pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
-        }.forEach { event.blockList().removeAll(it.value) }
+    private fun filterForNoExplosiveLands(land: Map.Entry<Chunk, List<Block>>): Boolean {
+        return pandorasClusterApi.getLand(land.key) == null ||
+                pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
     }
 
     @EventHandler
