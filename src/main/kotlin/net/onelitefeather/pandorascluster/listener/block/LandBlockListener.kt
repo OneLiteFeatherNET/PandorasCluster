@@ -7,7 +7,10 @@ import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.getBlockFace
 import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.Chunk
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -83,19 +86,6 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
         if (event is EntityBlockFormEvent) return
         event.isCancelled = land.getLandFlag(LandFlag.BLOCK_FORM).getValue<Boolean>() == false
-    }
-
-    @EventHandler
-    fun handleEntityBlockForm(event: EntityBlockFormEvent) {
-
-        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        val landFlag = LandFlag.ICE_FORM
-
-        event.isCancelled = if (land.getLandFlag(landFlag).getValue<Boolean>() == false) {
-            false
-        } else if (!land.hasAccess(event.entity.uniqueId)) {
-            false
-        } else !hasPermission(event.entity, landFlag)
     }
 
     @EventHandler
@@ -227,4 +217,36 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
             !hasPermission(event.player, LandFlag.BUCKET_INTERACT)
         }
     }
+
+    @EventHandler
+    fun handleEntityExplode(event: TNTPrimeEvent) {
+        val block = event.primingBlock ?: event.block
+        val land = pandorasClusterApi.getLand(block.chunk)
+        val primerEntity = event.primingEntity
+        if (land != null) {
+
+            val landFlag = land.getLandFlag(LandFlag.EXPLOSIONS)
+            val explosionsDisallowed = landFlag.getValue<Boolean>() == false
+            val hasNoAccessAndNoPermissions = { entity: Entity ->
+                !land.hasAccess(entity.uniqueId) && !hasPermission(entity, LandFlag.EXPLOSIONS)
+            }
+
+            event.isCancelled = if (explosionsDisallowed) {
+                true
+            } else if (primerEntity != null) {
+                hasNoAccessAndNoPermissions(primerEntity)
+            } else false
+        }
+    }
+
+
+    @EventHandler
+    fun handleBlockExplode(event: BlockExplodeEvent) {
+        event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands).forEach { event.blockList().removeAll(it.value) }
+    }
+
+    private fun filterForNoExplosiveLands(land: Map.Entry<Chunk, List<Block>>): Boolean {
+        return pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
+    }
+
 }

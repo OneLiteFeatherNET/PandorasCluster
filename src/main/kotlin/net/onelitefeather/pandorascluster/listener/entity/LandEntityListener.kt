@@ -1,10 +1,13 @@
 package net.onelitefeather.pandorascluster.listener.entity
 
-import com.destroystokyo.paper.event.block.TNTPrimeEvent
+import com.destroystokyo.paper.event.entity.EntityPathfindEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.Chunk
+import org.bukkit.block.Block
 import org.bukkit.block.data.type.CaveVinesPlant
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.TurtleEgg
@@ -12,6 +15,7 @@ import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.block.EntityBlockFormEvent
 import org.bukkit.event.entity.*
 import org.bukkit.permissions.Permissible
 import org.spigotmc.event.entity.EntityMountEvent
@@ -19,17 +23,40 @@ import org.spigotmc.event.entity.EntityMountEvent
 class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
 
     @EventHandler
-    fun handleProjectileBlockHit(event: ProjectileHitEvent) {
+    fun handleProjectileHit(event: ProjectileHitEvent) {
         val entity = event.entity
         val shooter = if (entity.shooter is Entity) {
-            entity.shooter as Entity
-        } else null ?: return
+            entity.shooter
+        } else null
+
+        val land: Land?
+        val hitEntity = event.hitEntity
+        if (hitEntity != null) {
+
+            land = pandorasClusterApi.getLand(hitEntity.chunk) ?: return
+            if (shooter is Entity && land.hasAccess(shooter.uniqueId)) return
+
+            val cancel = if (hitEntity !is Player) {
+                val flag = land.getLandFlag(LandFlag.PVE)
+                val value = flag.getValue<Boolean>()!!
+                shooter is Permissible && hasPermission(shooter, LandFlag.PVE) || !value || shooter is Entity
+            } else {
+                val flag = land.getLandFlag(LandFlag.PVP)
+                val value = flag.getValue<Boolean>()!!
+                shooter is Permissible && hasPermission(shooter, LandFlag.PVP) || !value || shooter is Entity
+            }
+
+            event.isCancelled = cancel
+            return
+        }
+
         val hitBlock = event.hitBlock
         if (hitBlock != null) {
-            val land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
-            event.isCancelled = !land.hasAccess(shooter.uniqueId)
+            land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
+            event.isCancelled = shooter is Entity && !land.hasAccess(shooter.uniqueId)
         }
     }
+
 
     @EventHandler
     fun handleEntityDamageByEntity(event: EntityDamageByEntityEvent) {
@@ -57,28 +84,15 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
     }
 
     @EventHandler
-    fun handleEntityExplode(event: TNTPrimeEvent) {
-
-        val block = event.block
-        val land = pandorasClusterApi.getLand(block.chunk)
-        val primerEntity = event.primerEntity
-        val landFlag = LandFlag.EXPLOSIONS
-
-        if (land != null) {
-            event.isCancelled = if (land.getLandFlag(landFlag).getValue<Boolean>() == false) {
-                true
-            } else if (primerEntity != null) {
-                if (land.hasAccess(primerEntity.uniqueId)) return
-                !hasPermission(primerEntity, landFlag)
-            } else false
+    fun handleEntityExplode(event: EntityExplodeEvent) {
+        if(event.entity is TNTPrimed) {
+            event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands).forEach { event.blockList().removeAll(it.value) }
         }
     }
 
-    @EventHandler
-    fun handleEntityExplode(event: EntityExplodeEvent) {
-        event.blockList().groupBy { it.chunk }.filter {
-            pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
-        }.forEach { event.blockList().removeAll(it.value) }
+    private fun filterForNoExplosiveLands(land: Map.Entry<Chunk, List<Block>>): Boolean {
+        return pandorasClusterApi.getLand(land.key) == null ||
+                pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
     }
 
     @EventHandler
@@ -173,6 +187,44 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         if (owner !is Permissible) return
         if (land.hasAccess(owner.uniqueId)) return
         event.isCancelled = !hasPermission(owner, LandFlag.ENTITY_TAME)
+    }
+
+    @EventHandler
+    fun handleEntityPathfinding(event: EntityPathfindEvent) {
+        val entity = event.entity
+        val location = event.loc
+        val land = pandorasClusterApi.getLand(location.chunk)
+        val entityLand = pandorasClusterApi.getLand(entity.chunk)
+        event.isCancelled = if (entityLand != null) {
+            if (land != null) {
+                !hasSameOwner(entityLand, land)
+            } else {
+                true
+            }
+        } else {
+            land != null
+        }
+    }
+
+    @EventHandler
+    fun handleEntityBlockForm(event: EntityBlockFormEvent) {
+
+        val block = event.block
+        val land = pandorasClusterApi.getLand(block.chunk) ?: return
+
+        if (block.type.name.endsWith("ICE")) {
+            val iceFormFlag = LandFlag.ICE_FORM
+            event.isCancelled = if (land.getLandFlag(iceFormFlag).getValue<Boolean>() == false) {
+                false
+            } else if (!land.hasAccess(event.entity.uniqueId)) {
+                false
+            } else !hasPermission(event.entity, iceFormFlag)
+        } else {
+            val blockFormFlag = land.getLandFlag(LandFlag.BLOCK_FORM)
+            if (land.hasAccess(event.entity.uniqueId)) return
+            if (blockFormFlag.getValue<Boolean>() == true) return
+            event.isCancelled = true
+        }
     }
 
     private fun cancelCropInteract(entity: Entity, land: Land?): Boolean {

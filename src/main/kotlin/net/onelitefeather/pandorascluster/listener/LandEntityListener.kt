@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.listener
 
-import com.destroystokyo.paper.event.block.TNTPrimeEvent
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
@@ -72,23 +71,6 @@ class LandEntityListener(private val landService: LandService) : Listener, Entit
                 val value = flag.getValue<Boolean>()
                 hasPermission(attacker, LandFlag.PVP) || value == false
             }
-        }
-    }
-
-    @EventHandler
-    fun handleEntityExplode(event: TNTPrimeEvent) {
-        val block = event.block
-        val land = landService.getFullLand(block.chunk)
-        val primerEntity = event.primerEntity
-        if (land != null) {
-            val landFlag = landService.getLandFlag(LandFlag.EXPLOSIONS, land)
-            event.isCancelled = if (landFlag != null && landFlag.getValue<Boolean>() == false) {
-                true
-            } else if (primerEntity != null) {
-                if (land.hasAccess(primerEntity.uniqueId)) return
-                if (hasPermission(primerEntity, LandFlag.EXPLOSIONS)) return
-                true
-            } else false
         }
     }
 
