@@ -65,6 +65,7 @@ data class Land(
     }
 
     fun hasMemberAccess(uuid: UUID): Boolean {
+        if(!hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return false
         if (isOwner(uuid)) return true
         val landOwner = owner ?: return false
         val landMember = getLandMember(uuid) ?: return false
@@ -74,11 +75,7 @@ data class Land(
 
     fun hasAccess(uuid: UUID): Boolean {
         if (isOwner(uuid)) return true
-        if (hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return true
-        val landOwner = owner ?: return false
-        val landMember = getLandMember(uuid) ?: return false
-        if (landMember.role == LandRole.MEMBER && !landOwner.isOnline()) return false
-        return landMember.role.access
+        return hasMemberAccess(uuid)
     }
 
     override fun equals(other: Any?): Boolean {
