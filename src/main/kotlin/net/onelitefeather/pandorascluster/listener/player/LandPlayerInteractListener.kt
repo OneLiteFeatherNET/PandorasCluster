@@ -12,10 +12,12 @@ import org.bukkit.block.data.Powerable
 import org.bukkit.block.data.type.Farmland
 import org.bukkit.block.data.type.RespawnAnchor
 import org.bukkit.block.data.type.TurtleEgg
+import org.bukkit.entity.Allay
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.player.*
 
 @Suppress("kotlin:S1874")
@@ -201,6 +203,19 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
             return !hasPermission(player, LandFlag.TURTLE_EGG_DESTROY)
         } else {
             return !hasPermission(player, LandFlag.TURTLE_EGG_DESTROY)
+        }
+    }
+
+    @EventHandler
+    fun handleEntityItemPickup(event: EntityPickupItemEvent) {
+
+        val entity = event.entity
+        if(entity is Allay) {
+            val item = event.item
+
+            val land = pandorasClusterApi.getLand(item.chunk) ?: return
+            val thrower = item.thrower ?: return
+            event.isCancelled = !land.hasAccess(thrower)
         }
     }
 }
