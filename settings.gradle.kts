@@ -47,7 +47,7 @@ dependencyResolutionManagement {
             library("sentrylog4j2", "io.sentry", "sentry-log4j2").version("6.0.0")
 
             // Database
-            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.4.0.Final")
+            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.4.4.Final")
             library("mariadbJavaClient","org.mariadb.jdbc", "mariadb-java-client").version("3.0.6")
             library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.1.5.Final")
         }
