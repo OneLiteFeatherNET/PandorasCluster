@@ -79,6 +79,7 @@ class PandorasClusterPlugin : JavaPlugin() {
         annotationParser.parse(SetHomeCommand(api))
         annotationParser.parse(SetFlagCommand(api))
         annotationParser.parse(ClaimCommand(api))
+        annotationParser.parse(UnclaimCommand(api))
         annotationParser.parse(SetOwnerCommand(api))
         annotationParser.parse(SetRoleCommand(api))
         annotationParser.parse(LandInfoCommand(api))
