@@ -95,6 +95,10 @@ paper {
     foliaSupported = true
 
     serverDependencies {
+        register("WorldEdit") {
+            required = true
+        }
+
         register("WorldGuard") {
             required = false
         }
