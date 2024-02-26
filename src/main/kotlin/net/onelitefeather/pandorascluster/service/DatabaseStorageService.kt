@@ -14,6 +14,7 @@ import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.land.position.toHomePosition
 import org.apache.commons.lang3.StringUtils
+import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -245,22 +246,71 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         }
     }
 
-    fun deletePlayerLand(player: Player) {
-        val landPlayer = pandorasClusterApi.getLandPlayer(player.uniqueId) ?: return
-        val land = pandorasClusterApi.getLand(landPlayer)
-        if (land != null) {
-            var transaction: Transaction? = null
-            try {
-                pandorasClusterApi.getSessionFactory().openSession().use { session ->
-                    transaction = session.beginTransaction()
-                    session.remove(land)
-                    transaction?.commit()
+    fun unclaimLand(player: Player) {
+
+        val land = pandorasClusterApi.getLandService().getLand(player) ?: return
+        var transaction: Transaction? = null
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                transaction = session.beginTransaction()
+
+                session.remove(land.homePosition)
+                land.landMembers.forEach(this::removeLandMember)
+
+                val world = Bukkit.getWorld(land.world)
+                if(world != null) {
+                    land.chunks.forEach { chunkPlaceholder ->
+                        removeChunkPlaceholder(chunkPlaceholder)
+                        pandorasClusterApi.getLandService().landCache.invalidate(world.getChunkAt(chunkPlaceholder.chunkIndex))
+                    }
                 }
-            } catch (e: HibernateException) {
-                transaction?.rollback()
-                pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the land from the database.", e)
-                Sentry.captureException(e)
+
+                land.flags.forEach(this::removeLandFlag)
+                session.remove(land)
+                transaction?.commit()
             }
+        } catch (e: HibernateException) {
+            transaction?.rollback()
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the land from the database.", e)
+            Sentry.captureException(e)
+        }
+    }
+
+    fun removeChunkPlaceholder(chunkPlaceholder: ChunkPlaceholder) {
+        var transaction: Transaction? = null
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                transaction = session.beginTransaction()
+                session.remove(chunkPlaceholder)
+                transaction?.commit()
+
+                if(chunkPlaceholder.land != null) {
+                    pandorasClusterApi.getLandService().updateLoadedChunks(chunkPlaceholder.land)
+                }
+            }
+        } catch (e: HibernateException) {
+            transaction?.rollback()
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
+            Sentry.captureException(e)
+        }
+    }
+
+    fun removeLandFlag(landFlagEntity: LandFlagEntity) {
+        var transaction: Transaction? = null
+        try {
+            pandorasClusterApi.getSessionFactory().openSession().use { session ->
+                transaction = session.beginTransaction()
+                session.remove(landFlagEntity)
+                transaction?.commit()
+
+                if(landFlagEntity.land != null) {
+                    pandorasClusterApi.getLandService().updateLoadedChunks(landFlagEntity.land)
+                }
+            }
+        } catch (e: HibernateException) {
+            transaction?.rollback()
+            pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
+            Sentry.captureException(e)
         }
     }
 
