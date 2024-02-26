@@ -72,6 +72,10 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         return landService.isChunkClaimed(chunk)
     }
 
+    override fun unclaimLand(player: Player) {
+        databaseStorageService.unclaimLand(player)
+    }
+
     override fun getLands(): List<Land> {
         return landService.getLands()
     }
