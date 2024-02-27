@@ -188,7 +188,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                     HomePosition::class.java
                 )
                 landOfOwner.setParameter("uuid", uuid.toString())
-                return landOfOwner.singleResult
+                return landOfOwner.uniqueResultOptional().orElseGet { null }
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
@@ -256,6 +256,11 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         consumer.accept(land)
+    }
+
+    fun getLand(owner: Player): Land? {
+        val landPlayer = pandorasClusterApi.getLandPlayer(owner.uniqueId) ?: return null
+        return getLand(landPlayer)
     }
 
     fun getLand(owner: LandPlayer): Land? {
