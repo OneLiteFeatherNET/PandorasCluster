@@ -49,7 +49,7 @@ dependencyResolutionManagement {
             // Database
             library("hibernateCore", "org.hibernate", "hibernate-core").version("6.4.4.Final")
             library("mariadbJavaClient","org.mariadb.jdbc", "mariadb-java-client").version("3.0.6")
-            library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.1.5.Final")
+            library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.4.4.Final")
         }
     }
 }
