@@ -16,7 +16,7 @@ dependencyResolutionManagement {
             version("run-paper", "2.0.0")
             version("publishdata", "1.2.5-DEV")
             version("shadow", "8.1.1")
-            version("liquibase", "2.1.0")
+            version("liquibase", "2.2.1")
 
             plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
             plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
