@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.service
 
-import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.builder.landBuilder
 import net.onelitefeather.pandorascluster.enums.LandRole
@@ -57,7 +56,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
             transaction?.rollback()
             pandorasClusterApi.getLogger()
                 .log(Level.SEVERE, String.format("Cannot update land home %s", homePosition), e)
-            Sentry.captureException(e)
         }
     }
 
@@ -86,7 +84,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 "Cannot save land member $landMember",
                 e
             )
-            Sentry.captureException(e)
         }
     }
 
@@ -127,7 +124,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load landflag $landFlag", e)
-            Sentry.captureException(e)
         }
 
         return getDefaultFlag(landFlag)
@@ -168,7 +164,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
             transaction?.rollback()
             pandorasClusterApi.getLogger()
                 .log(Level.SEVERE, String.format("Cannot update landflag %s", landFlag), e)
-            Sentry.captureException(e)
         }
     }
 
@@ -184,7 +179,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger().log(Level.SEVERE, String.format("Cannot update land %s", land), e)
-            Sentry.captureException(e)
         }
     }
 
@@ -207,7 +201,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
                 "Cannot save chunk placeholder $chunkPlaceholder",
                 e
             )
-            Sentry.captureException(e)
         }
     }
 
@@ -241,7 +234,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
             } catch (e: HibernateException) {
                 transaction?.rollback()
                 pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot update land", e)
-                Sentry.captureException(e)
             }
         }
     }
@@ -272,7 +264,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the land from the database.", e)
-            Sentry.captureException(e)
         }
     }
 
@@ -291,7 +282,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
-            Sentry.captureException(e)
         }
     }
 
@@ -310,7 +300,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
-            Sentry.captureException(e)
         }
     }
 
@@ -326,7 +315,6 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         } catch (e: HibernateException) {
             transaction?.rollback()
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot remove the landmember from the land.", e)
-            Sentry.captureException(e)
         }
     }
 }
