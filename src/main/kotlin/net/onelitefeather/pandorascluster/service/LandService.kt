@@ -6,7 +6,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion
-import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
@@ -167,7 +166,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not load lands.", e)
-            Sentry.captureException(e)
 
         }
         return lands
@@ -192,8 +190,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
-            Sentry.captureException(e)
-
         }
         return null
     }
@@ -213,7 +209,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e)
-            Sentry.captureException(e)
             return false
         }
     }
@@ -235,7 +230,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Something went wrong!", e)
-            Sentry.captureException(e)
             return false
         }
     }
@@ -275,7 +269,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, cannotUpdateLand, e)
-            Sentry.captureException(e)
         }
 
         return null
@@ -304,7 +297,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Could not find land", e)
-            Sentry.captureException(e)
         }
 
         return land
@@ -323,7 +315,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot load landmember $landPlayer", e)
-            Sentry.captureException(e)
         }
 
         return null
@@ -367,8 +358,6 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
             }
         } catch (e: HibernateException) {
             pandorasClusterApi.getLogger().log(Level.SEVERE, "Cannot count chunks by land $land", e)
-            Sentry.captureException(e)
-
         }
 
         return chunks

@@ -44,9 +44,6 @@ dependencies {
 
     implementation(libs.caffeine)
 
-    // Sentry
-    implementation(libs.sentry)
-
     // Database
     implementation(libs.hibernateCore)
     implementation(libs.mariadbJavaClient)

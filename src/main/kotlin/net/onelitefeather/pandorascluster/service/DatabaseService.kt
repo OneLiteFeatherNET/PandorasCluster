@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.service
 
-import io.sentry.Sentry
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
@@ -52,7 +51,6 @@ class DatabaseService(
         try {
             sessionFactory = configuration.buildSessionFactory(registry)
         } catch (e: Exception) {
-            Sentry.captureException(e)
             Bukkit.getPluginManager().disablePlugin(pandorasClusterPlugin)
         }
     }
