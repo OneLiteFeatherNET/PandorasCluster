@@ -10,7 +10,6 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
-import io.sentry.Sentry
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import org.bukkit.command.CommandSender
@@ -24,7 +23,6 @@ fun PandorasClusterPlugin.buildCommandSystem() {
         paperCommandManager = PaperCommandManager.createNative(this, CommandExecutionCoordinator.simpleCoordinator())
     } catch (e: Exception) {
         logger.log(Level.WARNING, "Failed to build command system", e)
-        Sentry.captureException(e)
         server.pluginManager.disablePlugin(this)
         return
     }
@@ -74,14 +72,4 @@ fun PandorasClusterPlugin.buildHelpSystem() {
         NamedTextColor.DARK_BLUE,
         NamedTextColor.AQUA
     )
-}
-
-fun JavaPlugin.sentry() {
-    val dsn = System.getProperty("sentry.dsn", "https://b798943d3b7f4bb0a3b0c0ac14cfd376@sentry.themeinerlp.dev/3")
-    val env = System.getProperty("sentry.env", "local")
-    Sentry.init {
-        it.dsn = dsn
-        it.environment = env
-        it.release = this.description.version
-    }
 }

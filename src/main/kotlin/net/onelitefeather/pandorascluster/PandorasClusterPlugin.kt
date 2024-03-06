@@ -5,7 +5,7 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
-import io.sentry.Sentry
+
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.translation.GlobalTranslator
@@ -18,7 +18,6 @@ import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
 import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
 import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
-import net.onelitefeather.pandorascluster.extensions.sentry
 import net.onelitefeather.pandorascluster.util.LynxWrapper
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
@@ -36,37 +35,26 @@ class PandorasClusterPlugin : JavaPlugin() {
     lateinit var bukkitAudiences: BukkitAudiences
     lateinit var api: PandorasClusterApiImpl
 
-    override fun onLoad() {
-        sentry()
-    }
-
     override fun onEnable() {
-        try {
+        saveDefaultConfig()
+        config.options().copyDefaults(true)
+        saveConfig()
 
-            saveDefaultConfig()
-            config.options().copyDefaults(true)
-            saveConfig()
+        bukkitAudiences = BukkitAudiences.create(this)
+        api = PandorasClusterApiImpl(this)
+        server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
 
-            bukkitAudiences = BukkitAudiences.create(this)
-            api = PandorasClusterApiImpl(this)
-            server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
+        buildCommandSystem()
+        registerCommands()
+        buildHelpSystem()
 
-            buildCommandSystem()
-            registerCommands()
-            buildHelpSystem()
-
-            val registry = TranslationRegistry.create(Key.key("pandorascluster", "localization"))
-            supportedLocals.forEach { locale ->
-                val bundle = ResourceBundle.getBundle("pandorascluster", locale, UTF8ResourceBundleControl.get())
-                registry.registerAll(locale, bundle, false)
-            }
-            registry.defaultLocale(supportedLocals.first())
-            GlobalTranslator.translator().addSource(LynxWrapper(registry))
-
-        } catch (e: Exception) {
-            Sentry.captureException(e)
-            e.printStackTrace()
+        val registry = TranslationRegistry.create(Key.key("pandorascluster", "localization"))
+        supportedLocals.forEach { locale ->
+            val bundle = ResourceBundle.getBundle("pandorascluster", locale, UTF8ResourceBundleControl.get())
+            registry.registerAll(locale, bundle, false)
         }
+        registry.defaultLocale(supportedLocals.first())
+        GlobalTranslator.translator().addSource(LynxWrapper(registry))
     }
 
     private fun registerCommands() {
