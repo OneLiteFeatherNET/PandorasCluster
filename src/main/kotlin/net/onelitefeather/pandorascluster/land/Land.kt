@@ -65,7 +65,7 @@ data class Land(
     }
 
     fun hasMemberAccess(uuid: UUID): Boolean {
-        if(!hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return false
+        if(hasMemberPermission(uuid, Permission.OWNED_CHUNK)) return true
         if (isOwner(uuid)) return true
         val landOwner = owner ?: return false
         val landMember = getLandMember(uuid) ?: return false
