@@ -18,7 +18,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.EntityBlockFormEvent
 import org.bukkit.event.entity.*
 import org.bukkit.permissions.Permissible
-import org.spigotmc.event.entity.EntityMountEvent
 
 class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
 
@@ -123,20 +122,10 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
 
     @EventHandler
     fun handleEntityMount(event: EntityMountEvent) {
-
         val mount = event.mount
         val entity = event.entity
-
-        val landFlag = LandFlag.ENTITY_MOUNT
         val land = this.pandorasClusterApi.getLand(mount.chunk) ?: return
-        if (land.hasAccess(entity.uniqueId)) return
-        if (land.getLandFlag(landFlag).getValue<Boolean>() == true) return
-
-        event.isCancelled = if (mount is Tameable && entity is AnimalTamer) {
-            !mount.isTamed || !isPetOwner(mount, entity)
-        } else {
-            !hasPermission(entity, landFlag)
-        }
+        event.isCancelled = !canMountEntity(mount, entity, land)
     }
 
     @EventHandler
