@@ -3,11 +3,14 @@ package net.onelitefeather.pandorascluster.listener.entity;
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import org.bukkit.entity.AnimalTamer
-import org.bukkit.entity.Tameable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.vehicle.*
+import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.event.vehicle.VehicleCreateEvent
+import org.bukkit.event.vehicle.VehicleDamageEvent
+import org.bukkit.event.vehicle.VehicleDestroyEvent
+import org.bukkit.event.vehicle.VehicleMoveEvent
+
 
 class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
 
@@ -49,6 +52,7 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
     @EventHandler
     fun handleVehicleCreation(event: VehicleCreateEvent) {
         val vehicle = event.vehicle
+        if (vehicle.entitySpawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT) return
         val land = pandorasClusterApi.getLand(vehicle.chunk) ?: return
         event.isCancelled = land.getLandFlag(LandFlag.VEHICLE_CREATE).getValue<Boolean>() == false
     }
@@ -60,20 +64,6 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
         val toLand = pandorasClusterApi.getLand(to.chunk)
         if (toLand != null) {
             vehicle.passengers.filter { toLand.isBanned(it.uniqueId) }.forEach { vehicle.removePassenger(it) }
-        }
-    }
-
-    @EventHandler
-    fun handleVehicleEnter(event: VehicleEnterEvent) {
-
-        val vehicle = event.vehicle
-        val entered = event.entered
-        val land = pandorasClusterApi.getLand(vehicle.chunk)
-        if (land != null) {
-            if(vehicle is Tameable && entered is AnimalTamer && isPetOwner(vehicle, entered)) return
-            if (land.getLandFlag(LandFlag.VEHICLE_USE).getValue<Boolean>() == true) return
-            if (land.hasAccess(entered.uniqueId)) return
-            event.isCancelled = !hasPermission(entered, LandFlag.VEHICLE_USE)
         }
     }
 }
