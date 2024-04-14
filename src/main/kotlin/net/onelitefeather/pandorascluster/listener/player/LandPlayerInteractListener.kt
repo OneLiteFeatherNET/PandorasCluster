@@ -83,7 +83,6 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
     }
 
     @Suppress("DEPRECATION")
-    // isInteractable - no alternative possible at the moment
     @EventHandler
     fun handlePlayerInteract(event: PlayerInteractEvent) {
 
