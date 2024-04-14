@@ -25,16 +25,6 @@ class PlayerInteractEntityListener(val pandorasClusterApi: PandorasClusterApi) :
         val land = pandorasClusterApi.getLand(entity.chunk) ?: return
 
         event.isCancelled = when (entity) {
-
-            is Tameable -> {
-                if(!entity.isTamed) {
-                    if(land.getLandFlag(LandFlag.ENTITY_MOUNT).getValue<Boolean>() == true) return
-                    !hasPermission(player, LandFlag.ENTITY_MOUNT)
-                } else {
-                    !isPetOwner(entity, player)
-                }
-            }
-
             is Allay -> { !land.hasAccess(player.uniqueId) }
             is Cow -> {
                 if(land.hasAccess(player.uniqueId)) return
