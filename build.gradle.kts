@@ -1,5 +1,3 @@
-import de.chojo.Repo
-
 plugins {
     kotlin("jvm") version "1.9.22"
     alias(libs.plugins.run.paper)
@@ -103,10 +101,6 @@ paper {
 
     permissions {
         listOf(
-            "pandorascluster.command.land.info",
-            "pandorascluster.command.land.visit",
-            "pandorascluster.command.land.flag.set",
-            "pandorascluster.command.land.set.home",
             "pandorascluster.flags.flag.pvp",
             "pandorascluster.flags.flag.pve",
             "pandorascluster.flags.flag.use",
@@ -135,15 +129,20 @@ paper {
             "pandorascluster.flags.flag.entity-leash",
             "pandorascluster.flags.flag.villager-interact",
             "pandorascluster.flags.flag.fire-protection",
-            "pandorascluster.flags.flag.sponge-absorb",
-            "pandorascluster.limit.claim",
-            "pandorascluster.owned.access",
-            "pandorascluster.owned.block.break",
-            "pandorascluster.owned.block.place",
-            "pandorascluster.owned.entry.denied",
-            "pandorascluster.owned.interact.container",
+            "pandorascluster.flags.flag.sponge-absorb"
+        ).forEach { perm ->
+            register(perm) {
+                default = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.FALSE
+            }
+        }
 
-            ).forEach { perm ->
+        listOf(
+            "pandorascluster.command.land.info",
+            "pandorascluster.command.land.visit",
+            "pandorascluster.command.land.flag.set",
+            "pandorascluster.command.land.set.home",
+            "pandorascluster.limit.claim"
+        ).forEach { perm ->
             register(perm) {
                 default = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.TRUE
             }
@@ -155,9 +154,14 @@ paper {
             "pandorascluster.admin.set.flags",
             "pandorascluster.admin.set.home",
             "pandorascluster.admin.set.owner",
+            "pandorascluster.owned.entry.denied",
             "pandorascluster.unowned.access",
             "pandorascluster.unowned.block.break",
             "pandorascluster.unowned.block.place",
+            "pandorascluster.owned.access",
+            "pandorascluster.owned.block.break",
+            "pandorascluster.owned.block.place",
+            "pandorascluster.owned.interact.container"
         ).forEach { perm ->
             register(perm) {
                 default = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.OP

@@ -25,17 +25,12 @@ class LynxWrapper(private val translator: TranslationRegistry) : Translator {
 
     override fun translate(component: TranslatableComponent, locale: Locale): Component? {
         val miniMessageResult = this.translate(component.key(), locale) ?: return null
-        val values = arrayOfNulls<String>(component.args().size)
+        val values = arrayOfNulls<String>(component.arguments().size)
 
-        component.args().forEachIndexed { index, argumentComponent ->
-            if (argumentComponent !is TranslatableComponent) {
-                values[index] = MiniMessage.miniMessage().serialize(GlobalTranslator.render(argumentComponent, locale))
-            } else {
-                val comp = this.translate(argumentComponent, locale) ?: GlobalTranslator.render(argumentComponent, locale)
-                values[index] = MiniMessage.miniMessage().serialize(comp)
-            }
-
+        component.arguments().forEachIndexed { index, argumentComponent ->
+            values[index] = MiniMessage.miniMessage().serialize(GlobalTranslator.render(argumentComponent.asComponent(), locale))
         }
+
         val resultComponent =
             MiniMessage.miniMessage().deserialize(miniMessageResult.format(values.filterNotNull().toTypedArray()))
         val children = resultComponent.children().toTypedArray().map { GlobalTranslator.render(it, locale) }

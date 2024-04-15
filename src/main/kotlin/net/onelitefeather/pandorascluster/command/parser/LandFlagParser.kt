@@ -15,10 +15,12 @@ import java.util.*
 class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
 
     @Parser(name = "landFlag", suggestions = "landFlags")
-    fun parseLandFlags(commandContext: CommandContext<Player>, input: Queue<String>): LandFlag {
+    fun parseLandFlags(@Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>, input: Queue<String>): LandFlag {
         return findByName(input.remove().lowercase()) ?: LandFlag.UNKNOWN
     }
 
+    // isInteractable - no alternative possible at the moment
+    @Suppress("DEPRECATION")
     @Suggestions("flag_values")
     fun flagSuggestions(commandContext: CommandContext<Player>, input: String): List<String> {
         val landFlag = commandContext.get<LandFlag>("flag")
@@ -44,7 +46,7 @@ class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
 
 
     @Suggestions("landFlags")
-    fun landFlags(commandContext: CommandContext<Player>, input: String): List<String> {
+    fun landFlags(@Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>, @Suppress("UNUSED_PARAMETER") input: String): List<String> {
         return getDefaultFlagNames()
     }
 }
