@@ -31,10 +31,10 @@ class DatabaseService(
     init {
         val configuration = Configuration()
         val properties = Properties()
-        properties[Environment.JAKARTA_JDBC_URL] = jdbcUrl
-        properties[Environment.JAKARTA_JDBC_DRIVER] = driver
-        properties[Environment.JAKARTA_JDBC_USER] = username
-        properties[Environment.JAKARTA_JDBC_PASSWORD] = password
+        properties[Environment.URL] = jdbcUrl
+        properties[Environment.DRIVER] = driver
+        properties[Environment.USER] = username
+        properties[Environment.PASS] = password
         properties[Environment.IMPLICIT_NAMING_STRATEGY] = ImplicitNamingStrategyLegacyJpaImpl::class.java
         properties[Environment.CONNECTION_PROVIDER] = HikariCPConnectionProvider::class.java
         properties[Environment.DIALECT] = MariaDBDialect()
