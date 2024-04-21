@@ -1,9 +1,14 @@
 package net.onelitefeather.pandorascluster.util
 
+import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.land.Land
 import org.bukkit.Chunk
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+
+fun canEnterLand(player: Player, land: Land): Boolean {
+    return Permission.LAND_ENTRY_DENIED.hasPermission(player) || !land.isBanned(player.uniqueId)
+}
 
 fun hasSameOwner(it: Land, claimedLand: Land) = it.owner == claimedLand.owner
 
