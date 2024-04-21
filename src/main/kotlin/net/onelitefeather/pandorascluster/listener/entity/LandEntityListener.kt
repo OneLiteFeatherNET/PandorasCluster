@@ -1,10 +1,13 @@
 package net.onelitefeather.pandorascluster.listener.entity
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent
+import net.onelitefeather.pandorascluster.api.MobCapType
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.util.getEntityCount
+import net.onelitefeather.pandorascluster.util.getEntityLimit
 import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.block.Block
@@ -223,6 +226,36 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
             if (land.hasAccess(event.entity.uniqueId)) return
             if (blockFormFlag.getValue<Boolean>() == true) return
             event.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun handleEntitySpawn(event: EntitySpawnEvent) {
+
+        val entity = event.entity
+
+        val land = pandorasClusterApi.getLand(entity.chunk) ?: return
+        var entityCount = 0
+        var limit = 0
+
+        if (entity is Animals) {
+            entityCount = getEntityCount(land, MobCapType.ANIMALS)
+            limit = getEntityLimit(land, MobCapType.ANIMALS)
+        }
+
+        if (entity is Monster) {
+            entityCount = getEntityCount(land, MobCapType.MONSTER)
+            limit = getEntityLimit(land, MobCapType.MONSTER)
+        }
+
+        if (entity is AbstractVillager) {
+            entityCount = getEntityCount(land, MobCapType.VILLAGER)
+            limit = getEntityLimit(land, MobCapType.VILLAGER)
+        }
+
+        if (entityCount > 0 && limit > 0) {
+            // Add 1 to the current entity count and check if the entity can spawn
+            event.isCancelled = (entityCount + 1) > limit
         }
     }
 
