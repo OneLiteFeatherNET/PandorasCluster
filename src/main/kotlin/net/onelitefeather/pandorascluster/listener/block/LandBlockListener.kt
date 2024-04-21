@@ -10,6 +10,7 @@ import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockState
 import org.bukkit.entity.Entity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -22,9 +23,7 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
 
     @EventHandler
     fun handleSpongeAbsorb(event: SpongeAbsorbEvent) {
-        event.blocks.groupBy { it.chunk }.filter {
-            pandorasClusterApi.getLand(it.key)?.getLandFlag(LandFlag.SPONGE_ABSORB)?.getValue<Boolean>() == true
-        }.forEach { event.blocks.removeAll(it.value) }
+        event.blocks.groupBy(BlockState::getChunk).filter(this::filterSpongeAbsorb).forEach { event.blocks.removeAll(it.value) }
     }
 
     @EventHandler
@@ -249,4 +248,7 @@ class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Li
         return pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.EXPLOSIONS)?.getValue<Boolean>() == false
     }
 
+    private fun filterSpongeAbsorb(land: Map.Entry<Chunk, List<BlockState>>): Boolean {
+        return pandorasClusterApi.getLand(land.key)?.getLandFlag(LandFlag.SPONGE_ABSORB)?.getValue<Boolean>() == false
+    }
 }
