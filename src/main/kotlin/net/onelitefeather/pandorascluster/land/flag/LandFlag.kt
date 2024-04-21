@@ -43,7 +43,10 @@ enum class LandFlag(val flagName: String,
     FIRE_PROTECTION("fire-protection", false, LandFlagType.WORLD_TICK, 2),
     FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, 2),
     INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, 2),
-    SPONGE_ABSORB("sponge-absorb", false, LandFlagType.WORLD_TICK, 2);
+    SPONGE_ABSORB("sponge-absorb", false, LandFlagType.WORLD_TICK, 2),
+    ANIMAL_CAP("animal-cap", "250", LandFlagType.ENTITY, 1),
+    MONSTER_CAP("monster-cap", "250", LandFlagType.ENTITY, 1),
+    VILLAGER_CAP("villager-cap", "100", LandFlagType.ENTITY, 1);
 
 }
 
