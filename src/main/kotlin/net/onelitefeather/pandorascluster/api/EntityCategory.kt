@@ -1,6 +1,6 @@
 package net.onelitefeather.pandorascluster.api
 
-enum class MobCapType {
+enum class EntityCategory {
 
     ANIMALS,
     MONSTER,

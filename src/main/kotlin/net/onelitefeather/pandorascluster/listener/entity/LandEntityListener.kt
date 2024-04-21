@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.listener.entity
 
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent
-import net.onelitefeather.pandorascluster.api.MobCapType
+import net.onelitefeather.pandorascluster.api.EntityCategory
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
@@ -239,18 +239,18 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         var limit = 0
 
         if (entity is Animals) {
-            entityCount = getEntityCount(land, MobCapType.ANIMALS)
-            limit = getEntityLimit(land, MobCapType.ANIMALS)
+            entityCount = getEntityCount(land, EntityCategory.ANIMALS)
+            limit = getEntityLimit(land, EntityCategory.ANIMALS)
         }
 
         if (entity is Monster) {
-            entityCount = getEntityCount(land, MobCapType.MONSTER)
-            limit = getEntityLimit(land, MobCapType.MONSTER)
+            entityCount = getEntityCount(land, EntityCategory.MONSTER)
+            limit = getEntityLimit(land, EntityCategory.MONSTER)
         }
 
         if (entity is AbstractVillager) {
-            entityCount = getEntityCount(land, MobCapType.VILLAGER)
-            limit = getEntityLimit(land, MobCapType.VILLAGER)
+            entityCount = getEntityCount(land, EntityCategory.VILLAGER)
+            limit = getEntityLimit(land, EntityCategory.VILLAGER)
         }
 
         if (entityCount > 0 && limit > 0) {
