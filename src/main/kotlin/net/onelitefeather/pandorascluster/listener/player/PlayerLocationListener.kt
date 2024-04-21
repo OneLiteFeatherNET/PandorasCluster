@@ -1,7 +1,8 @@
-package net.onelitefeather.pandorascluster.listener.player;
+package net.onelitefeather.pandorascluster.listener.player
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.util.canEnterLand
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.event.EventHandler
@@ -14,17 +15,26 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent
 class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Listener {
 
     val world: World = Bukkit.getWorlds()[0]
+    private val allowedReasons = listOf(
+        PlayerTeleportEvent.TeleportCause.PLUGIN,
+        PlayerTeleportEvent.TeleportCause.COMMAND,
+        PlayerTeleportEvent.TeleportCause.UNKNOWN
+    )
 
     @EventHandler
     fun handlePlayerMovement(event: PlayerMoveEvent) {
-        val player = event.player
         if (!event.hasExplicitlyChangedBlock()) return
-        val toLand = pandorasClusterApi.getLand(event.to.chunk)
-        if (toLand != null) {
-            if (Permission.LAND_ENTRY_DENIED.hasPermission(player)) return
-            if (!toLand.isBanned(player.uniqueId)) return
-            event.to = event.from
+        val player = event.player
+        val toLand = pandorasClusterApi.getLand(event.to.chunk) ?: return
+        if (canEnterLand(player, toLand)) return
+
+        val fromLand = pandorasClusterApi.getLand(event.from.chunk)
+        if(fromLand != null && toLand.isBanned(player.uniqueId)) {
+            event.to = world.spawnLocation
+            return
         }
+
+        event.to = event.to.set(event.from.blockX.toDouble(), event.to.y, event.from.blockZ.toDouble())
     }
 
     @EventHandler
@@ -32,11 +42,10 @@ class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Liste
         val player = event.player
         val to = event.to
         val from = event.from
+        if (allowedReasons.contains(event.cause)) return
         val land = pandorasClusterApi.getLand(to.chunk) ?: pandorasClusterApi.getLand(from.chunk) ?: return
-        if (Permission.LAND_ENTRY_DENIED.hasPermission(player)) return
-        if (land.isBanned(player.uniqueId)) {
-            event.to = event.from
-        }
+        if (canEnterLand(player, land)) return
+        event.to = event.from
     }
 
     @EventHandler
