@@ -41,7 +41,7 @@ dependencyResolutionManagement {
             library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
 
             // Database
-            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.4.4.Final")
+            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.5.0.Final")
             library("mariadbJavaClient","org.mariadb.jdbc", "mariadb-java-client").version("3.0.6")
             library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.4.4.Final")
         }
