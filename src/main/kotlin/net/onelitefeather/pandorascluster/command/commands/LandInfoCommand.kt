@@ -39,10 +39,11 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             Component.text(land.homePosition.getBlockY()),
             Component.text(land.homePosition.getBlockZ())))
 
-        player.sendMessage(Component.translatable("command.info.flags").arguments(pandorasClusterApi.pluginPrefix(), buildFlags(land)))
-        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(
-            pluginPrefix,
-            Component.text(pandorasClusterApi.getLandService().getChunksByLand(land))))
+        player.sendMessage(Component.translatable("command.info.flags").arguments(
+            MiniMessage.miniMessage().deserialize(pandorasClusterApi.pluginPrefix()), buildFlags(land)))
+
+        val chunkCount = pandorasClusterApi.getLandService().getChunksByLand(land)
+        player.sendMessage(miniMessage { "<lang:command.info.total-chunk-count:'$pluginPrefix':'$chunkCount'>" })
     }
 
     private fun buildMembers(land: Land): Component {
@@ -78,16 +79,9 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             }
 
             val suggestionValue = if (booleanFlag) !value.toBoolean() else value
-            Component.translatable("command.info.flags.entry").arguments(
-                Component.text(flagName),
-                Component.text(value),
-                Component.text(flagName),
-                Component.text(suggestionValue.toString()),
-                symbolColor
-            )
+            MiniMessage.miniMessage().deserialize("<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">")
         }.toList()
 
-        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else
-            Component.translatable("command.info.flags.none")
+        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")
     }
 }
