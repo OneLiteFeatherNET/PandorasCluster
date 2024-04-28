@@ -10,10 +10,10 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.minecraft.extras.MinecraftHelp
 import cloud.commandframework.paper.PaperCommandManager
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import org.bukkit.command.CommandSender
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
 import java.util.logging.Level
@@ -39,10 +39,12 @@ fun PandorasClusterPlugin.buildCommandSystem() {
 
     confirmationManager = CommandConfirmationManager(
         20L, TimeUnit.SECONDS, { context: CommandPostprocessingContext<CommandSender> ->
-            bukkitAudiences.sender(context.commandContext.sender).sendMessage(miniMessage { "<lang:command.confirm:'${api.pluginPrefix()}'>" })
+            bukkitAudiences.sender(context.commandContext.sender).sendMessage(
+                Component.translatable("command.confirm").arguments(api.pluginPrefix()))
         },
         { sender: CommandSender ->
-            bukkitAudiences.sender(sender).sendMessage(miniMessage { "<lang:command.confirm.no-pending-commands:'${api.pluginPrefix()}'>" })
+            bukkitAudiences.sender(sender).sendMessage(
+                Component.translatable("command.confirm.no-pending-commands").arguments(api.pluginPrefix()))
         }
     )
 

@@ -2,7 +2,6 @@ package net.onelitefeather.pandorascluster.command.commands
 
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
-import cloud.commandframework.annotations.CommandPermission
 import cloud.commandframework.annotations.Confirmation
 import com.fastasyncworldedit.core.Fawe
 import com.fastasyncworldedit.core.FaweAPI
@@ -10,8 +9,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.CuboidRegion
 import com.sk89q.worldedit.world.RegenOptions
+import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import org.bukkit.entity.Player
 
 class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
@@ -22,7 +21,7 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
     fun execute(player: Player) {
 
         if (!pandorasClusterApi.hasPlayerLand(player)) {
-            player.sendMessage(miniMessage { "<lang:no-own-land-found:'${pandorasClusterApi.pluginPrefix()}'>" })
+            player.sendMessage(Component.translatable("no-own-land-found").arguments(pandorasClusterApi.pluginPrefix()))
             return
         }
 
@@ -50,7 +49,7 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
             }
         }
 
-        player.sendMessage(miniMessage { "<lang:command.unclaim.success:'${pandorasClusterApi.pluginPrefix()}'>" })
+        player.sendMessage(Component.translatable("command.unclaim.success").arguments(pandorasClusterApi.pluginPrefix()))
         pandorasClusterApi.unclaimLand(player)
     }
 }

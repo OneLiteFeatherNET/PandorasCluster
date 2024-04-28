@@ -1,11 +1,8 @@
 package net.onelitefeather.pandorascluster.api
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import net.onelitefeather.pandorascluster.service.DatabaseService
@@ -15,7 +12,6 @@ import net.onelitefeather.pandorascluster.service.LandService
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
-import java.text.MessageFormat
 import java.util.*
 import java.util.logging.Logger
 
@@ -48,8 +44,8 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
         }
     }
 
-    override fun pluginPrefix(): String {
-        return "<lang:prefix>"
+    override fun pluginPrefix(): Component {
+        return Component.translatable("prefix")
     }
 
     override fun getPlugin(): PandorasClusterPlugin {

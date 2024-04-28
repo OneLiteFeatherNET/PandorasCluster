@@ -7,9 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.Land
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
@@ -22,49 +20,36 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'$pluginPrefix'>" })
+            player.sendMessage(Component.translatable("chunk-already-claimed").arguments(pluginPrefix))
             return
         }
 
-        val accessMessage = if (land.hasAccess(player.uniqueId)) "<lang:boolean-true>" else "<lang:boolean-false>"
+        val accessMessage = if (land.hasAccess(player.uniqueId))
+            Component.translatable("boolean-true") else Component.translatable("boolean-false")
 
-        player.sendMessage(miniMessage { "<lang:command.info.owner:'$pluginPrefix':'${land.owner?.name ?: player.name}'>" })
-        player.sendMessage(miniMessage { "<lang:command.info.access:'$pluginPrefix':'$accessMessage'>" })
+        player.sendMessage(Component.translatable("command.info.owner").arguments(pluginPrefix,
+            Component.text(land.owner?.name ?: player.name)))
 
-        player.sendMessage(miniMessage {
-            "<lang:command.info.members:'${pandorasClusterApi.pluginPrefix()}':'${
-                buildMembers(
-                    land
-                )
-            }'>"
-        })
+        player.sendMessage(Component.translatable("command.info.access").arguments(pluginPrefix, accessMessage))
+        player.sendMessage(Component.translatable("command.info.members").arguments(pandorasClusterApi.pluginPrefix(), buildMembers(land)))
 
-        player.sendMessage(miniMessage {
-            "<lang:command.info.home:'" + "${pandorasClusterApi.pluginPrefix()}':'" +
-                    "${land.homePosition.getBlockX()}':'" +
-                    "${land.homePosition.getBlockY()}':'" +
-                    "${land.homePosition.getBlockZ()}'>"
-        })
-
-        player.sendMessage(Component.translatable("command.info.flags").arguments(
-            MiniMessage.miniMessage().deserialize(pandorasClusterApi.pluginPrefix()), buildFlags(land)))
-
-        val chunkCount = pandorasClusterApi.getLandService().getChunksByLand(land)
-        player.sendMessage(miniMessage { "<lang:command.info.total-chunk-count:'$pluginPrefix':'$chunkCount'>" })
+        player.sendMessage(Component.translatable("command.info.flags").arguments(pandorasClusterApi.pluginPrefix(), buildFlags(land)))
+        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(
+            pluginPrefix,
+            Component.text(pandorasClusterApi.getLandService().getChunksByLand(land))))
     }
 
-    private fun buildMembers(land: Land): String {
-        val out = StringBuilder()
-        val separator = ", "
-        for (landMember in land.landMembers) {
-            if (landMember.member?.name == null) continue
-            out.append("<lang:command.info.members.entry:\"${landMember.role.display}\":\"${landMember.member.name}\">")
-            if (out.isNotEmpty()) {
-                out.append(separator)
-            }
-        }
+    private fun buildMembers(land: Land): Component {
 
-        return if (out.isNotEmpty()) out.removeSuffix(separator).toString() else "<lang:command.info.members.nobody>"
+        val members = land.landMembers.filterNot { it.member?.name == null}.map {
+            Component.translatable("command.info.members.entry").arguments(
+                MiniMessage.miniMessage().deserialize(it.role.display),
+                Component.text(it.member?.name ?: "null"))
+        }.toList()
+
+        return if (members.isNotEmpty())
+            Component.join(JoinConfiguration.separator(Component.text(", ")), members) else
+            Component.translatable("command.info.members.nobody")
     }
 
     private fun buildFlags(land: Land): Component {
@@ -78,18 +63,25 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             val symbolColor = if (booleanFlag) {
                 val booleanValue = value.toBoolean()
                 if (booleanValue) {
-                    "<lang:command.info.flag.enabled>"
+                    Component.translatable("command.info.flag.enabled")
                 } else {
-                    "<lang:command.info.flag.disabled>"
+                    Component.translatable("command.info.flag.disabled")
                 }
             } else {
-                "<lang:command.info.flag.disabled>"
+                Component.translatable("command.info.flag.disabled")
             }
 
             val suggestionValue = if (booleanFlag) !value.toBoolean() else value
-            MiniMessage.miniMessage().deserialize("<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">")
+            Component.translatable("command.info.flags.entry").arguments(
+                Component.text(flagName),
+                Component.text(value),
+                Component.text(flagName),
+                Component.text(suggestionValue.toString()),
+                symbolColor
+            )
         }.toList()
 
-        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")
+        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else
+            Component.translatable("command.info.flags.none")
     }
 }

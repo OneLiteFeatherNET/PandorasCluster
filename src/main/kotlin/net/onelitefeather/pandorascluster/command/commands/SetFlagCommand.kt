@@ -5,10 +5,10 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
+import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.isValidValue
 import org.bukkit.entity.Player
@@ -26,22 +26,23 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
         val land = pandorasClusterApi.getLand(player.chunk)
         if (land == null) {
-            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'$pluginPrefix'>" })
+            player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
             return
         }
 
         if (!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_FLAG)) {
-            player.sendMessage(miniMessage { "<lang:not-authorized:'$pluginPrefix'>" })
+            player.sendMessage(Component.translatable("not-authorized").arguments(pluginPrefix))
             return
         }
 
         if(!isValidValue(landFlag, value)) {
-            player.sendMessage(miniMessage { "<lang:command.set-flag.invalid-value:'$pluginPrefix':'$value':'$landFlag'>" })
+            player.sendMessage(Component.translatable("command.set-flag.invalid-value").
+            arguments(pluginPrefix, Component.text(value), Component.text(landFlag.name)))
             return
         }
 
         if(landFlag == LandFlag.UNKNOWN) {
-            player.sendMessage(miniMessage { "<lang:command.set-flag.not-found:'$pluginPrefix'>" })
+            player.sendMessage(Component.translatable("command.set-flag.not-found").arguments(pluginPrefix))
             return
         }
 
@@ -50,7 +51,9 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         } else {
             pandorasClusterApi.getDatabaseStorageService().addUseMaterial(land, value)
         }
-
-        player.sendMessage(miniMessage { "<lang:command.set-flag.success:'$pluginPrefix':'${landFlag.name}':'$value'>" })
+        player.sendMessage(Component.translatable("command.set-flag.success").arguments(
+            pluginPrefix,
+            Component.text(landFlag.name),
+            Component.text(value)))
     }
 }

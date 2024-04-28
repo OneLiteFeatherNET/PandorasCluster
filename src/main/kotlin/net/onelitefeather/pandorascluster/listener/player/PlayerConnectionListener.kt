@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.listener.player
 
+import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -19,7 +19,7 @@ class PlayerConnectionListener(val api: PandorasClusterApi) : Listener {
         }
 
         if(api.registerPlayer(player.uniqueId, player.name)) {
-            player.sendMessage(miniMessage { "<lang:player-data-created:'${api.pluginPrefix()}'>" })
+            player.sendMessage(Component.translatable("player-data-created").arguments(api.pluginPrefix()))
         }
     }
 
