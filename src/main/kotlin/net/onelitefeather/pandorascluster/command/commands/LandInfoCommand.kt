@@ -33,12 +33,6 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
         player.sendMessage(Component.translatable("command.info.access").arguments(pluginPrefix, accessMessage))
         player.sendMessage(Component.translatable("command.info.members").arguments(pandorasClusterApi.pluginPrefix(), buildMembers(land)))
 
-        player.sendMessage(Component.translatable("command.info.home").arguments(
-            pluginPrefix,
-            Component.text(land.homePosition.getBlockX()),
-            Component.text(land.homePosition.getBlockY()),
-            Component.text(land.homePosition.getBlockZ())))
-
         player.sendMessage(Component.translatable("command.info.flags").arguments(pandorasClusterApi.pluginPrefix(), buildFlags(land)))
         player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(
             pluginPrefix,
