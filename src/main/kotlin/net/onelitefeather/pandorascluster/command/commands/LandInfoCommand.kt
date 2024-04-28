@@ -48,7 +48,9 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     private fun buildMembers(land: Land): Component {
 
         val members = land.landMembers.filterNot { it.member?.name == null}.map {
-            MiniMessage.miniMessage().deserialize("<lang:command.info.members.entry:\"${it.role.display}\":\"${it.member?.name}\">")
+            Component.translatable("command.info.members.entry").arguments(
+                MiniMessage.miniMessage().deserialize(it.role.display),
+                Component.text(it.member?.name ?: "null"))
         }.toList()
 
         return if (members.isNotEmpty())
@@ -67,16 +69,22 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             val symbolColor = if (booleanFlag) {
                 val booleanValue = value.toBoolean()
                 if (booleanValue) {
-                    "<lang:command.info.flag.enabled>"
+                    Component.translatable("command.info.flag.enabled")
                 } else {
-                    "<lang:command.info.flag.disabled>"
+                    Component.translatable("command.info.flag.disabled")
                 }
             } else {
-                "<lang:command.info.flag.disabled>"
+                Component.translatable("command.info.flag.disabled")
             }
 
             val suggestionValue = if (booleanFlag) !value.toBoolean() else value
-            MiniMessage.miniMessage().deserialize("<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">")
+            Component.translatable("command.info.flags.entry").arguments(
+                Component.text(flagName),
+                Component.text(value),
+                Component.text(flagName),
+                Component.text(suggestionValue.toString()),
+                symbolColor
+            )
         }.toList()
 
         return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else
