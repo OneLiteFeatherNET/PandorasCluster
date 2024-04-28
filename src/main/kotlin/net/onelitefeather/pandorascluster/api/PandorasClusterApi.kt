@@ -16,7 +16,7 @@ import java.util.logging.Logger
 
 interface PandorasClusterApi {
 
-    fun pluginPrefix(): String
+    fun pluginPrefix(): Component
 
     fun getPlugin(): PandorasClusterPlugin
 
