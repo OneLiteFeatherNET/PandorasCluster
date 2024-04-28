@@ -8,13 +8,14 @@ import cloud.commandframework.annotations.parsers.Parser
 import cloud.commandframework.annotations.specifier.Greedy
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.LAND_ROLES
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.enums.Permission
 import net.onelitefeather.pandorascluster.enums.getLandRole
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -35,45 +36,56 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         val targetPlayerId = landPlayer.getUniqueId()
 
         if (land == null) {
-            player.sendMessage(miniMessage { "<lang:chunk-is-not-claimed:'${pluginPrefix}'>" })
+            player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
             return
         }
 
         if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_ROLE)) {
-            player.sendMessage(miniMessage { "<lang:not-authorized:'${pluginPrefix}'>" })
+            player.sendMessage(Component.translatable("not-authorized").arguments(pluginPrefix))
             return
         }
 
         val targetName = landPlayer.name ?: "not found"
         if (targetPlayerId == null) {
-            player.sendMessage(miniMessage { "<lang:player-data-not-found:'${pluginPrefix}':'${targetName}'>" })
+            player.sendMessage(
+                Component.translatable("player-data-not-found").
+            arguments(pluginPrefix, Component.text(targetName)))
             return
         }
 
         if (!landRole.isGrantAble()) {
-            player.sendMessage(miniMessage { "<lang:command.set-role.role-not.grantable:'${pluginPrefix}':'${landRole.display}'>" })
+            player.sendMessage(Component.translatable("command.set-role.role-not.grantable").arguments(
+                pluginPrefix,
+                MiniMessage.miniMessage().deserialize(landRole.display)))
             return
         }
 
         if (land.isOwner(targetPlayerId)) {
-            player.sendMessage(miniMessage { "<lang:command.set-role.cannot-change-the-land-owner:'${pluginPrefix}'>" })
+            player.sendMessage(Component.translatable("command.set-role.cannot-change-the-land-owner").arguments(pluginPrefix))
             return
         }
 
         if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || hasPermission(player, Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
                 pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
-                player.sendMessage(miniMessage { "<lang:command.set-role.access:'${pluginPrefix}':'${targetName}':'${landRole.display}'>" })
+                player.sendMessage(Component.translatable("command.set-role.access").arguments(
+                    pluginPrefix,
+                    Component.text(targetName),
+                    MiniMessage.miniMessage().deserialize(landRole.display)))
             } else {
 
                 val member = land.getLandMember(targetPlayerId)
                 if(member == null) {
-                    player.sendMessage(miniMessage { "<lang:command.remove.not-found:'${pluginPrefix}':'${targetName}'>" })
+                    player.sendMessage(Component.translatable("command.remove.not-found").arguments(
+                        pluginPrefix,
+                        Component.text(targetName)))
                     return
                 }
 
                 pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
-                player.sendMessage(miniMessage { "<lang:command.remove.success:'${pluginPrefix}':'${targetName}'>" })
+                player.sendMessage(Component.translatable("command.remove.success").arguments(
+                    pluginPrefix,
+                    Component.text(targetName)))
             }
         }
     }

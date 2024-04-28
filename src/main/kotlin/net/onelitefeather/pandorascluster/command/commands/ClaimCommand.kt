@@ -2,9 +2,9 @@ package net.onelitefeather.pandorascluster.command.commands
 
 import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
+import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.extensions.miniMessage
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
 import net.onelitefeather.pandorascluster.util.hasSameOwner
@@ -21,18 +21,20 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityU
 
         val landPlayer = pandorasClusterApi.getLandPlayer(player.uniqueId)
         if (landPlayer == null) {
-            player.sendMessage(miniMessage { "<lang:player-data-not-found:'${pluginPrefix}':'${player.name}'>" })
+            player.sendMessage(Component.translatable("player-data-not-found").
+            arguments(pluginPrefix, Component.text(player.name)))
+
             return
         }
 
         val playerChunk = player.chunk
         if (pandorasClusterApi.getLandService().checkWorldGuardRegion(playerChunk)) {
-            player.sendMessage(miniMessage { "<lang:worldguard-region-found:'${pluginPrefix}'>" })
+            player.sendMessage(Component.translatable("worldguard-region-found").arguments(pluginPrefix))
             return
         }
 
         if (pandorasClusterApi.isChunkClaimed(playerChunk)) {
-            player.sendMessage(miniMessage { "<lang:chunk-already-claimed:'${pluginPrefix}'>" })
+            player.sendMessage(Component.translatable("chunk-already-claimed").arguments(pluginPrefix))
             return
         }
 
@@ -55,13 +57,13 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityU
                 if (claimedChunk != null) {
                     val claimedLand = pandorasClusterApi.getLand(claimedChunk)
                     if (claimedLand != null && !hasSameOwner(it, claimedLand)) {
-                        player.sendMessage(miniMessage { "<lang:another-land-too-close:'${pluginPrefix}'>" })
+                        player.sendMessage(Component.translatable("another-land-too-close").arguments(pluginPrefix))
                         return@findConnectedChunk
                     }
                 }
 
                 if (!it.isOwner(player.uniqueId)) {
-                    player.sendMessage(miniMessage { "<lang:invalid-land-owner:'${pluginPrefix}'>" })
+                    player.sendMessage(Component.translatable("invalid-land-owner").arguments(pluginPrefix))
                     return@findConnectedChunk
                 }
 
@@ -71,18 +73,18 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityU
                 val newChunkCount = (pandorasClusterApi.getLandService().getChunksByLand(it) + 1)
 
                 if(claimLimit != IGNORE_CLAIM_LIMIT && newChunkCount > claimLimit) {
-                    player.sendMessage(miniMessage { "<lang:chunk.claim-limit-reached:'${pluginPrefix}'>" })
+                    player.sendMessage(Component.translatable("chunk.claim-limit-reached").arguments(pluginPrefix))
                     return@findConnectedChunk
                 }
 
                 this.pandorasClusterApi.getDatabaseStorageService().addChunkPlaceholder(playerChunk, it)
-                player.sendMessage(miniMessage { "<lang:chunk-successfully-merged:'${pluginPrefix}'>" })
+                player.sendMessage(Component.translatable("chunk-successfully-merged").arguments(pluginPrefix))
             } else {
                 if (pandorasClusterApi.hasPlayerLand(player)) {
-                    player.sendMessage(miniMessage { "<lang:player-already-has-land:'${pluginPrefix}'>" })
+                    player.sendMessage(Component.translatable("player-already-has-land").arguments(pluginPrefix))
                 } else {
                     pandorasClusterApi.getDatabaseStorageService().createLand(landPlayer, player, playerChunk)
-                    player.sendMessage(miniMessage { "<lang:chunk-successfully-claimed:'${pluginPrefix}'>" })
+                    player.sendMessage(Component.translatable("chunk-successfully-claimed").arguments(pluginPrefix))
                 }
             }
         }
