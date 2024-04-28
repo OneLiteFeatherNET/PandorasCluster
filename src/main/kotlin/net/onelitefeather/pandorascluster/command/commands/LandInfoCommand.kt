@@ -4,6 +4,7 @@ import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.extensions.miniMessage
@@ -45,9 +46,8 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
                     "${land.homePosition.getBlockZ()}'>"
         })
 
-        player.sendMessage(
-            miniMessage { "<lang:command.info.flags:'${pandorasClusterApi.pluginPrefix()}':'${buildFlags(land)}'>" }
-        )
+        player.sendMessage(Component.translatable("command.info.flags").arguments(
+            MiniMessage.miniMessage().deserialize(pandorasClusterApi.pluginPrefix()), buildFlags(land)))
 
         val chunkCount = pandorasClusterApi.getLandService().getChunksByLand(land)
         player.sendMessage(miniMessage { "<lang:command.info.total-chunk-count:'$pluginPrefix':'$chunkCount'>" })
@@ -67,15 +67,13 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
         return if (out.isNotEmpty()) out.removeSuffix(separator).toString() else "<lang:command.info.members.nobody>"
     }
 
-    private fun buildFlags(land: Land): String {
-        val stringBuilder = StringBuilder()
+    private fun buildFlags(land: Land): Component {
 
-        for (landFlag in land.flags) {
+        val flags = land.flags.map {
+            val value = it.value ?: "Unknown Value"
+            val flagName = it.name ?: "Unknown Flag"
 
-            val value = landFlag.value ?: "Unknown Value"
-            val flagName = landFlag.name ?: "Unknown Flag"
-
-            val booleanFlag = landFlag.type?.toInt() == 2
+            val booleanFlag = it.type?.toInt() == 2
 
             val symbolColor = if (booleanFlag) {
                 val booleanValue = value.toBoolean()
@@ -89,12 +87,9 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             }
 
             val suggestionValue = if (booleanFlag) !value.toBoolean() else value
+            MiniMessage.miniMessage().deserialize("<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">")
+        }.toList()
 
-            stringBuilder.append(
-                "<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">"
-            )
-        }
-
-        return if (stringBuilder.isNotEmpty()) stringBuilder.toString() else "<lang:command.info.flags.none>"
+        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")
     }
 }
