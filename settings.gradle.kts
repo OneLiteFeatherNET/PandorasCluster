@@ -8,6 +8,12 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    if (System.getenv("CI") != null) {
+        repositoriesMode = RepositoriesMode.PREFER_SETTINGS
+        repositories {
+            maven("https://repo.htl-md.schule/repository/Gitlab-Runner/")
+        }
+    }
     versionCatalogs {
         create("libs") {
 
