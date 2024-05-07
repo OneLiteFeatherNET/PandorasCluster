@@ -1,4 +1,4 @@
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
-  - component: gitlab.themeinerlp.dev/onelitefeather/ci-components/paper-plugin@0.0.2
+  - component: gitlab.themeinerlp.dev/onelitefeather/ci-components/paper-plugin@0.0.3
