@@ -1,6 +1,6 @@
 zombie-velocity-multiplier: 0.4
 
-trusted-particle: REDSTONE
+trusted-particle: DUST
 untrusted-particle: FLAME
 particle-data:
   trusted-speed: 1
@@ -22,7 +22,14 @@ particle-data:
     size: 2.5
     material: AIR
 
-
+staff.notification:
+  discord:
+    enabled: true
+    token: '4oc5GNpdBPG8x0-7zOmeR36mFKbw4hnc66l70Slvw-g5oKrvDyxGZx5sbWLAnIsL5KkC'
+    tokenId: '1239860357418319902'
+    discord-message: "The Land from **%s** has reached the limit for **%s** spawning."
+  #In minutes
+  cooldown: 1
 tasks:
   show-border-multiplier: 1
 database:
