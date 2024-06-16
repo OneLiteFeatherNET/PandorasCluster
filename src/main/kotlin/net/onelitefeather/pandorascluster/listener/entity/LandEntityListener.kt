@@ -237,25 +237,32 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
         val land = pandorasClusterApi.getLand(entity.chunk) ?: return
         var entityCount = 0
         var limit = 0
+        var category: EntityCategory? = null
 
         if (entity is Animals) {
-            entityCount = getEntityCount(land, EntityCategory.ANIMALS)
-            limit = getEntityLimit(land, EntityCategory.ANIMALS)
+            category = EntityCategory.ANIMALS
+            entityCount = getEntityCount(land, category)
+            limit = getEntityLimit(land, category)
         }
 
         if (entity is Monster) {
-            entityCount = getEntityCount(land, EntityCategory.MONSTER)
-            limit = getEntityLimit(land, EntityCategory.MONSTER)
+            category = EntityCategory.MONSTER
+            entityCount = getEntityCount(land, category)
+            limit = getEntityLimit(land, category)
         }
 
         if (entity is AbstractVillager) {
-            entityCount = getEntityCount(land, EntityCategory.VILLAGER)
-            limit = getEntityLimit(land, EntityCategory.VILLAGER)
+            category = EntityCategory.VILLAGER
+            entityCount = getEntityCount(land, category)
+            limit = getEntityLimit(land, category)
         }
 
-        if (entityCount > 0 && limit > 0) {
+        if (entityCount >= limit) {
             // Add 1 to the current entity count and check if the entity can spawn
             event.isCancelled = (entityCount + 1) > limit
+            if (category != null) {
+                pandorasClusterApi.getStaffNotificaton().notifyEntitySpawnLimit(land, category)
+            }
         }
     }
 
