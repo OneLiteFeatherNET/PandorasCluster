@@ -57,20 +57,20 @@ publishData {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = "21"
         }
     }
 
     runServer {
-        minecraftVersion("1.20.4")
-        jvmArgs("-Xmx4G")
+        minecraftVersion("1.20.6")
+        jvmArgs("-Xmx4G", "-Dcom.mojang.eula.agree=true")
     }
 }
 
