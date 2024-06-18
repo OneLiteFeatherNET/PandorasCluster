@@ -23,6 +23,7 @@ class MinecraftStaffNotification(private val pandorasClusterApi: PandorasCluster
             val ownerName = Component.text(landOwner.name!!)
             val entityCategoryName = Component.text(entityCategory.name.lowercase().replaceFirstChar { it.uppercase() })
             val hoverMessage = Component.translatable("staff.notification.mob.limit.reached.hover").arguments(
+                pandorasClusterApi.pluginPrefix(),
                 Component.text(land.id!!),
                 getHighlightColor(land, EntityCategory.ANIMALS),
                 getHighlightColor(land, EntityCategory.VILLAGER),
