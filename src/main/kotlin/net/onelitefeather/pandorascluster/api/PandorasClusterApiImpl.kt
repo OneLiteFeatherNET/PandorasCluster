@@ -43,20 +43,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
                 databaseStorageService = DatabaseStorageService(this)
                 landService = LandService(this)
                 landPlayerService = LandPlayerService(this)
-
-                val useDiscordStaffNotification = plugin.config.getBoolean("staff.notification.discord.enabled")
-
-                staffNotification = if (useDiscordStaffNotification) {
-
-                    val webhook = DiscordWebhook(
-                        plugin.config.getString("staff.notification.discord.token")!!,
-                        plugin.config.getString("staff.notification.discord.tokenId")!!
-                    )
-
-                    DiscordStaffNotification(this, webhook)
-                } else {
-                    MinecraftStaffNotification(this)
-                }
+                staffNotification = buildStaffNotification()
             }
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
@@ -144,4 +131,17 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getStaffNotificaton() = staffNotification
+
+    private fun buildStaffNotification(): StaffNotification {
+
+        val useDiscordStaffNotification = plugin.config.getBoolean("staff.notification.discord.enabled")
+        val token = plugin.config.getString("staff.notification.discord.token", "")!!
+        val tokenId = plugin.config.getString("staff.notification.discord.tokenId", "")!!
+
+        return if (useDiscordStaffNotification && token.isNotEmpty() && tokenId.isNotEmpty()) {
+            DiscordStaffNotification(this, DiscordWebhook(token, tokenId))
+        } else {
+            MinecraftStaffNotification(this)
+        }
+    }
 }
