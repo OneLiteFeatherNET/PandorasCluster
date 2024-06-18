@@ -28,6 +28,8 @@ class DiscordWebhook(val token: String, val tokenId: String) {
 
     @Throws(IOException::class)
     fun execute() {
+
+        require(this.token.isEmpty() || this.tokenId.isEmpty()) { "The token or tokenId cannot be empty" }
         require(!(this.content == null && embeds.isEmpty())) { "Set content or add at least one EmbedObject" }
 
         val jsonObject = JsonObject()
@@ -68,7 +70,6 @@ class DiscordWebhook(val token: String, val tokenId: String) {
             }
 
             jsonObject.add("embeds", embedObjects)
-
 
             val urlConnection = URI(discordWebhookUrl.format(tokenId, token)).toURL()
             val connection = urlConnection.openConnection() as HttpsURLConnection
