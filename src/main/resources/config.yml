@@ -25,8 +25,8 @@ particle-data:
 staff.notification:
   discord:
     enabled: true
-    token: '4oc5GNpdBPG8x0-7zOmeR36mFKbw4hnc66l70Slvw-g5oKrvDyxGZx5sbWLAnIsL5KkC'
-    tokenId: '1239860357418319902'
+    token: ''
+    tokenId: ''
     discord-message: "The Land from **%s** has reached the limit for **%s** spawning."
   #In minutes
   cooldown: 1
