@@ -22,12 +22,14 @@ particle-data:
     size: 2.5
     material: AIR
 
-staff.notification:
-  discord:
-    enabled: true
-    token: ''
-    tokenId: ''
-    discord-message: "The Land from **%s** has reached the limit for **%s** spawning."
+staff:
+  notification:
+    discord:
+      message: "The Land from **%s** has reached the limit for **%s** spawning."
+      enabled: true
+      token: ''
+      tokenId: ''
+
   #In minutes
   cooldown: 1
 tasks:
