@@ -261,7 +261,7 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
             // Add 1 to the current entity count and check if the entity can spawn
             event.isCancelled = (entityCount + 1) > limit
             if (category != null) {
-                pandorasClusterApi.getStaffNotificaton().notifyEntitySpawnLimit(land, category)
+                pandorasClusterApi.getStaffNotificaton().notify(land, category)
             }
         }
     }
