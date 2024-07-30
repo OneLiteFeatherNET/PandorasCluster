@@ -5,14 +5,7 @@ import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.notification.DiscordStaffNotification
-import net.onelitefeather.pandorascluster.notification.MinecraftStaffNotification
-import net.onelitefeather.pandorascluster.notification.StaffNotification
-import net.onelitefeather.pandorascluster.service.DatabaseService
-import net.onelitefeather.pandorascluster.service.DatabaseStorageService
-import net.onelitefeather.pandorascluster.service.LandPlayerService
-import net.onelitefeather.pandorascluster.service.LandService
-import net.onelitefeather.pandorascluster.util.discord.DiscordWebhook
+import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
@@ -25,7 +18,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private lateinit var landService: LandService
     private lateinit var databaseStorageService: DatabaseStorageService
     private lateinit var landPlayerService: LandPlayerService
-    private lateinit var staffNotification: StaffNotification
+    private lateinit var staffNotification: StaffNotificationService
     private var messages: ResourceBundle
 
     init {
@@ -43,7 +36,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
                 databaseStorageService = DatabaseStorageService(this)
                 landService = LandService(this)
                 landPlayerService = LandPlayerService(this)
-                staffNotification = buildStaffNotification()
+                staffNotification = StaffNotificationService(this)
             }
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
@@ -131,17 +124,4 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     }
 
     override fun getStaffNotificaton() = staffNotification
-
-    private fun buildStaffNotification(): StaffNotification {
-
-        val useDiscordStaffNotification = plugin.config.getBoolean("staff.notification.discord.enabled")
-        val token = plugin.config.getString("staff.notification.discord.token", "")!!
-        val tokenId = plugin.config.getString("staff.notification.discord.tokenId", "")!!
-
-        return if (useDiscordStaffNotification && token.isNotEmpty() && tokenId.isNotEmpty()) {
-            DiscordStaffNotification(this, DiscordWebhook(token, tokenId))
-        } else {
-            MinecraftStaffNotification(this)
-        }
-    }
 }
