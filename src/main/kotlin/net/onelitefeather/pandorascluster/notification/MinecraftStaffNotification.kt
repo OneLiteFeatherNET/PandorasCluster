@@ -41,10 +41,9 @@ class MinecraftStaffNotification(private val pandorasClusterApi: PandorasCluster
 
         val count = getEntityCount(land, entityCategory)
         val limit = getEntityLimit(land, entityCategory)
-        return MiniMessage.miniMessage().deserialize(
-            if (count >= limit) "<red><count></red>" else "<green><count></green>",
-            Placeholder.unparsed("count", count.toString())
-        )
+
+        val messageKey = if(count >= limit) "staff.notification.mob.count.red" else "staff.notification.mob.count.green"
+        return Component.translatable(messageKey)
     }
 
     private fun getPermission() = "pandorascluster.staff.notify"
