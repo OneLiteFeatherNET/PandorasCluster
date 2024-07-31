@@ -18,7 +18,7 @@ import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
 import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
 import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
 import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
-import net.onelitefeather.pandorascluster.util.LynxWrapper
+import net.onelitefeather.pandorascluster.translation.PluginTranslationRegistry
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
@@ -54,7 +54,7 @@ class PandorasClusterPlugin : JavaPlugin() {
             registry.registerAll(locale, bundle, false)
         }
         registry.defaultLocale(supportedLocals.first())
-        GlobalTranslator.translator().addSource(LynxWrapper(registry))
+        GlobalTranslator.translator().addSource(PluginTranslationRegistry(registry))
     }
 
     private fun registerCommands() {

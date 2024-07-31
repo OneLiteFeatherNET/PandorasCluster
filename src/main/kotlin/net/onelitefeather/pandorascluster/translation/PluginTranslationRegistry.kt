@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.util
+package net.onelitefeather.pandorascluster.translation
 
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -10,11 +10,7 @@ import net.kyori.adventure.translation.Translator
 import java.text.MessageFormat
 import java.util.*
 
-/**
- * Just a simple wrapper that allows us to use '<lang:key:value> recursive and more useful'
- * Thanks to @author Lynx from Paper
- */
-class LynxWrapper(private val translator: TranslationRegistry) : Translator {
+class PluginTranslationRegistry(private val translator: TranslationRegistry) : Translator {
     override fun name(): Key {
         return this.translator.name();
     }
