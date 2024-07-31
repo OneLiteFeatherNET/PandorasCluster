@@ -4,14 +4,14 @@ import cloud.commandframework.annotations.CommandDescription
 import cloud.commandframework.annotations.CommandMethod
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.util.AVAILABLE_CHUNK_ROTATIONS
 import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
-import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 
-class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
+class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils, ChunkUtils {
 
     @CommandMethod("land claim")
     @CommandDescription("Claim a free chunk")
@@ -21,9 +21,8 @@ class ClaimCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityU
 
         val landPlayer = pandorasClusterApi.getLandPlayer(player.uniqueId)
         if (landPlayer == null) {
-            player.sendMessage(Component.translatable("player-data-not-found").
-            arguments(pluginPrefix, Component.text(player.name)))
-
+            player.sendMessage(Component.translatable("player-data-not-found").arguments(
+                pluginPrefix, Component.text(player.name)))
             return
         }
 
