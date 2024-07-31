@@ -11,7 +11,8 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 
-class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterApi, private val landService: LandService) : Listener, EntityUtils {
+class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterApi,
+                                private val landService: LandService) : Listener, EntityUtils {
 
     @EventHandler
     fun handleHangingBreak(event: HangingBreakEvent) {

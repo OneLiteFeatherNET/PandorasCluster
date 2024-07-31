@@ -9,6 +9,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.LandRole
 import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.player.LandMember
 import org.bukkit.entity.Player
 
 class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
@@ -52,11 +53,14 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     }
 
     private fun buildDeniedMembers(land: Land): Component {
-        val members = land.landMembers.filter { it.role == LandRole.BANNED }.filterNot { it.member?.name == null}.map {
-            Component.translatable("command.info.members.entry").arguments(
-                MiniMessage.miniMessage().deserialize(it.role.display),
-                Component.text(it.member?.name ?: "null"))
-        }.toList()
+
+       val members = land.landMembers
+            .filter(this::filterDeniedMembers)
+            .filterNot(this::filterPlayerNameNotNull).map {
+                Component.translatable("command.info.members.entry").arguments(
+                    MiniMessage.miniMessage().deserialize(it.role.display),
+                    Component.text(it.member?.name!!))
+            }.toList()
 
         return if (members.isNotEmpty())
             Component.join(JoinConfiguration.separator(Component.text(", ")), members) else
@@ -64,18 +68,17 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     }
 
     private fun buildMembers(land: Land): Component {
-        val members = land.landMembers.filterNot { it.role == LandRole.BANNED }.filterNot { it.member?.name == null}.map {
-            Component.translatable("command.info.members.entry").arguments(
-                MiniMessage.miniMessage().deserialize(it.role.display),
-                Component.text(it.member?.name ?: "null"))
-        }.toList()
+        val members =
+            land.landMembers.filterNot(this::filterDeniedMembers).filterNot(this::filterPlayerNameNotNull).map {
+                Component.translatable("command.info.members.entry").arguments(
+                    MiniMessage.miniMessage().deserialize(it.role.display),
+                    Component.text(it.member?.name!!))
+            }.toList()
 
         return if (members.isNotEmpty())
             Component.join(JoinConfiguration.separator(Component.text(", ")), members) else
             Component.translatable("command.info.members.nobody")
     }
-
-    private fun filterDeniedMembers(landRole: LandRole): Boolean = landRole == LandRole.BANNED
 
     private fun buildFlags(land: Land): Component {
 
@@ -102,4 +105,8 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
         return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")
     }
+
+    private fun filterDeniedMembers(landMember: LandMember): Boolean = landMember.role == LandRole.BANNED
+
+    private fun filterPlayerNameNotNull(landMember: LandMember) = landMember.member?.name == null
 }

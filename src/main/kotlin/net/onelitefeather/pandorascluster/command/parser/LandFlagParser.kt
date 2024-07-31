@@ -8,6 +8,7 @@ import net.onelitefeather.pandorascluster.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.land.flag.findByName
 import net.onelitefeather.pandorascluster.land.flag.getDefaultFlagNames
 import net.onelitefeather.pandorascluster.util.MATERIALS
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.util.StringUtil
 import java.util.*
@@ -25,28 +26,27 @@ class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
     fun flagSuggestions(commandContext: CommandContext<Player>, input: String): List<String> {
         val landFlag = commandContext.get<LandFlag>("flag")
 
-        when(landFlag.type.toInt()) {
+        when (landFlag.type.toInt()) {
             0 -> {
                 if (commandContext.get<LandFlag>("flag") == LandFlag.USE) {
-                    return MATERIALS.filter { StringUtil.startsWithIgnoreCase(it.name, input.lowercase()) }.filter { it.isInteractable }.map { it.name }
+                    return MATERIALS.filter(Material::isInteractable)
+                        .map(Material::toString)
+                        .filter { StringUtil.startsWithIgnoreCase(it, input.lowercase()) }
                 }
             }
 
-            2 -> {
-                return listOf("true", "false")
-            }
-
-            else -> {
-                return emptyList()
-            }
+            2 -> return listOf("true", "false")
+            else -> return emptyList()
         }
 
         return emptyList()
     }
 
-
     @Suggestions("landFlags")
-    fun landFlags(@Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>, @Suppress("UNUSED_PARAMETER") input: String): List<String> {
+    fun landFlags(
+        @Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>,
+        @Suppress("UNUSED_PARAMETER") input: String
+    ): List<String> {
         return getDefaultFlagNames()
     }
 }
