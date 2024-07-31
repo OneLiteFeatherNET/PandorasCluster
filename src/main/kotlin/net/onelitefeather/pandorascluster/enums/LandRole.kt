@@ -11,6 +11,6 @@ enum class LandRole(val roleName: String, val display: String, val access: Boole
     fun isGrantAble() = this != OWNER
 }
 
-val LAND_ROLES = LandRole.values()
+val LAND_ROLES = LandRole.entries.toTypedArray()
 fun getLandRole(name: String): LandRole? =
     LAND_ROLES.firstOrNull { landRole ->  landRole.name == name.uppercase() }
