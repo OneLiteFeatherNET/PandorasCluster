@@ -47,8 +47,11 @@ enum class LandFlag(val flagName: String,
 
 }
 
-val LAND_FLAGS = LandFlag.values()
-fun findByName(name: String): LandFlag? =
-    LAND_FLAGS.firstOrNull { landFlag -> landFlag.name == name.uppercase() || landFlag.flagName.equals(name, true)  }
+val LAND_FLAGS = LandFlag.entries.toTypedArray()
 
+fun findByName(name: String): LandFlag? = LAND_FLAGS.firstOrNull { filterFlagName(it, name) }
 fun getDefaultFlagNames(): List<String> = LAND_FLAGS.map { it.name }
+
+fun filterFlagName(landFlag: LandFlag, flagName: String) =
+            landFlag.name == flagName.uppercase() ||
+            landFlag.flagName.equals(flagName, true)
