@@ -25,20 +25,6 @@ data class LandPlayer(
 
     fun getUniqueId(): UUID? = if (uuid == null) null else UUID.fromString(uuid)
 
-    fun getDisplayName(): Component {
-        val id = getUniqueId()
-        id ?: return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
-        val player =
-            Bukkit.getPlayer(id) ?: return LegacyComponentSerializer.legacyAmpersand().deserialize(name ?: "Steve")
-        return player.displayName()
-    }
-
-    fun getLocation(): Location? {
-        val id = getUniqueId()
-        id ?: return null
-        return Bukkit.getPlayer(id)?.location
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
