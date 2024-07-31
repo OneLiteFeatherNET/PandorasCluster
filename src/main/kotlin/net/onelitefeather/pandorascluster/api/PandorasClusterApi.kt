@@ -4,10 +4,7 @@ import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.service.DatabaseService
-import net.onelitefeather.pandorascluster.service.DatabaseStorageService
-import net.onelitefeather.pandorascluster.service.LandPlayerService
-import net.onelitefeather.pandorascluster.service.LandService
+import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
@@ -61,4 +58,6 @@ interface PandorasClusterApi {
     fun getLand(landOwner: LandPlayer): Land?
 
     fun registerPlayer(uuid: UUID, name: String): Boolean
+
+    fun getStaffNotificaton(): StaffNotificationService
 }

@@ -5,10 +5,7 @@ import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.service.DatabaseService
-import net.onelitefeather.pandorascluster.service.DatabaseStorageService
-import net.onelitefeather.pandorascluster.service.LandPlayerService
-import net.onelitefeather.pandorascluster.service.LandService
+import net.onelitefeather.pandorascluster.service.*
 import org.bukkit.Chunk
 import org.bukkit.entity.Player
 import org.hibernate.SessionFactory
@@ -21,6 +18,7 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private lateinit var landService: LandService
     private lateinit var databaseStorageService: DatabaseStorageService
     private lateinit var landPlayerService: LandPlayerService
+    private lateinit var staffNotification: StaffNotificationService
     private var messages: ResourceBundle
 
     init {
@@ -34,10 +32,11 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
 
         if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
             databaseService = DatabaseService(plugin, jdbcUrl, username, password, databaseDriver)
-            if(databaseService.isRunning()) {
+            if (databaseService.isRunning()) {
                 databaseStorageService = DatabaseStorageService(this)
                 landService = LandService(this)
                 landPlayerService = LandPlayerService(this)
+                staffNotification = StaffNotificationService(this)
             }
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
@@ -123,4 +122,6 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     override fun registerPlayer(uuid: UUID, name: String): Boolean {
         return landPlayerService.createPlayer(uuid, name)
     }
+
+    override fun getStaffNotificaton() = staffNotification
 }
