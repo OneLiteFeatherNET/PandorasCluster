@@ -1,8 +1,10 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.hasSameOwner
+import org.bukkit.Chunk
+import org.bukkit.block.BlockState
 import org.bukkit.event.*
 import org.bukkit.event.block.BlockFertilizeEvent
 import org.bukkit.event.block.LeavesDecayEvent
@@ -10,7 +12,7 @@ import org.bukkit.event.raid.RaidTriggerEvent
 import org.bukkit.event.world.StructureGrowEvent
 
 class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
-    Listener {
+    Listener, ChunkUtils {
 
     @EventHandler
     fun handleRaidStart(event: RaidTriggerEvent) {
@@ -52,21 +54,29 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
         }
 
         if (blocks.isEmpty()) return
-        val blocksByChunks = blocks.groupBy { it.chunk }
+
+        val blocksByChunks = blocks.groupBy(BlockState::getChunk)
         val firstChunk = blocks.first().chunk
         val origin = pandorasClusterApi.getLand(firstChunk)
+
         if (origin == null && event is Cancellable) {
             event.isCancelled = true
             return
         }
 
-        val result = blocksByChunks.filter { entry ->
-            val plot = pandorasClusterApi.getLand(entry.key)
-            plot == null || !hasSameOwner(plot, origin!!)
-        }.values.reduceOrNull { acc, blockStates -> acc + blockStates }
-        result?.forEach {
-            if(event is BlockFertilizeEvent) event.blocks.remove(it)
-            if(event is StructureGrowEvent) event.blocks.remove(it)
+        blocksByChunks.filter(this::filterHasSameOwner).values.reduceOrNull(this::combineBlockStates)?.forEach {
+            if (event is BlockFertilizeEvent) event.blocks.remove(it)
+            if (event is StructureGrowEvent) event.blocks.remove(it)
         }
+    }
+
+    private fun combineBlockStates(origin: List<BlockState>, add: List<BlockState>): List<BlockState> {
+        return origin.plus(add)
+    }
+
+    private fun filterHasSameOwner(map: Map.Entry<Chunk, List<BlockState>>): Boolean {
+        val plot = pandorasClusterApi.getLand(map.key)
+        return map.value.map { pandorasClusterApi.getLand(it.chunk) }
+            .firstOrNull { plot == null || !hasSameOwner(plot, it!!) } != null
     }
 }
