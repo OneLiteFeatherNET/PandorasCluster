@@ -3,10 +3,10 @@ package net.onelitefeather.pandorascluster.util.discord
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.onelitefeather.pandorascluster.util.discord.embed.EmbedObject
+import net.onelitefeather.pandorascluster.util.propertyDiscordWebhookUrl
 import java.awt.Color
 import java.io.IOException
 import java.net.URI
-import java.net.URL
 import java.nio.charset.Charset
 import javax.net.ssl.HttpsURLConnection
 
@@ -17,7 +17,7 @@ class DiscordWebhook(val token: String, val tokenId: String) {
     var isTts: Boolean = false
 
     private var embeds: MutableList<EmbedObject> = ArrayList()
-    private val discordWebhookUrl = "https://discord.com/api/webhooks/%s/%s"
+
     fun getEmbeds(): List<EmbedObject> {
         return embeds
     }
@@ -71,7 +71,7 @@ class DiscordWebhook(val token: String, val tokenId: String) {
 
             jsonObject.add("embeds", embedObjects)
 
-            val urlConnection = URI(discordWebhookUrl.format(tokenId, token)).toURL()
+            val urlConnection = URI(propertyDiscordWebhookUrl.format(tokenId, token)).toURL()
             val connection = urlConnection.openConnection() as HttpsURLConnection
             connection.addRequestProperty("Content-Type", "application/json")
             connection.addRequestProperty("User-Agent", "JavaDiscordWebhook")

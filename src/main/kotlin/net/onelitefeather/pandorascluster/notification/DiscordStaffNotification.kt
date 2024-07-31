@@ -6,12 +6,11 @@ import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.util.discord.DiscordWebhook
 import net.onelitefeather.pandorascluster.util.discord.embed.EmbedObject
 import net.onelitefeather.pandorascluster.util.getEntityCount
+import net.onelitefeather.pandorascluster.util.propertyDiscordAvatarUrl
 import java.awt.Color
 
 class DiscordStaffNotification(private val pandorasClusterApi: PandorasClusterApi,
     private val discordWebhook: DiscordWebhook) : StaffNotification(pandorasClusterApi) {
-
-    private val avatarUrl = "https://mc-heads.net/avatar/%s/100"
 
     override fun notifyEntitySpawnLimit(land: Land, entityCategory: EntityCategory) {
 
@@ -31,7 +30,7 @@ class DiscordStaffNotification(private val pandorasClusterApi: PandorasClusterAp
         discordWebhook.addEmbed(EmbedObject()
             .setTitle(embedTitle)
             .setColor(Color.RED)
-            .setAuthor(landOwnerName, null, avatarUrl.format(landOwner.getUniqueId()))
+            .setAuthor(landOwnerName, null, propertyDiscordAvatarUrl.format(landOwner.getUniqueId()))
             .addField(animalsField)
             .addField(villagerField)
             .addField(monsterField))

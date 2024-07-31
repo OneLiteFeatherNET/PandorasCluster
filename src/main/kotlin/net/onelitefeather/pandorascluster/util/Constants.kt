@@ -15,6 +15,10 @@ const val PLUGIN_NAME = "PandorasCluster"
 const val CHUNK_LENGTH = 16
 
 const val IGNORE_CLAIM_LIMIT: Int = -2
+
+val propertyDiscordAvatarUrl: String = System.getProperty("discordAvatarUrl", "https://mc-heads.net/avatar/%s/100")
+val propertyDiscordWebhookUrl: String = System.getProperty("discordWebhookUrl", "https://discord.com/api/webhooks/%s/%s")
+
 val SERVER_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
 
