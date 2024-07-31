@@ -2,15 +2,15 @@ package net.onelitefeather.pandorascluster.notification
 
 import net.onelitefeather.pandorascluster.api.EntityCategory
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.util.discord.DiscordWebhook
 import net.onelitefeather.pandorascluster.util.discord.embed.EmbedObject
-import net.onelitefeather.pandorascluster.util.getEntityCount
 import net.onelitefeather.pandorascluster.util.propertyDiscordAvatarUrl
 import java.awt.Color
 
 class DiscordStaffNotification(private val pandorasClusterApi: PandorasClusterApi,
-    private val discordWebhook: DiscordWebhook) : StaffNotification(pandorasClusterApi) {
+    private val discordWebhook: DiscordWebhook) : StaffNotification(pandorasClusterApi), ChunkUtils {
 
     override fun notifyEntitySpawnLimit(land: Land, entityCategory: EntityCategory) {
 

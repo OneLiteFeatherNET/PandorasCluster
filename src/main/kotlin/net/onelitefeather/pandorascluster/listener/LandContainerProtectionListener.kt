@@ -1,14 +1,14 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.util.hasSameOwner
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import org.bukkit.block.BlockState
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.inventory.DoubleChestInventory
 
-class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi) : Listener {
+class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi) : Listener, ChunkUtils {
 
     @EventHandler
     fun handleInventoryMoveItem(event: InventoryMoveItemEvent) {
