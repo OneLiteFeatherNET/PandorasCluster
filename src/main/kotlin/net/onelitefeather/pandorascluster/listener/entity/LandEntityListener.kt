@@ -3,12 +3,10 @@ package net.onelitefeather.pandorascluster.listener.entity
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent
 import net.onelitefeather.pandorascluster.api.EntityCategory
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.getEntityCount
-import net.onelitefeather.pandorascluster.util.getEntityLimit
-import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.CaveVinesPlant
@@ -22,7 +20,7 @@ import org.bukkit.event.block.EntityBlockFormEvent
 import org.bukkit.event.entity.*
 import org.bukkit.permissions.Permissible
 
-class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
+class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils, ChunkUtils {
 
     @EventHandler
     fun handleProjectileHit(event: ProjectileHitEvent) {
@@ -87,8 +85,9 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
 
     @EventHandler
     fun handleEntityExplode(event: EntityExplodeEvent) {
-        if(event.entity is TNTPrimed) {
-            event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands).forEach { event.blockList().removeAll(it.value) }
+        if (event.entity is TNTPrimed) {
+            event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands)
+                .forEach { event.blockList().removeAll(it.value) }
         }
     }
 
@@ -114,8 +113,12 @@ class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : L
 
         if (blockData is TurtleEgg && land.getLandFlag(LandFlag.TURTLE_EGG_DESTROY).getValue<Boolean>() == false) {
             event.isCancelled = true
+
+            val targetVelocity = event.entity.location.direction
+            val velocityMultiplier = pandorasClusterApi.getPlugin().config.getDouble("zombie-velocity-multiplier")
+
             event.entity.velocity =
-                event.entity.velocity.subtract(event.entity.location.direction).normalize().multiply(pandorasClusterApi.getPlugin().config.getDouble("zombie-velocity-multiplier"))
+                event.entity.velocity.subtract(targetVelocity).normalize().multiply(velocityMultiplier)
             return
         }
 
