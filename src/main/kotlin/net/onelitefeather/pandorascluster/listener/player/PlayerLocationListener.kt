@@ -2,7 +2,7 @@ package net.onelitefeather.pandorascluster.listener.player
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.util.canEnterLand
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.event.EventHandler
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.spigotmc.event.player.PlayerSpawnLocationEvent
 
-class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Listener {
+class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Listener, ChunkUtils {
 
     val world: World = Bukkit.getWorlds()[0]
     private val allowedReasons = listOf(

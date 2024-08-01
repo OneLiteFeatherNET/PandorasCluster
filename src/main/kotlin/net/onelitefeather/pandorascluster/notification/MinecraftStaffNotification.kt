@@ -1,15 +1,13 @@
 package net.onelitefeather.pandorascluster.notification
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.onelitefeather.pandorascluster.api.EntityCategory
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.util.getEntityCount
-import net.onelitefeather.pandorascluster.util.getEntityLimit
 
-class MinecraftStaffNotification(private val pandorasClusterApi: PandorasClusterApi) : StaffNotification(pandorasClusterApi) {
+class MinecraftStaffNotification(private val pandorasClusterApi: PandorasClusterApi) :
+    StaffNotification(pandorasClusterApi), ChunkUtils {
 
     override fun notifyEntitySpawnLimit(land: Land, entityCategory: EntityCategory) {
 

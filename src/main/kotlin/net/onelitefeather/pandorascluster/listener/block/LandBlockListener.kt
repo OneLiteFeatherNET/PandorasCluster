@@ -3,10 +3,9 @@ package net.onelitefeather.pandorascluster.listener.block
 import io.papermc.paper.event.block.PlayerShearBlockEvent
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.getBlockFace
-import net.onelitefeather.pandorascluster.util.hasSameOwner
 import org.bukkit.Chunk
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -19,7 +18,7 @@ import org.bukkit.event.block.*
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 
-class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils {
+class LandBlockListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils, ChunkUtils {
 
     @EventHandler
     fun handleSpongeAbsorb(event: SpongeAbsorbEvent) {

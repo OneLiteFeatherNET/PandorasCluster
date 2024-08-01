@@ -7,6 +7,7 @@ import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldguard.WorldGuard
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.land.ChunkPlaceholder
 import net.onelitefeather.pandorascluster.land.Land
 import net.onelitefeather.pandorascluster.land.flag.LandFlag
@@ -37,7 +38,7 @@ import java.util.function.Consumer
 import java.util.logging.Level
 
 
-class LandService(private val pandorasClusterApi: PandorasClusterApi) {
+class LandService(private val pandorasClusterApi: PandorasClusterApi) : ChunkUtils {
 
     val landCache: LoadingCache<Chunk, Land> = Caffeine.newBuilder().maximumSize(10_000)
         .expireAfterAccess(Duration.ofMinutes(5))
@@ -118,8 +119,8 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 val chunkX = chunk.x
                 val chunkZ = chunk.z
 
-                val minX = chunkX * CHUNK_LENGTH
-                val minZ = chunkZ * CHUNK_LENGTH
+                val minX = chunkX * chunkLength()
+                val minZ = chunkZ * chunkLength()
 
                 val north = world.getChunkAt(chunkX, chunkZ - 1)
                 val south = world.getChunkAt(chunkX, chunkZ + 1)
@@ -127,30 +128,30 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) {
                 val east = world.getChunkAt(chunkX + 1, chunkZ)
 
                 if (!land.isMergedChunk(north)) {
-                    (minX until minX + CHUNK_LENGTH)
+                    (minX until minX + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt(it, playerLocation.blockY, minZ).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(south)) {
-                    (minX until minX + CHUNK_LENGTH)
+                    (minX until minX + chunkLength())
                         .asSequence()
-                        .map { world.getBlockAt(it, playerLocation.blockY, (minZ + CHUNK_LENGTH)).location }
+                        .map { world.getBlockAt(it, playerLocation.blockY, (minZ + chunkLength())).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(west)) {
-                    (minZ until minZ + CHUNK_LENGTH)
+                    (minZ until minZ + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt(minX, playerLocation.blockY, it).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
                 if (!land.isMergedChunk(east)) {
-                    (minZ until minZ + CHUNK_LENGTH)
+                    (minZ until minZ + chunkLength())
                         .asSequence()
-                        .map { world.getBlockAt((minX + CHUNK_LENGTH), playerLocation.blockY, it).location }
+                        .map { world.getBlockAt((minX + chunkLength()), playerLocation.blockY, it).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
             }
