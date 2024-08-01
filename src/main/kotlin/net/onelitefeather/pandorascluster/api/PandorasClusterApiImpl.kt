@@ -22,22 +22,14 @@ class PandorasClusterApiImpl(private val plugin: PandorasClusterPlugin) : Pandor
     private var messages: ResourceBundle
 
     init {
-
-        val jdbcUrl = plugin.config.getString("database.jdbcUrl")
-        val databaseDriver = plugin.config.getString("database.driver")
-        val username = plugin.config.getString("database.username")
-        val password = plugin.config.getString("database.password")
-
         messages = ResourceBundle.getBundle("pandorascluster", Locale.US, UTF8ResourceBundleControl())
 
-        if (jdbcUrl != null && databaseDriver != null && username != null && password != null) {
-            databaseService = DatabaseService(plugin, jdbcUrl, username, password, databaseDriver)
-            if (databaseService.isRunning()) {
-                databaseStorageService = DatabaseStorageService(this)
-                landService = LandService(this)
-                landPlayerService = LandPlayerService(this)
-                staffNotification = StaffNotificationService(this)
-            }
+        databaseService = DatabaseService(plugin)
+        if (databaseService.isRunning()) {
+            databaseStorageService = DatabaseStorageService(this)
+            landService = LandService(this)
+            landPlayerService = LandPlayerService(this)
+            staffNotification = StaffNotificationService(this)
         } else {
             this.plugin.server.pluginManager.disablePlugin(plugin)
         }
