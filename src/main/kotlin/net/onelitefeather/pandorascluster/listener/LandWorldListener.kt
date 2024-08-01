@@ -76,7 +76,9 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
 
     private fun filterHasSameOwner(map: Map.Entry<Chunk, List<BlockState>>): Boolean {
         val plot = pandorasClusterApi.getLand(map.key)
-        return map.value.map { pandorasClusterApi.getLand(it.chunk) }
-            .firstOrNull { plot == null || !hasSameOwner(plot, it!!) } != null
+        return map.value.firstOrNull {
+            val otherLand = pandorasClusterApi.getLand(it.chunk)
+            plot == null || !hasSameOwner(plot, otherLand!!)
+        } != null
     }
 }
