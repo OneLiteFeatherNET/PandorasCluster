@@ -20,8 +20,9 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
     @Confirmation
     fun execute(player: Player) {
 
-        if (!pandorasClusterApi.hasPlayerLand(player)) {
-            player.sendMessage(Component.translatable("no-own-land-found").arguments(pandorasClusterApi.pluginPrefix()))
+        val land = pandorasClusterApi.getLand(player.chunk) ?: return
+        if(!land.isOwner(player.uniqueId) && !player.hasPermission("pandorascluster.command.unclaim.other")) {
+            player.sendMessage(Component.translatable("not-authorized").arguments(pandorasClusterApi.pluginPrefix()))
             return
         }
 
@@ -30,7 +31,6 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
         val biome = BukkitAdapter.adapt(bukkitWorld.getBiome(player.location))
         val session = Fawe.instance().worldEdit.newEditSession(world)
 
-        val land = pandorasClusterApi.getLand(player.chunk) ?: return
         land.chunks.forEach { chunkPlaceholder ->
             val bukkitChunk = player.world.getChunkAt(chunkPlaceholder.chunkIndex)
             val posX = (bukkitChunk.x shl 4).toDouble()
@@ -50,6 +50,6 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         player.sendMessage(Component.translatable("command.unclaim.success").arguments(pandorasClusterApi.pluginPrefix()))
-        pandorasClusterApi.unclaimLand(player)
+        pandorasClusterApi.unclaimLand(land)
     }
 }
