@@ -61,4 +61,4 @@ class ParticleData(
     }
 }
 
-val DEFAULT_PARTICLE_DATA = ParticleData(Particle.REDSTONE, Particle.FLAME, 64, 1.0, 0.0, 0.0, 0.0, 0.0, null)
+val DEFAULT_PARTICLE_DATA = ParticleData(Particle.DUST, Particle.FLAME, 64, 1.0, 0.0, 0.0, 0.0, 0.0, null)
