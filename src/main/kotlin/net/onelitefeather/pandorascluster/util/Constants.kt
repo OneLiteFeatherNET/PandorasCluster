@@ -1,6 +1,8 @@
 package net.onelitefeather.pandorascluster.util
 
 import net.onelitefeather.pandorascluster.enums.ChunkRotation
+import net.onelitefeather.pandorascluster.land.Land
+import net.onelitefeather.pandorascluster.land.position.dummyHomePosition
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import java.util.*
@@ -24,6 +26,17 @@ val AVAILABLE_CHUNK_ROTATIONS = arrayOf(
     BlockFace.EAST,
     BlockFace.SOUTH,
     BlockFace.WEST
+)
+
+val DUMMY_LAND = Land(
+    -1,
+    null,
+    dummyHomePosition(),
+    arrayListOf(),
+    arrayListOf(),
+    arrayListOf(),
+    "world",
+    -1, -1
 )
 
 
