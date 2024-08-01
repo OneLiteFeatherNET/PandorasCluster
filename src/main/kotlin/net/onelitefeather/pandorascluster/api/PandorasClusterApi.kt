@@ -25,7 +25,7 @@ interface PandorasClusterApi {
 
     fun isChunkClaimed(chunk: Chunk): Boolean
 
-    fun unclaimLand(player: Player)
+    fun unclaimLand(land: Land)
 
     /**
      * @return A list of all [Land]'s
