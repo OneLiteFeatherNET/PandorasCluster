@@ -35,8 +35,8 @@ staff:
 tasks:
   show-border-multiplier: 1
 database:
-  jdbcUrl: 'jdbc:mariadb://localhost:3306/pandorascluster?useSSL=false'
-  username: 'pandorascluster'
-  password: 'CoTayoC4wIbu'
-  driver: 'org.mariadb.jdbc.Driver'
-  dialect: 'org.hibernate.dialect.MariaDBDialect'
+  jdbcUrl: 'jdbc:postgresql://localhost:5432/pandoras_cluster'
+  username: 'pandoras_cluster'
+  password: 'pandoras_cluster'
+  driver: 'org.postgresql.Driver'
+  dialect: 'org.hibernate.dialect.PostgreSQLDialect'
