@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.mariadbJavaClient)
     implementation(libs.hibernateHikariCP)
 
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.2")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     implementation("org.postgresql:postgresql:42.7.3") //DATABASE
 
 }
