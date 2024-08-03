@@ -101,7 +101,7 @@ class LandPlayerInteractListener(val pandorasClusterApi: PandorasClusterApi) : L
             } else if (blockData is RespawnAnchor && action == Action.RIGHT_CLICK_BLOCK) {
                 cancelRespawnInteract(player, land, blockData)
             } else if (blockData is Powerable) {
-                cancelRedstoneInteract(player, land)
+                cancelRedstoneInteract(player, land) && event.action == Action.PHYSICAL
             } else {
                 event.isCancelled
             }
