@@ -238,9 +238,8 @@ class DatabaseStorageService(val pandorasClusterApi: PandorasClusterApi) {
         }
     }
 
-    fun unclaimLand(player: Player) {
+    fun unclaimLand(land: Land) {
 
-        val land = pandorasClusterApi.getLandService().getLand(player) ?: return
         var transaction: Transaction? = null
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
