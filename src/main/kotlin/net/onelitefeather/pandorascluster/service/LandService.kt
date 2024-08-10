@@ -18,6 +18,7 @@ import net.onelitefeather.pandorascluster.land.position.HomePosition
 import net.onelitefeather.pandorascluster.listener.LandContainerProtectionListener
 import net.onelitefeather.pandorascluster.listener.LandWorldListener
 import net.onelitefeather.pandorascluster.listener.block.LandBlockListener
+import net.onelitefeather.pandorascluster.listener.entity.LandEntityDamageListener
 import net.onelitefeather.pandorascluster.listener.entity.LandEntityListener
 import net.onelitefeather.pandorascluster.listener.entity.LandHangingEntityListener
 import net.onelitefeather.pandorascluster.listener.entity.LandVehicleListener
@@ -67,6 +68,7 @@ class LandService(private val pandorasClusterApi: PandorasClusterApi) : ChunkUti
             pandorasClusterApi.getPlugin()
         )
         pluginManager.registerEvents(LandVehicleListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
+        pluginManager.registerEvents(LandEntityDamageListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
 
         //Players
         pluginManager.registerEvents(LandPlayerInteractListener(pandorasClusterApi), pandorasClusterApi.getPlugin())
