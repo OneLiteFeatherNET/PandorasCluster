@@ -23,67 +23,6 @@ import org.bukkit.permissions.Permissible
 class LandEntityListener(private val pandorasClusterApi: PandorasClusterApi) : Listener, EntityUtils, ChunkUtils {
 
     @EventHandler
-    fun handleProjectileHit(event: ProjectileHitEvent) {
-        val entity = event.entity
-        val shooter = if (entity.shooter is Entity) {
-            entity.shooter
-        } else null
-
-        val land: Land?
-        val hitEntity = event.hitEntity
-        if (hitEntity != null) {
-
-            land = pandorasClusterApi.getLand(hitEntity.chunk) ?: return
-            if (shooter is Entity && land.hasAccess(shooter.uniqueId)) return
-
-            val cancel = if (hitEntity !is Player) {
-                val flag = land.getLandFlag(LandFlag.PVE)
-                val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && hasPermission(shooter, LandFlag.PVE) || !value || shooter is Entity
-            } else {
-                val flag = land.getLandFlag(LandFlag.PVP)
-                val value = flag.getValue<Boolean>()!!
-                shooter is Permissible && hasPermission(shooter, LandFlag.PVP) || !value || shooter is Entity
-            }
-
-            event.isCancelled = cancel
-            return
-        }
-
-        val hitBlock = event.hitBlock
-        if (hitBlock != null) {
-            land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
-            event.isCancelled = shooter is Entity && !land.hasAccess(shooter.uniqueId)
-        }
-    }
-
-
-    @EventHandler
-    fun handleEntityDamageByEntity(event: EntityDamageByEntityEvent) {
-
-        val target = event.entity
-        var attacker = event.damager
-
-        val pvpFlag = LandFlag.PVP
-        val pveFlag = LandFlag.PVE
-
-        if (attacker is Projectile) {
-            attacker = attacker.shooter as Entity
-        }
-
-        val land = pandorasClusterApi.getLand(target.chunk) ?: pandorasClusterApi.getLand(attacker.chunk) ?: return
-        event.isCancelled = if (target is Player && attacker is Player) {
-            if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
-            if (land.hasAccess(attacker.uniqueId) && land.hasAccess(target.uniqueId)) return
-            !hasPermission(attacker, pvpFlag)
-        } else {
-            if (land.getLandFlag(pvpFlag).getValue<Boolean>() == true) return
-            if (land.hasAccess(target.uniqueId) || land.hasAccess(attacker.uniqueId)) return
-            !hasPermission(target, pveFlag) || !hasPermission(attacker, pveFlag)
-        }
-    }
-
-    @EventHandler
     fun handleEntityExplode(event: EntityExplodeEvent) {
         if (event.entity is TNTPrimed) {
             event.blockList().groupBy(Block::getChunk).filter(this::filterForNoExplosiveLands)
