@@ -54,7 +54,7 @@ dependencies {
 
 publishData {
     addBuildData()
-    useGitlabReposForProject("66", "https://gitlab.themeinerlp.dev/")
+    useGitlabReposForProject("66", "https://gitlab.onelitefeather.dev/")
     publishTask("shadowJar")
 }
 
