@@ -10,6 +10,9 @@ import java.util.logging.Level
 
 class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
 
+    /**
+     * @return all registered land players.
+     */
     fun getPlayers(): List<LandPlayer> {
         try {
 
@@ -29,6 +32,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         return listOf()
     }
 
+    /**
+     * @param uuid the uuid of the player.
+     * @param name the name of the player.
+     */
     fun createPlayer(uuid: UUID, name: String): Boolean {
         if(playerExists(uuid)) return false
         val landPlayer = LandPlayer(null, uuid.toString(), name)
@@ -36,6 +43,9 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         return true
     }
 
+    /**
+     * @param uuid the uuid of the player.
+     */
     fun deletePlayer(uuid: UUID) {
         val landPlayer = getLandPlayer(uuid)
         var transaction: Transaction? = null
@@ -54,6 +64,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         }
     }
 
+    /**
+     * @param uuid the uuid of the player.
+     * @return the land player by the uuid.
+     */
     fun getLandPlayer(uuid: UUID): LandPlayer? {
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
@@ -75,6 +89,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         return null
     }
 
+    /**
+     * @param uuid the uuid of the player.
+     * @return true if the player exists
+     */
     fun playerExists(uuid: UUID): Boolean {
         var exists = false
         try {
@@ -94,6 +112,9 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         return exists
     }
 
+    /**
+     * @param landPlayer the player to update
+     */
     fun updateLandPlayer(landPlayer: LandPlayer) {
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
@@ -107,6 +128,10 @@ class LandPlayerService(val pandorasClusterApi: PandorasClusterApi) {
         }
     }
 
+    /**
+     * @param name the name of the player.
+     * @return the land player by the name.
+     */
     fun getLandPlayer(name: String): LandPlayer? {
         try {
             pandorasClusterApi.getSessionFactory().openSession().use { session ->
