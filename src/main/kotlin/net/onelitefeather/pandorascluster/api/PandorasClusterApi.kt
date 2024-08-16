@@ -19,12 +19,27 @@ interface PandorasClusterApi {
 
     fun getDatabaseStorageService(): DatabaseStorageService
 
+    /**
+     * @param player the player
+     * @return true if the player owns a land.
+     */
     fun hasPlayerLand(player: Player): Boolean
 
+    /**
+     * @param playerId the uuid of the player
+     * @return true if the player owns a land.
+     */
     fun hasPlayerLand(playerId: UUID): Boolean
 
+    /**
+     * @param chunk the chunk
+     * @return true if the chunk is claimed.
+     */
     fun isChunkClaimed(chunk: Chunk): Boolean
 
+    /**
+     * @param land the land to unclaim
+     */
     fun unclaimLand(land: Land)
 
     /**
@@ -32,10 +47,22 @@ interface PandorasClusterApi {
      */
     fun getLands(): List<Land>
 
+    /**
+     * @param player the player
+     * @return the landplayer by the bukkit player
+     */
     fun getLandPlayer(player: Player): LandPlayer?
 
+    /**
+     * @param uuid the uuid of the player
+     * @return the landplayer by the players uuid
+     */
     fun getLandPlayer(uuid: UUID): LandPlayer?
 
+    /**
+     * @param name the players name
+     * @return the landplayer by the players name
+     */
     fun getLandPlayer(name: String): LandPlayer?
 
     /**
@@ -54,9 +81,23 @@ interface PandorasClusterApi {
 
     fun getLogger(): Logger
 
+    /**
+     * @param chunk the chunk
+     * @return the land by the chunk.
+     */
     fun getLand(chunk: Chunk): Land?
+
+    /**
+     * @param landOwner the owner of the land
+     * @return the land by the land owner.
+     */
     fun getLand(landOwner: LandPlayer): Land?
 
+    /**
+     * @param uuid the player uuid
+     * @param name the player name
+     * @return true if the registration was successfully else the user is already registred.
+     */
     fun registerPlayer(uuid: UUID, name: String): Boolean
 
     fun getStaffNotificaton(): StaffNotificationService
