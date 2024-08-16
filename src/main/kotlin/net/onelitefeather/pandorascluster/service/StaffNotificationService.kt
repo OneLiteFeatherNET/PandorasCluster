@@ -22,10 +22,18 @@ class StaffNotificationService(private val pandorasClusterApi: PandorasClusterAp
         }
     }
 
+    /**
+     * Register a new [StaffNotification]
+     * @param staffNotification
+     */
     fun addStaffNotification(staffNotification: StaffNotification) {
         staffNotifications.add(staffNotification)
     }
 
+    /**
+     * @param land the suspicious land
+     * @param category the entity category
+     */
     fun notify(land: Land, category: EntityCategory) {
         staffNotifications.forEach { it.notifyEntitySpawnLimit(land, category) }
     }

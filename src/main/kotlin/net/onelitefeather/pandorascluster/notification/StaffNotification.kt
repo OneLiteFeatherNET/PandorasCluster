@@ -9,9 +9,17 @@ abstract class StaffNotification(private val pandorasClusterApi: PandorasCluster
 
     private val staffNotificationCooldown: MutableMap<EntityCategory, Long> = EnumMap(EntityCategory::class.java)
 
+    /**
+     * @param entityCategory the entity category
+     * @return true if the cooldown is over
+     */
     fun canBeNotified(entityCategory: EntityCategory) =
         System.currentTimeMillis() >= staffNotificationCooldown.getOrDefault(entityCategory, 0L)
 
+    /**
+     * @param entityCategory the entity category
+     * @param cooldown the cooldown time
+     */
     fun updateCooldown(entityCategory: EntityCategory, cooldown: Long) {
         staffNotificationCooldown[entityCategory] = cooldown
     }
@@ -20,6 +28,10 @@ abstract class StaffNotification(private val pandorasClusterApi: PandorasCluster
         System.currentTimeMillis() + 1000 * 60 * pandorasClusterApi.getPlugin().config.getInt("staff.notification.cooldown")
 
 
+    /**
+     * @param land the land
+     * @param entityCategory the entity category
+     */
     abstract fun notifyEntitySpawnLimit(land: Land, entityCategory: EntityCategory)
 
 }
