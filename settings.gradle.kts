@@ -40,7 +40,7 @@ dependencyResolutionManagement {
             library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
             library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.3")
             library("cloudMinecraftExtras", "cloud.commandframework", "cloud-minecraft-extras").version("1.8.4")
-            library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.3")
+            library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
             library("commodore", "me.lucko", "commodore").version("2.2")
 
 
