@@ -13,4 +13,6 @@
 *.toml filter=lfs diff=lfs merge=lfs -text
 *.kt filter=lfs diff=lfs merge=lfs -text
 /.gitlab/CODEOWNERS filter=lfs diff=lfs merge=lfs -text
+*.drawio filter=lfs diff=lfs merge=lfs -text
+*.LocationUtil filter=lfs diff=lfs merge=lfs -text
 * !text !filter !merge !diff
