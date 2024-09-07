@@ -53,3 +53,7 @@ dependencyResolutionManagement {
         }
     }
 }
+include("api")
+include("adapters:bukkit")
+include("adapters:database")
+include("plugin")
