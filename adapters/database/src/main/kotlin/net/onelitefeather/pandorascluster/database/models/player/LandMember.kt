@@ -1,9 +1,8 @@
-package net.onelitefeather.pandorascluster.api.models.database.player
+package net.onelitefeather.pandorascluster.database.models.player
 
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.api.enum.LandRole
 import net.onelitefeather.pandorascluster.api.models.database.Land
-import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.hibernate.Hibernate
 
 @Entity

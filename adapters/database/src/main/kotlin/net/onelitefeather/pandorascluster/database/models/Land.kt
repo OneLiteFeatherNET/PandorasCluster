@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.models.database
+package net.onelitefeather.pandorascluster.database.models
 
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.api.enum.LandRole

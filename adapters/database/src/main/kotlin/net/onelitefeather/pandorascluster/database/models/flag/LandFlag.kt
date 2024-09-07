@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.models.database.flag
+package net.onelitefeather.pandorascluster.database.models.flag
 
 /**
  * case 0 -> this.value;

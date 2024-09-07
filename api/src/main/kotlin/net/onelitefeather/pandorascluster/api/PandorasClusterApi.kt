@@ -1,11 +1,11 @@
 package net.onelitefeather.pandorascluster.api
 
 import net.kyori.adventure.text.Component
-import net.onelitefeather.pandorascluster.api.models.database.Land
-import net.onelitefeather.pandorascluster.api.models.dto.PandorasChunk
-import net.onelitefeather.pandorascluster.api.models.dto.PandorasPlayer
+import net.onelitefeather.pandorascluster.api.models.Chunk
+import net.onelitefeather.pandorascluster.api.models.Land
+import net.onelitefeather.pandorascluster.api.models.LandPlayer
+import net.onelitefeather.pandorascluster.api.models.Player
 import net.onelitefeather.pandorascluster.api.service.*
-import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.hibernate.SessionFactory
 import java.util.*
 import java.util.logging.Logger
@@ -23,7 +23,7 @@ interface PandorasClusterApi {
      * @param player the player
      * @return true if the player owns a land.
      */
-    fun hasPlayerLand(player: PandorasPlayer): Boolean
+    fun hasPlayerLand(player: Player): Boolean
 
     /**
      * @param playerId the uuid of the player
@@ -35,7 +35,7 @@ interface PandorasClusterApi {
      * @param chunk the chunk
      * @return true if the chunk is claimed.
      */
-    fun isChunkClaimed(chunk: PandorasChunk): Boolean
+    fun isChunkClaimed(chunk: Chunk): Boolean
 
     /**
      * @param land the land to unclaim
@@ -51,7 +51,7 @@ interface PandorasClusterApi {
      * @param player the player
      * @return the landplayer by the bukkit player
      */
-    fun getLandPlayer(player: PandorasPlayer): LandPlayer?
+    fun getLandPlayer(player: Player): LandPlayer?
 
     /**
      * @param uuid the uuid of the player
@@ -69,7 +69,7 @@ interface PandorasClusterApi {
      * @param player the player
      * @return A list of all [Land]'s where the player has access.
      */
-    fun getLands(player: PandorasPlayer): List<Land>
+    fun getLands(player: Player): List<Land>
 
     fun getSessionFactory(): SessionFactory
 
@@ -85,7 +85,7 @@ interface PandorasClusterApi {
      * @param chunk the chunk
      * @return the land by the chunk.
      */
-    fun getLand(chunk: PandorasChunk): Land?
+    fun getLand(chunk: Chunk): Land?
 
     /**
      * @param landOwner the owner of the land
