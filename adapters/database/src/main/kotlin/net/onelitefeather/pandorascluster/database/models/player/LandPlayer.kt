@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.land.player
+package net.onelitefeather.pandorascluster.database.models.player
 
 import jakarta.persistence.*
 import org.bukkit.Bukkit
