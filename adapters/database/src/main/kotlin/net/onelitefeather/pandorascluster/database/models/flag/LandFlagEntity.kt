@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.models.database.flag
+package net.onelitefeather.pandorascluster.database.models.flag
 
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.api.models.database.Land

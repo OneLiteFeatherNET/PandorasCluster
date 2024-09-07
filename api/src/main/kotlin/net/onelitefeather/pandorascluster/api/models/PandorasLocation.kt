@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.models.dto
+package net.onelitefeather.pandorascluster.api.models
 
 interface PandorasLocation {
 

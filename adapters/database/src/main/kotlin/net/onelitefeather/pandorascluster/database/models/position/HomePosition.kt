@@ -1,8 +1,6 @@
-package net.onelitefeather.pandorascluster.api.models.database.position
+package net.onelitefeather.pandorascluster.database.models.position
 
 import jakarta.persistence.*
-import net.onelitefeather.pandorascluster.api.models.dto.PandorasLocation
-import net.onelitefeather.pandorascluster.api.utils.LocationUtil
 import org.hibernate.Hibernate
 
 @Entity
@@ -28,12 +26,6 @@ data class HomePosition(
     val pitch: Float = 1.0F
 ) {
 
-    fun getBlockX(): Int = LocationUtil.Instances.instance.locToBlock(this.posX)
-
-    fun getBlockY(): Int = LocationUtil.Instances.instance.locToBlock(this.posY)
-
-    fun getBlockZ(): Int = LocationUtil.Instances.instance.locToBlock(this.posZ)
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -50,5 +42,3 @@ data class HomePosition(
                 "(id = $id , posX = $posX , posY = $posY , posZ = $posZ , " +
                 "yaw = $yaw , pitch = $pitch)"
 }
-fun toHomePosition(location: PandorasLocation): HomePosition =
-    HomePosition(null, location.x(), location.y(), location.z(), location.yaw(), location.pitch())
