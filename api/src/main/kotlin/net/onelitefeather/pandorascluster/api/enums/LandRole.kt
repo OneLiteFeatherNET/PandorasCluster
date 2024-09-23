@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.enum
+package net.onelitefeather.pandorascluster.api.enums
 
 enum class LandRole(val roleName: String, val display: String, val access: Boolean) {
     OWNER("owner", "<dark_red>Owner", true),
@@ -9,8 +9,11 @@ enum class LandRole(val roleName: String, val display: String, val access: Boole
     VISITOR("visitor", "<gray>Visitor", false);
 
     fun isGrantAble() = this != OWNER
+
+    companion object {
+        val LAND_ROLES = LandRole.entries.toTypedArray()
+        fun getLandRole(name: String): LandRole? =
+            LAND_ROLES.firstOrNull { landRole ->  landRole.name == name.uppercase() }
+    }
 }
 
-val LAND_ROLES = LandRole.entries.toTypedArray()
-fun getLandRole(name: String): LandRole? =
-    LAND_ROLES.firstOrNull { landRole ->  landRole.name == name.uppercase() }

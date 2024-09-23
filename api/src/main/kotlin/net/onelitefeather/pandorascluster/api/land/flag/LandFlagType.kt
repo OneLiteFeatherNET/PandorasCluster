@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.database.models.flag
+package net.onelitefeather.pandorascluster.api.land.flag
 
 enum class LandFlagType {
     PLAYER,

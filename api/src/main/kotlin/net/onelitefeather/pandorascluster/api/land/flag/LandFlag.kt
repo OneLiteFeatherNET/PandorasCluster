@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.database.models.flag
+package net.onelitefeather.pandorascluster.api.land.flag
 
 /**
  * case 0 -> this.value;
@@ -48,13 +48,15 @@ enum class LandFlag(val flagName: String,
     MONSTER_CAP("monster-cap", "250", LandFlagType.ENTITY, 1),
     VILLAGER_CAP("villager-cap", "100", LandFlagType.ENTITY, 1);
 
+    companion object {
+        val LAND_FLAGS = LandFlag.entries.toTypedArray()
+
+        fun findByName(name: String): LandFlag? = LAND_FLAGS.firstOrNull { filterFlagName(it, name) }
+        fun getDefaultFlagNames(): List<String> = LAND_FLAGS.map { it.name }
+
+        fun filterFlagName(landFlag: LandFlag, flagName: String) =
+            landFlag.name == flagName.uppercase() ||
+                    landFlag.flagName.equals(flagName, true)
+    }
 }
 
-val LAND_FLAGS = LandFlag.entries.toTypedArray()
-
-fun findByName(name: String): LandFlag? = LAND_FLAGS.firstOrNull { filterFlagName(it, name) }
-fun getDefaultFlagNames(): List<String> = LAND_FLAGS.map { it.name }
-
-fun filterFlagName(landFlag: LandFlag, flagName: String) =
-            landFlag.name == flagName.uppercase() ||
-            landFlag.flagName.equals(flagName, true)

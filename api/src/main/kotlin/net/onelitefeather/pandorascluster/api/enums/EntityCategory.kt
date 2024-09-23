@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api
+package net.onelitefeather.pandorascluster.api.enums
 
 enum class EntityCategory {
 
