@@ -7,13 +7,14 @@ import cloud.commandframework.annotations.Confirmation
 import cloud.commandframework.annotations.specifier.Quoted
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.land.flag.FlagRoleAttachment
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
-import net.onelitefeather.pandorascluster.api.models.database.flag.isValidValue
 import org.bukkit.entity.Player
 
-class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
+class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils, ChunkUtils {
 
     @CommandMethod("land flag set <flag> <value>")
     @CommandPermission("pandorascluster.command.land.flag.set")
@@ -24,7 +25,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         @Argument(value = "value", suggestions = "flag_values") @Quoted value: String
     ) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
         if (land == null) {
             player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
             return
@@ -35,7 +36,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
             return
         }
 
-        if(!isValidValue(landFlag, value)) {
+        if(!FlagRoleAttachment.isValidValue(landFlag, value)) {
             player.sendMessage(Component.translatable("command.set-flag.invalid-value").
             arguments(pluginPrefix, Component.text(value), Component.text(landFlag.name)))
             return
@@ -46,11 +47,7 @@ class SetFlagCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
             return
         }
 
-        if(landFlag != LandFlag.USE) {
-            pandorasClusterApi.getDatabaseStorageService().updateLandFlag(landFlag, value, land)
-        } else {
-            pandorasClusterApi.getDatabaseStorageService().addUseMaterial(land, value)
-        }
+        pandorasClusterApi.getLandFlagService().updateLandFlag(land.getFlag(landFlag).copy(value = value))
         player.sendMessage(Component.translatable("command.set-flag.success").arguments(
             pluginPrefix,
             Component.text(landFlag.name),

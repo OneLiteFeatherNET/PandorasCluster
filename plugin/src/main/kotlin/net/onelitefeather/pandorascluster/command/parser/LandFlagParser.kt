@@ -4,9 +4,7 @@ import cloud.commandframework.annotations.parsers.Parser
 import cloud.commandframework.annotations.suggestions.Suggestions
 import cloud.commandframework.context.CommandContext
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
-import net.onelitefeather.pandorascluster.api.models.database.flag.findByName
-import net.onelitefeather.pandorascluster.api.models.database.flag.getDefaultFlagNames
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.MATERIALS
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -17,7 +15,7 @@ class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
 
     @Parser(name = "landFlag", suggestions = "landFlags")
     fun parseLandFlags(@Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>, input: Queue<String>): LandFlag {
-        return findByName(input.remove().lowercase()) ?: LandFlag.UNKNOWN
+        return LandFlag.findByName(input.remove().lowercase()) ?: LandFlag.UNKNOWN
     }
 
     // isInteractable - no alternative possible at the moment
@@ -47,6 +45,6 @@ class LandFlagParser(private val pandorasClusterApi: PandorasClusterApi) {
         @Suppress("UNUSED_PARAMETER") commandContext: CommandContext<Player>,
         @Suppress("UNUSED_PARAMETER") input: String
     ): List<String> {
-        return getDefaultFlagNames()
+        return LandFlag.getDefaultFlagNames()
     }
 }

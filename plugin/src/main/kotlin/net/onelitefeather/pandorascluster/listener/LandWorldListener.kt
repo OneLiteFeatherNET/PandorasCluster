@@ -1,8 +1,8 @@
 package net.onelitefeather.pandorascluster.listener
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.extensions.ChunkUtils
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
 import org.bukkit.Chunk
 import org.bukkit.block.BlockState
 import org.bukkit.event.*
@@ -17,20 +17,20 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
     @EventHandler
     fun handleRaidStart(event: RaidTriggerEvent) {
 
-        val land = pandorasClusterApi.getLand(event.player.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.player.chunk))
         if(land == null) {
             event.isCancelled = true
             return
         }
 
-        if (land.hasAccess(event.player.uniqueId)) return
+        if (land.hasMemberAccess(event.player.uniqueId)) return
         event.isCancelled = true
     }
 
     @EventHandler
     fun handleLeavesDecay(event: LeavesDecayEvent) {
-        val land = pandorasClusterApi.getLand(event.block.chunk) ?: return
-        val landFlag = land.getLandFlag(LandFlag.LEAVES_DECAY)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk((event.block.chunk))) ?: return
+        val landFlag = land.getFlag(LandFlag.LEAVES_DECAY)
         if (landFlag.getValue<Boolean>() == false) return
         event.isCancelled = true
     }
@@ -57,7 +57,7 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
 
         val blocksByChunks = blocks.groupBy(BlockState::getChunk)
         val firstChunk = blocks.first().chunk
-        val origin = pandorasClusterApi.getLand(firstChunk)
+        val origin = pandorasClusterApi.getLandService().getLand(toClaimedChunk(firstChunk))
 
         if (origin == null && event is Cancellable) {
             event.isCancelled = true
@@ -75,9 +75,9 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
     }
 
     private fun filterHasSameOwner(map: Map.Entry<Chunk, List<BlockState>>): Boolean {
-        val plot = pandorasClusterApi.getLand(map.key)
+        val plot = pandorasClusterApi.getLandService().getLand(toClaimedChunk(map.key))
         return map.value.firstOrNull {
-            val otherLand = pandorasClusterApi.getLand(it.chunk)
+            val otherLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(it.chunk))
             plot == null || !hasSameOwner(plot, otherLand!!)
         } != null
     }

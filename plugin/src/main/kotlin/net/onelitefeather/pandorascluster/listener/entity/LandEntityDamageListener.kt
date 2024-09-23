@@ -1,10 +1,10 @@
 package net.onelitefeather.pandorascluster.listener.entity
 
+import net.onelitefeather.pandorascluster.api.land.Land
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -25,14 +25,14 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         val causingEntity = event.damageSource.causingEntity ?: return
 
         val entity = event.entity
-        val land = pandorasClusterApi.getLand(causingEntity.chunk) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(causingEntity.chunk)) ?: return
 
         if (causingEntity !is Arrow) return
 
         event.isCancelled = if (causingEntity.shooter is BlockProjectileSource) {
             if (hasPermission(entity, LandFlag.PVE)) return
-            if (land.hasAccess(entity.uniqueId)) return
-            land.getLandFlag(LandFlag.PVE).getValue<Boolean>() == false
+            if (land.hasMemberAccess(entity.uniqueId)) return
+            land.getFlag(LandFlag.PVE).getValue<Boolean>() == false
         } else {
             event.isCancelled
         }
@@ -46,7 +46,7 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
 
         if (attacker is Projectile) return
 
-        val land = pandorasClusterApi.getLand(target.chunk) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(target.chunk)) ?: return
         event.isCancelled = !canDamage(land, attacker, target)
     }
 
@@ -59,7 +59,7 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         } else null ?: return
 
         val hitEntity = event.hitEntity ?: return
-        val land = pandorasClusterApi.getLand(hitEntity.chunk) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(hitEntity.chunk)) ?: return
 
         event.isCancelled = !canDamage(land, shooter, hitEntity)
     }
@@ -73,24 +73,24 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         } else null ?: return
 
         val hitBlock = event.hitBlock ?: return
-        val land = pandorasClusterApi.getLand(hitBlock.chunk) ?: return
-        event.isCancelled = !land.hasAccess(shooter.uniqueId)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(hitBlock.chunk)) ?: return
+        event.isCancelled = !land.hasMemberAccess(shooter.uniqueId)
     }
 
     private fun canDamage(land: Land, attacker: Entity, target: Entity): Boolean {
 
         if (target is Player && attacker is Player) {
             if (hasPermission(attacker, LandFlag.PVP)) return true
-            if (land.hasAccess(attacker.uniqueId)) return true
-            return land.getLandFlag(LandFlag.PVP).getValue<Boolean>() == true
+            if (land.hasMemberAccess(attacker.uniqueId)) return true
+            return land.getFlag(LandFlag.PVP).getValue<Boolean>() == true
         }
 
-        val pveFlag = land.getLandFlag(LandFlag.PVE).getValue<Boolean>() == true
+        val pveFlag = land.getFlag(LandFlag.PVE).getValue<Boolean>() == true
 
         val targetPlayer = targetPlayer(attacker, target)
         if (targetPlayer != null) {
             if (hasPermission(targetPlayer, LandFlag.PVE)) return true
-            if (land.hasAccess(targetPlayer.uniqueId)) return true
+            if (land.hasMemberAccess(targetPlayer.uniqueId)) return true
             return pveFlag
         }
 

@@ -5,16 +5,18 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.land.player.LandPlayer
-import net.onelitefeather.pandorascluster.land.position.fromHomePosition
+import net.onelitefeather.pandorascluster.api.player.LandPlayer
+import net.onelitefeather.pandorascluster.extensions.LocationUtils
 import org.bukkit.entity.Player
 
-class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
+class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) : LocationUtils {
 
     @CommandMethod("land home")
     fun executeHomeCommand(player: Player) {
-        val homePosition = pandorasClusterApi.getLandService().getHome(player.uniqueId) ?: return
-        player.teleport(fromHomePosition(player.world, homePosition))
+
+        val landPlayer = pandorasClusterApi.getLandPlayerService().getLandPlayer(player.uniqueId) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(landPlayer) ?: return
+        player.teleport(fromHomePosition(player.world, land.home!!))
         player.sendMessage(Component.translatable("command.home.success").arguments(pandorasClusterApi.pluginPrefix()))
     }
 
@@ -26,14 +28,9 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
     ) {
 
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val playerName = landOwner.name ?: "null"
-        if (landOwner.uuid == null) {
-            player.sendMessage(Component.translatable("player-data-not-found").
-            arguments(pluginPrefix, Component.text(playerName)))
-            return
-        }
+        val playerName = landOwner.name
 
-        val land = pandorasClusterApi.getLand(landOwner)
+        val land = pandorasClusterApi.getLandService().getLand(landOwner)
         if (land == null) {
             player.sendMessage(Component.translatable("player-has-no-land").arguments(pluginPrefix))
             return
@@ -44,7 +41,7 @@ class LandTeleportCommands(val pandorasClusterApi: PandorasClusterApi) {
             return
         }
 
-        player.teleport(fromHomePosition(player.world, land.homePosition))
+        player.teleport(fromHomePosition(player.world, land.home!!))
         player.sendMessage(Component.translatable("command.visit.success").arguments(pluginPrefix, Component.text(playerName)))
     }
 }

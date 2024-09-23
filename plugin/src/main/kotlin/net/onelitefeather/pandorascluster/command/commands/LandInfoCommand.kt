@@ -6,13 +6,14 @@ import cloud.commandframework.annotations.CommandPermission
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.onelitefeather.pandorascluster.api.land.Land
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.LandRole
-import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.api.models.database.player.LandMember
+import net.onelitefeather.pandorascluster.api.enums.LandRole
+import net.onelitefeather.pandorascluster.api.player.LandMember
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import org.bukkit.entity.Player
 
-class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) : ChunkUtils {
 
     @CommandMethod("land info")
     @CommandDescription("Get information about the land you standing on")
@@ -20,13 +21,13 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     fun execute(player: Player) {
 
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
         if (land == null) {
             player.sendMessage(Component.translatable("chunk-already-claimed").arguments(pluginPrefix))
             return
         }
 
-        val accessMessage = if (land.hasAccess(player.uniqueId))
+        val accessMessage = if (land.hasMemberAccess(player.uniqueId))
             Component.translatable("boolean-true") else Component.translatable("boolean-false")
 
         player.sendMessage(Component.translatable("command.info.owner").arguments(pluginPrefix,
@@ -39,19 +40,16 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
             pandorasClusterApi.pluginPrefix(), buildDeniedMembers(land)))
 
         player.sendMessage(Component.translatable("command.info.flags").arguments(pandorasClusterApi.pluginPrefix(), buildFlags(land)))
-        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(
-            pluginPrefix,
-            Component.text(pandorasClusterApi.getLandService().getChunksByLand(land))))
+        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(pluginPrefix, Component.text(land.chunks.size)))
     }
 
     private fun buildDeniedMembers(land: Land): Component {
 
-       val members = land.landMembers
-            .filter(this::filterDeniedMembers)
-            .filterNot(this::filterPlayerNameNotNull).map {
+       val members = land.members
+            .filter(this::filterDeniedMembers).map {
                 Component.translatable("command.info.members.entry").arguments(
                     MiniMessage.miniMessage().deserialize(it.role.display),
-                    Component.text(it.member?.name!!))
+                    Component.text(it.member.name))
             }.toList()
 
         return if (members.isNotEmpty())
@@ -61,10 +59,10 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
 
     private fun buildMembers(land: Land): Component {
         val members =
-            land.landMembers.filterNot(this::filterDeniedMembers).filterNot(this::filterPlayerNameNotNull).map {
+            land.members.filterNot(this::filterDeniedMembers).map {
                 Component.translatable("command.info.members.entry").arguments(
                     MiniMessage.miniMessage().deserialize(it.role.display),
-                    Component.text(it.member?.name!!))
+                    Component.text(it.member.name))
             }.toList()
 
         return if (members.isNotEmpty())
@@ -75,10 +73,10 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     private fun buildFlags(land: Land): Component {
 
         val flags = land.flags.map {
-            val value = it.value ?: "Unknown Value"
-            val flagName = it.name ?: "Unknown Flag"
+            val value = it.value
+            val flagName = it.flag.name
 
-            val booleanFlag = it.type?.toInt() == 2
+            val booleanFlag = it.flag.type.toInt() == 2
 
             val symbolColor = if (booleanFlag) {
                 val booleanValue = value.toBoolean()
@@ -106,6 +104,4 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) {
     }
 
     private fun filterDeniedMembers(landMember: LandMember): Boolean = landMember.role == LandRole.BANNED
-
-    private fun filterPlayerNameNotNull(landMember: LandMember) = landMember.member?.name == null
 }

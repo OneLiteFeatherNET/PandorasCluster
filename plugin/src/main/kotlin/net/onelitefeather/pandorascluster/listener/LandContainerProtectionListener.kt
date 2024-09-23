@@ -24,8 +24,12 @@ class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi
                 if (sideLeft == null || sideRight == null) {
                     true
                 } else {
-                    val land = pandorasClusterApi.getLand((sideLeft as BlockState).chunk)
-                    val otherLand = pandorasClusterApi.getLand((sideRight as BlockState).chunk)
+
+                    val leftChunk = toClaimedChunk((sideLeft as BlockState).chunk)
+                    val rightChunk = toClaimedChunk((sideRight as BlockState).chunk)
+
+                    val land = pandorasClusterApi.getLandService().getLand(leftChunk)
+                    val otherLand = pandorasClusterApi.getLandService().getLand(rightChunk)
                     land == null || otherLand == null || !hasSameOwner(land, otherLand)
                 }
             } else {
@@ -37,8 +41,12 @@ class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi
         }
 
         if (destinationInventory.holder is BlockState) {
-            val land = pandorasClusterApi.getLand((destinationInventory.holder as BlockState).block.chunk)
-            val sourceLand = pandorasClusterApi.getLand((event.source.holder as BlockState).block.chunk)
+
+            val destinationChunk = toClaimedChunk((destinationInventory.holder as BlockState).block.chunk)
+            val holder = toClaimedChunk((event.source.holder as BlockState).block.chunk)
+
+            val land = pandorasClusterApi.getLandService().getLand(destinationChunk)
+            val sourceLand = pandorasClusterApi.getLandService().getLand(holder)
             event.isCancelled = land == null || sourceLand == null || !hasSameOwner(sourceLand, land)
         }
     }

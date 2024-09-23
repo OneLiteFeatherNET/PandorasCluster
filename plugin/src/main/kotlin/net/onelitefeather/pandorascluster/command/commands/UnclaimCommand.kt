@@ -11,16 +11,17 @@ import com.sk89q.worldedit.regions.CuboidRegion
 import com.sk89q.worldedit.world.RegenOptions
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import org.bukkit.entity.Player
 
-class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
+class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) : ChunkUtils {
 
     @CommandMethod("land unclaim")
     @CommandDescription("Unclaim your land")
     @Confirmation
     fun execute(player: Player) {
 
-        val land = pandorasClusterApi.getLand(player.chunk) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk)) ?: return
         if(!land.isOwner(player.uniqueId) && !player.hasPermission("pandorascluster.command.unclaim.other")) {
             player.sendMessage(Component.translatable("not-authorized").arguments(pandorasClusterApi.pluginPrefix()))
             return
@@ -50,6 +51,6 @@ class UnclaimCommand(private val pandorasClusterApi: PandorasClusterApi) {
         }
 
         player.sendMessage(Component.translatable("command.unclaim.success").arguments(pandorasClusterApi.pluginPrefix()))
-        pandorasClusterApi.unclaimLand(land)
+        pandorasClusterApi.getLandService().unclaimLand(land)
     }
 }

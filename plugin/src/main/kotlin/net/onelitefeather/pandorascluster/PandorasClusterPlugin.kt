@@ -1,11 +1,5 @@
 package net.onelitefeather.pandorascluster
 
-import cloud.commandframework.annotations.AnnotationParser
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager
-import cloud.commandframework.meta.CommandMeta
-import cloud.commandframework.minecraft.extras.MinecraftHelp
-import cloud.commandframework.paper.PaperCommandManager
-
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.translation.GlobalTranslator
@@ -13,13 +7,12 @@ import net.kyori.adventure.translation.TranslationRegistry
 import net.kyori.adventure.util.UTF8ResourceBundleControl
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.PandorasClusterApiImpl
-import net.onelitefeather.pandorascluster.command.commands.*
-import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
-import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
-import net.onelitefeather.pandorascluster.extensions.buildCommandSystem
-import net.onelitefeather.pandorascluster.extensions.buildHelpSystem
+import net.onelitefeather.pandorascluster.notification.DiscordStaffNotification
+import net.onelitefeather.pandorascluster.notification.MinecraftStaffNotification
+import net.onelitefeather.pandorascluster.service.BukkitLandService
+import net.onelitefeather.pandorascluster.service.PaperCommandService
 import net.onelitefeather.pandorascluster.translation.PluginTranslationRegistry
-import org.bukkit.command.CommandSender
+import net.onelitefeather.pandorascluster.util.discord.DiscordWebhook
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
@@ -27,26 +20,26 @@ import java.util.*
 class PandorasClusterPlugin : JavaPlugin() {
 
     private val supportedLocals: Array<Locale> = arrayOf(Locale.US, Locale.GERMAN)
-    lateinit var paperCommandManager: PaperCommandManager<CommandSender>
-    lateinit var annotationParser: AnnotationParser<CommandSender>
-    lateinit var minecraftHelp: MinecraftHelp<CommandSender>
-    lateinit var confirmationManager: CommandConfirmationManager<CommandSender>
-
-    lateinit var bukkitAudiences: BukkitAudiences
     lateinit var api: PandorasClusterApiImpl
+    lateinit var bukkitAudiences: BukkitAudiences
+    lateinit var bukkitLandService: BukkitLandService
+    private lateinit var paperCommandService: PaperCommandService
 
     override fun onEnable() {
+
         saveDefaultConfig()
         config.options().copyDefaults(true)
         saveConfig()
 
         bukkitAudiences = BukkitAudiences.create(this)
-        api = PandorasClusterApiImpl(this)
+
+        api = PandorasClusterApiImpl()
         server.servicesManager.register(PandorasClusterApi::class.java, api, this, ServicePriority.Highest)
 
-        buildCommandSystem()
-        registerCommands()
-        buildHelpSystem()
+        bukkitLandService = BukkitLandService(api, this)
+
+        paperCommandService = PaperCommandService(this)
+        paperCommandService.setup()
 
         val registry = TranslationRegistry.create(Key.key("pandorascluster", "localization"))
         supportedLocals.forEach { locale ->
@@ -57,30 +50,28 @@ class PandorasClusterPlugin : JavaPlugin() {
         GlobalTranslator.translator().addSource(PluginTranslationRegistry(registry))
     }
 
-    private fun registerCommands() {
-
-        annotationParser.parse(LandPlayerParser(api))
-        annotationParser.parse(LandFlagParser(api))
-
-        annotationParser.parse(LandTeleportCommands(api))
-        annotationParser.parse(LandToggleBorderCommand(api))
-        annotationParser.parse(SetHomeCommand(api))
-        annotationParser.parse(SetFlagCommand(api))
-        annotationParser.parse(ClaimCommand(api))
-        annotationParser.parse(UnclaimCommand(api))
-        annotationParser.parse(SetOwnerCommand(api))
-        annotationParser.parse(SetRoleCommand(api))
-        annotationParser.parse(LandInfoCommand(api))
-
-        val builder = paperCommandManager.commandBuilder("land")
-        paperCommandManager.command(builder.literal("confirm").
-        meta(CommandMeta.DESCRIPTION, "Confirm").handler(confirmationManager.createConfirmationExecutionHandler()))
-    }
-
     override fun onDisable() {
         if(this::api.isInitialized){
             api.getDatabaseService().shutdown()
             server.servicesManager.unregisterAll(this)
         }
+    }
+
+    private fun addStaffNotifications() {
+        api.getStaffNotification().addStaffNotification(MinecraftStaffNotification(api, this))
+        val discordWebhook = buildDiscordWebhook()
+        if(discordWebhook != null) {
+            api.getStaffNotification().addStaffNotification(DiscordStaffNotification(api, discordWebhook))
+        }
+    }
+
+    private fun buildDiscordWebhook(): DiscordWebhook? {
+        val useDiscordStaffNotification = config.getBoolean("staff.notification.discord.enabled")
+        val token = config.getString("staff.notification.discord.token", "")!!
+        val tokenId = config.getString("staff.notification.discord.tokenId", "")!!
+
+        if (!useDiscordStaffNotification || token.isEmpty() || tokenId.isEmpty()) return null
+
+        return DiscordWebhook(token, tokenId)
     }
 }
