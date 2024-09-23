@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.enums
+package net.onelitefeather.pandorascluster.api.enums
 
 enum class ChunkRotation(val x: Int, val z: Int) {
 
@@ -13,4 +13,8 @@ enum class ChunkRotation(val x: Int, val z: Int) {
 
     WEST(1, 0),
     NORTH_WEST(-1, -1);
+
+    companion object {
+        val CHUNK_ROTATIONS = ChunkRotation.entries.toTypedArray()
+    }
 }
