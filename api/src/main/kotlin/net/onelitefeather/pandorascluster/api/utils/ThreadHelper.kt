@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.util
+package net.onelitefeather.pandorascluster.api.utils
 
 interface ThreadHelper {
     fun syncThreadForServiceLoader(runnable: Runnable) {
