@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.models
+package net.onelitefeather.pandorascluster.api.player
 
 interface Player {
 
