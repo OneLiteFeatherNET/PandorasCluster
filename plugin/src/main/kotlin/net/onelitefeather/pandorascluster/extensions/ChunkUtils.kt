@@ -1,10 +1,11 @@
 package net.onelitefeather.pandorascluster.extensions
 
-import net.onelitefeather.pandorascluster.api.EntityCategory
-import net.onelitefeather.pandorascluster.enums.ChunkRotation
-import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.land.Land
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
+import net.onelitefeather.pandorascluster.api.land.Land
+import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk
+import net.onelitefeather.pandorascluster.api.enums.ChunkRotation
+import net.onelitefeather.pandorascluster.api.enums.EntityCategory
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
 import net.onelitefeather.pandorascluster.util.BLOCK_FACES
 import net.onelitefeather.pandorascluster.util.CHUNK_ROTATIONS
 import org.bukkit.Bukkit
@@ -20,7 +21,7 @@ import org.bukkit.entity.Player
 interface ChunkUtils {
 
     fun canEnterLand(player: Player, land: Land): Boolean {
-        return Permission.LAND_ENTRY_DENIED.hasPermission(player) || !land.isBanned(player.uniqueId)
+        return player.hasPermission(Permission.LAND_ENTRY_DENIED.permissionNode) || !land.isBanned(player.uniqueId)
     }
 
     fun hasSameOwner(it: Land, claimedLand: Land) = it.owner == claimedLand.owner
@@ -28,19 +29,21 @@ interface ChunkUtils {
     fun getEntityLimit(land: Land, entityCategory: EntityCategory): Int {
 
         if(entityCategory == EntityCategory.ANIMALS) {
-            return land.getLandFlag(LandFlag.ANIMAL_CAP).getValue() ?: 0
+            return land.getFlag(LandFlag.ANIMAL_CAP).getValue() ?: 0
         }
 
         if(entityCategory == EntityCategory.MONSTER) {
-            return land.getLandFlag(LandFlag.MONSTER_CAP).getValue() ?: 0
+            return land.getFlag(LandFlag.MONSTER_CAP).getValue() ?: 0
         }
 
         if(entityCategory == EntityCategory.VILLAGER) {
-            return land.getLandFlag(LandFlag.VILLAGER_CAP).getValue() ?: 0
+            return land.getFlag(LandFlag.VILLAGER_CAP).getValue() ?: 0
         }
 
         return 0
     }
+
+    fun toClaimedChunk(chunk: Chunk): ClaimedChunk = ClaimedChunk(null, chunk.chunkKey)
 
     fun getEntityCount(land: Land, entityCategory: EntityCategory): Int {
 
