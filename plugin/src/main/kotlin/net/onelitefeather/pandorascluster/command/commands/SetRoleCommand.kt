@@ -11,17 +11,16 @@ import cloud.commandframework.context.CommandContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.LAND_ROLES
-import net.onelitefeather.pandorascluster.enums.LandRole
-import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.enums.getLandRole
+import net.onelitefeather.pandorascluster.api.enums.LandRole
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.player.LandPlayer
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
 
-class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
+class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils, ChunkUtils {
 
     @CommandMethod("land role <player> <role>")
     @CommandDescription("Set a Role for a Player")
@@ -32,8 +31,7 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         @Greedy @Argument("role", parserName = "landRole") landRole: LandRole
     ) {
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
-        val targetPlayerId = landPlayer.getUniqueId()
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
 
         if (land == null) {
             player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
@@ -45,11 +43,10 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
             return
         }
 
-        val targetName = landPlayer.name ?: "not found"
-        if (targetPlayerId == null) {
+        if (!pandorasClusterApi.getLandPlayerService().playerExists(landPlayer.uniqueId)) {
             player.sendMessage(
                 Component.translatable("player-data-not-found").
-            arguments(pluginPrefix, Component.text(targetName)))
+            arguments(pluginPrefix, Component.text(landPlayer.name)))
             return
         }
 
@@ -60,43 +57,43 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
             return
         }
 
-        if (land.isOwner(targetPlayerId)) {
+        if (land.isOwner(landPlayer.uniqueId)) {
             player.sendMessage(Component.translatable("command.set-role.cannot-change-the-land-owner").arguments(pluginPrefix))
             return
         }
 
         if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || hasPermission(player, Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
-                pandorasClusterApi.getDatabaseStorageService().addLandMember(land, landPlayer, landRole)
+                pandorasClusterApi.getLandPlayerService().addLandMember(land, landPlayer, landRole)
                 player.sendMessage(Component.translatable("command.set-role.access").arguments(
                     pluginPrefix,
-                    Component.text(targetName),
+                    Component.text(landPlayer.name),
                     MiniMessage.miniMessage().deserialize(landRole.display)))
             } else {
 
-                val member = land.getLandMember(targetPlayerId)
+                val member = land.getLandMember(landPlayer.uniqueId)
                 if(member == null) {
                     player.sendMessage(Component.translatable("command.remove.not-found").arguments(
                         pluginPrefix,
-                        Component.text(targetName)))
+                        Component.text(landPlayer.name)))
                     return
                 }
 
-                pandorasClusterApi.getDatabaseStorageService().removeLandMember(member)
+                pandorasClusterApi.getLandPlayerService().removeLandMember(member)
                 player.sendMessage(Component.translatable("command.remove.success").arguments(
                     pluginPrefix,
-                    Component.text(targetName)))
+                    Component.text(landPlayer.name)))
             }
         }
     }
 
     @Parser(name = "landRole", suggestions = "landRoles")
     fun parseLandRole(commandSender: CommandContext<CommandSender>, input: Queue<String>): LandRole {
-        return getLandRole(input.remove()) ?: return LandRole.VISITOR
+        return LandRole.getLandRole(input.remove()) ?: return LandRole.VISITOR
     }
 
     @Suggestions("landRoles")
     fun landRoles(commandSender: CommandContext<CommandSender>, input: String): List<String> {
-        return LAND_ROLES.filter { it.isGrantAble() }.map { it.name };
+        return LandRole.LAND_ROLES.filter { it.isGrantAble() }.map { it.name }
     }
 }

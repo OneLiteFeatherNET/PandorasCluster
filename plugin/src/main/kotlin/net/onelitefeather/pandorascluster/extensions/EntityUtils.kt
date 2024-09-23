@@ -1,8 +1,8 @@
 package net.onelitefeather.pandorascluster.extensions
 
-import net.onelitefeather.pandorascluster.enums.Permission
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
-import net.onelitefeather.pandorascluster.util.IGNORE_CLAIM_LIMIT
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.api.utils.IGNORE_CLAIM_LIMIT
 import org.apache.commons.lang3.StringUtils
 import org.bukkit.entity.AnimalTamer
 import org.bukkit.entity.Tameable

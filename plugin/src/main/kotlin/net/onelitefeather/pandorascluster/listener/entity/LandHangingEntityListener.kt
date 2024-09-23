@@ -1,10 +1,11 @@
 package net.onelitefeather.pandorascluster.listener.entity
 
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.api.models.database.flag.LandFlag
-import net.onelitefeather.pandorascluster.service.LandService
+import net.onelitefeather.pandorascluster.service.BukkitLandService
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
@@ -12,21 +13,21 @@ import org.bukkit.event.hanging.HangingBreakEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
 
 class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterApi,
-                                private val landService: LandService) : Listener, EntityUtils {
+                                private val bukkitLandService: BukkitLandService) : Listener, EntityUtils, ChunkUtils {
 
     @EventHandler
     fun handleHangingBreak(event: HangingBreakEvent) {
         if (event.cause == HangingBreakEvent.RemoveCause.ENTITY) return
         val entity = event.entity
-        val land = pandorasClusterApi.getLand(entity.chunk) ?: return
-        event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(entity.chunk)) ?: return
+        event.isCancelled = land.getFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
     @EventHandler
     fun handleHangingBreakByEntity(event: HangingBreakByEntityEvent) {
 
         val entity = event.entity
-        val land = pandorasClusterApi.getLand(entity.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(entity.chunk))
         val remover = event.remover
 
         if(land == null) {
@@ -34,14 +35,14 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
             return
         }
 
-        if(land.hasAccess(remover.uniqueId)) return
-        event.isCancelled = land.getLandFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
+        if(land.hasMemberAccess(remover.uniqueId)) return
+        event.isCancelled = land.getFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
     }
 
     @EventHandler
     fun handleHangingPlace(event: HangingPlaceEvent) {
 
-        val land = pandorasClusterApi.getLand(event.block.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.block.chunk))
         val player = event.player
         val landFlag = LandFlag.HANGING_PLACE
 
@@ -50,7 +51,7 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
             return
         }
 
-        if(player != null && (hasPermission(player, landFlag) || land?.hasAccess(player.uniqueId) == true)) return
-        event.isCancelled = land?.getLandFlag(landFlag)?.getValue<Boolean>() == false
+        if(player != null && (hasPermission(player, landFlag) || land?.hasMemberAccess(player.uniqueId) == true)) return
+        event.isCancelled = land?.getFlag(landFlag)?.getValue<Boolean>() == false
     }
 }

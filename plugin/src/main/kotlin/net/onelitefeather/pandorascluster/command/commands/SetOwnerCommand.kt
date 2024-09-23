@@ -3,12 +3,13 @@ package net.onelitefeather.pandorascluster.command.commands
 import cloud.commandframework.annotations.*
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.api.player.LandPlayer
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.land.player.LandPlayer
 import org.bukkit.entity.Player
 
-class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
+class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils, ChunkUtils {
 
     @CommandMethod("land setowner <player>")
     @CommandPermission("pandorascluster.command.land.setowner")
@@ -17,7 +18,7 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) : Enti
     fun execute(player: Player, @Argument("player", parserName = "landPlayer") landPlayer: LandPlayer) {
 
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
         if (land == null) {
             player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
             return
@@ -28,39 +29,37 @@ class SetOwnerCommand(private val pandorasClusterApi: PandorasClusterApi) : Enti
             return
         }
 
-        val targetPlayerId = landPlayer.getUniqueId()
-        val targetPlayerName = landPlayer.name ?: "null"
-        if (targetPlayerId == null) {
+        if (!pandorasClusterApi.getLandPlayerService().playerExists(landPlayer.uniqueId)) {
             player.sendMessage(
                 Component.translatable("player-data-not-found").
-                arguments(pluginPrefix, Component.text(targetPlayerName)))
+                arguments(pluginPrefix, Component.text(landPlayer.name)))
             return
         }
 
-        if (pandorasClusterApi.hasPlayerLand(targetPlayerId)) {
+        if (pandorasClusterApi.getLandService().hasPlayerLand(landPlayer)) {
             player.sendMessage(Component.translatable("target-player-already-has-land").arguments(
                 pluginPrefix,
-                Component.text(targetPlayerName)))
+                Component.text(landPlayer.name)))
             return
         }
 
-        if (land.isOwner(targetPlayerId)) {
+        if (land.isOwner(landPlayer.uniqueId)) {
             player.sendMessage(Component.translatable("command.set-owner.nothing-changed").arguments(
                 pluginPrefix,
-                Component.text(targetPlayerName)))
+                Component.text(landPlayer.name)))
             return
         }
 
-        if (land.getLandMember(targetPlayerId) != null) {
+        if (land.getLandMember(landPlayer.uniqueId) != null) {
             player.sendMessage(Component.translatable("command.set-owner.player-is-member").arguments(
                 pluginPrefix,
-                Component.text(targetPlayerName)))
+                Component.text(landPlayer.name)))
             return
         }
 
-        this.pandorasClusterApi.getDatabaseStorageService().setLandOwner(land, landPlayer)
+        this.pandorasClusterApi.getLandService().updateLand(land.copy(owner = landPlayer))
         player.sendMessage(Component.translatable("command.set-owner.success").arguments(
             pluginPrefix,
-            Component.text(targetPlayerName)))
+            Component.text(landPlayer.name)))
     }
 }

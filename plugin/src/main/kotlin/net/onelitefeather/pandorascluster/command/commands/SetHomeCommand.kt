@@ -5,12 +5,13 @@ import cloud.commandframework.annotations.CommandMethod
 import cloud.commandframework.annotations.CommandPermission
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.enums.Permission
+import net.onelitefeather.pandorascluster.api.enums.Permission
+import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
-import net.onelitefeather.pandorascluster.land.position.toHomePosition
+import net.onelitefeather.pandorascluster.extensions.LocationUtils
 import org.bukkit.entity.Player
 
-class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils {
+class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) : EntityUtils, LocationUtils, ChunkUtils {
 
     @CommandMethod("land set home")
     @CommandPermission("pandorascluster.command.land.set.home")
@@ -18,7 +19,7 @@ class SetHomeCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
     fun execute(player: Player) {
 
         val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLand(player.chunk)
+        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
         if (land == null) {
             player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
             return
