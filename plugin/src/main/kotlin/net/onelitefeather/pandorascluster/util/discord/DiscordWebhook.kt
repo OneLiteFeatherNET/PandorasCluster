@@ -2,8 +2,8 @@ package net.onelitefeather.pandorascluster.util.discord
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.onelitefeather.pandorascluster.api.utils.propertyDiscordWebhookUrl
 import net.onelitefeather.pandorascluster.util.discord.embed.EmbedObject
-import net.onelitefeather.pandorascluster.util.propertyDiscordWebhookUrl
 import java.awt.Color
 import java.io.IOException
 import java.net.URI
