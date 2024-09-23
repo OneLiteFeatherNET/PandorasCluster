@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.enum
+package net.onelitefeather.pandorascluster.api.enums
 
 
 enum class Permission(val permissionNode: String) {
