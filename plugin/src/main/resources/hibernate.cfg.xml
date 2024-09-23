@@ -5,13 +5,12 @@
 <hibernate-configuration>
     <session-factory>
         <!-- - Mapping files or annotated classes -->
-        <mapping class="net.onelitefeather.pandorascluster.api.models.database.Land" />
-        <mapping class="net.onelitefeather.pandorascluster.api.models.database.ChunkPlaceholder" />
-        <mapping class="net.onelitefeather.pandorascluster.api.models.database.flag.LandFlagEntity" />
-        <mapping class="net.onelitefeather.pandorascluster.api.models.database.player.LandMember" />
-        <mapping class="net.onelitefeather.pandorascluster.land.player.LandPlayer" />
-        <mapping class="net.onelitefeather.pandorascluster.api.models.database.position.HomePosition" />
-
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.FlagRoleAttachmentEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.LandEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.ClaimedChunkEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity" />
         <!-- Drop and re-create the database schema on startup -->
     </session-factory>
 </hibernate-configuration>
