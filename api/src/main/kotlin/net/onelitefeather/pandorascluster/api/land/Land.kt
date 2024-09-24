@@ -55,6 +55,8 @@ data class Land(
         return flags.firstOrNull { it.role == role && it.flag == flag } ?: FlagRoleAttachment.getDefaultFlag(flag)
     }
 
+    fun getFlags(role: LandRole): List<FlagRoleAttachment> = flags.filter { it.role == role }
+
     fun getFlag(flag: LandFlag): FlagRoleAttachment = getFlag(LandRole.VISITOR, flag)
 
     private fun isAdminOnline(): Boolean {
