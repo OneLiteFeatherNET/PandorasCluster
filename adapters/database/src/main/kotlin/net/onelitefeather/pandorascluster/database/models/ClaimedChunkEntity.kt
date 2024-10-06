@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models
 
 import jakarta.persistence.*
+import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO
 
 @Entity
 @Table(name = "land_chunks")
@@ -15,12 +16,16 @@ data class ClaimedChunkEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "land_id")
     val landEntity: LandEntity? = null
-) {
+): ClaimedChunkDBO {
 
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , chunkIndex = $chunkIndex )"
     }
+
+    override fun id(): Long? = id
+
+    override fun chunkIndex(): Long = chunkIndex
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
