@@ -32,7 +32,7 @@ interface LandService {
      * @param player the bukkit player
      * @param chunk the first claimed chunk
      */
-    fun createLand(owner: LandPlayer, home: HomePosition, chunk: ClaimedChunk, world: String)
+    fun createLand(owner: LandPlayer, home: HomePosition, chunk: ClaimedChunk, world: String): Land?
 
     /**
      * @param land the land to unclaim.
@@ -42,7 +42,7 @@ interface LandService {
     /**
      * @param claimedChunk the chunk to remove from the land.
      */
-    fun removeClaimedChunk(chunk: ClaimedChunk)
+    fun removeClaimedChunk(chunkIndex: Long): Boolean
 
     fun getLand(chunk: ClaimedChunk): Land?
 
@@ -51,4 +51,8 @@ interface LandService {
     fun isChunkClaimed(chunk: ClaimedChunk): Boolean
 
     fun hasPlayerLand(player: LandPlayer): Boolean
+
+    fun getClaimedChunk(chunkIndex: Long): ClaimedChunk?
+
+    fun updateLoadedChunks(land: Land)
 }
