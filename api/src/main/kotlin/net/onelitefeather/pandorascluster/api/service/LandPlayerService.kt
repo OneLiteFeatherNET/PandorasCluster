@@ -24,6 +24,8 @@ interface LandPlayerService {
 
     fun getLandMember(land: Land, landPlayer: LandPlayer): LandMember?
 
+    fun getLandMember(land: Land, uuid: UUID): LandMember?
+
     fun getLandPlayers(): List<LandPlayer>
 
     /**
