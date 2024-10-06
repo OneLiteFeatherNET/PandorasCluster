@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.database.mapper
+package net.onelitefeather.pandorascluster.api.mapper
 
 interface DatabaseEntityMapper<E, M> {
 
