@@ -9,20 +9,21 @@ interface LandFlagService {
 
     /**
      * @param landFlag the landflag
-     * @param value the value of the flag
      * @param land the land to add the flag
      */
-    fun addLandFlag(landFlag: LandFlag, value: String, role: LandRole?, land: Land)
+    fun addLandFlag(landFlag: LandFlag, role: LandRole?, land: Land)
 
     /**
      * @param flag the flag to update
      */
-    fun updateLandFlag(flag: FlagRoleAttachment)
+    fun updateLandFlag(flag: FlagRoleAttachment, land: Land)
 
     /**
-     * @param landFlagProperty the flag to remove from the land.
+     * @param flag the flag to remove from the land.
      */
-    fun removeLandFlag(landFlagProperty: FlagRoleAttachment)
+    fun removeLandFlag(flag: FlagRoleAttachment, land: Land)
 
-    fun getLandFlag(landFlag: LandFlag, land: Land): FlagRoleAttachment? = land.getFlag(landFlag)
+    fun getLandFlag(landFlag: LandFlag, land: Land): FlagRoleAttachment?
+
+    fun getFlags(land: Land): List<FlagRoleAttachment>
 }
