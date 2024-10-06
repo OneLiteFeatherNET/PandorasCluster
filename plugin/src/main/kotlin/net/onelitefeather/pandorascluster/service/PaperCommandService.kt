@@ -81,7 +81,7 @@ class PaperCommandService(private val plugin: PandorasClusterPlugin) {
 
     private fun buildHelpSystem(): MinecraftHelp<CommandSender> {
         val help = MinecraftHelp.createNative("/pandorascluster help", paperCommandManager)
-        minecraftHelp.helpColors = MinecraftHelp.HelpColors.of(
+        help.helpColors = MinecraftHelp.HelpColors.of(
             NamedTextColor.DARK_GREEN,
             NamedTextColor.GREEN,
             NamedTextColor.BLUE,
