@@ -48,6 +48,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4") //DATABASE
 
     implementation(project(":api"))
+    implementation(project(":common"))
 
 }
 
