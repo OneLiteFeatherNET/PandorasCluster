@@ -3,7 +3,8 @@ package net.onelitefeather.pandorascluster.database.models.player
 import jakarta.persistence.*
 import net.onelitefeather.pandorascluster.api.enums.LandRole
 import net.onelitefeather.pandorascluster.database.models.LandEntity
-import org.hibernate.Hibernate
+import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO
+import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO
 
 @Entity
 @Table(name = "land_members")
@@ -23,13 +24,20 @@ data class LandMemberEntity(
     @JoinColumn(name = "land_id")
     val land: LandEntity? = null
 
-) {
+): LandMemberDBO {
 
+    constructor() : this(null, LandPlayerEntity(), LandRole.VISITOR, null)
 
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(id = $id , member = $member , role = $role )"
     }
+
+    override fun id(): Long? = id
+
+    override fun member(): LandPlayerDBO = member
+
+    override fun role(): LandRole = role
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
