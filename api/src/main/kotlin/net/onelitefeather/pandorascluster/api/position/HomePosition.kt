@@ -9,6 +9,8 @@ data class HomePosition(val id: Long?,
                         val yaw: Float,
                         val pitch: Float) {
 
+    constructor() : this(null, 0.0, 0.0, 0.0, 0.0F, 0.0F)
+
     fun getBlockX(): Int = LocationUtil.Instances.instance.locToBlock(posX)
 
     fun getBlockY(): Int = LocationUtil.Instances.instance.locToBlock(posY)
