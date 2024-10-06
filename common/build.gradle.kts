@@ -1,18 +1,29 @@
 plugins {
-    id("java")
+    kotlin("jvm") version "2.0.20"
 }
-
-group = "net.onelitefeather"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
+    implementation(libs.caffeine)
 
-tasks.test {
-    useJUnitPlatform()
+    // Database
+    implementation(libs.hibernateCore)
+    implementation(libs.mariadbJavaClient)
+    implementation(libs.hibernateHikariCP)
+
+    implementation(project(":adapters:database"))
+    implementation(project(":api"))
+
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
+    implementation("org.postgresql:postgresql:42.7.4") //DATABASE
+
+    implementation("net.kyori:adventure-api:4.17.0")
+
+    testImplementation(project(":adapters:database"))
+    testImplementation(project(":api"))
+    testImplementation("com.h2database:h2:2.3.232")
+    testImplementation(kotlin("test"))
 }
