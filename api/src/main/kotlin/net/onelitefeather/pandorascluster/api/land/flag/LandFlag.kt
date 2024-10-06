@@ -1,52 +1,43 @@
 package net.onelitefeather.pandorascluster.api.land.flag
 
-/**
- * case 0 -> this.value;
- * case 1 -> Integer.getInteger(this.value);
- * case 2 -> Boolean.getBoolean(this.value);
- * case 3 -> Double.parseDouble(this.value);
- * case 4 -> Float.parseFloat(this.value);
- */
-enum class LandFlag(val flagName: String,
-                    val defaultValue: Any,
-                    val landFlagType: LandFlagType,
-                    val type: Byte) {
+import net.onelitefeather.pandorascluster.api.enums.LandRole
 
-    PVP("pvp", false, LandFlagType.PLAYER, 2),
-    PVE("pve", false, LandFlagType.PLAYER, 2),
-    USE("use", "", LandFlagType.PLAYER, 0),
-    REDSTONE("redstone", true, LandFlagType.WORLD_TICK, 2),
-    POTION_SPLASH("potion-splash", false, LandFlagType.ENTITY, 2),
-    HANGING_BREAK("hanging-break", false, LandFlagType.ENTITY, 2),
-    HANGING_PLACE("hanging-place", false, LandFlagType.PLAYER, 2),
-    VEHICLE_USE("vehicle-use", false, LandFlagType.ENTITY, 2),
-    VEHICLE_CREATE("vehicle-create", false, LandFlagType.ENTITY, 2),
-    VEHICLE_DAMAGE("vehicle-damage", false, LandFlagType.ENTITY, 2),
-    LEAVES_DECAY("leaves-decay", false, LandFlagType.WORLD_TICK, 2),
-    ENTITY_CHANGE_BLOCK("entity-change-block", false, LandFlagType.ENTITY, 2),
-    EXPLOSIONS("explosions", true, LandFlagType.EXPLOSION, 2),
-    MOB_GRIEFING("mob-griefing", true, LandFlagType.ENTITY, 2),
-    ICE_FORM("ice-form", false, LandFlagType.WORLD_TICK, 2),
-    BLOCK_FORM("block-form", false, LandFlagType.ENTITY, 2),
-    TURTLE_EGG_DESTROY("turtle-egg-destroy", false, LandFlagType.ENTITY, 2),
-    UNKNOWN("unknown", false, LandFlagType.ENTITY, 2),
-    INTERACT_CROPS("interact-crops", false, LandFlagType.PLAYER, 2),
-    ENTITY_MOUNT("entity-mount", false, LandFlagType.ENTITY, 2),
-    ENTITY_TAME("entity-tame", false, LandFlagType.ENTITY, 2),
-    BUCKET_INTERACT("bucket-interact", false, LandFlagType.PLAYER, 2),
-    SHEAR_BLOCK("shear-block", false, LandFlagType.PLAYER, 2),
-    SHEAR_ENTITY("shear-entity", false, LandFlagType.PLAYER, 2),
-    TAKE_LECTERN("take-lectern", false, LandFlagType.PLAYER, 2),
-    ENTITY_LEASH("entity-leash", false, LandFlagType.PLAYER, 2),
-    USE_BED("use-bed", false, LandFlagType.PLAYER, 2),
-    VILLAGER_INTERACT("villager-interact", false, LandFlagType.PLAYER, 2),
-    FIRE_PROTECTION("fire-protection", false, LandFlagType.WORLD_TICK, 2),
-    FARMLAND_DESTROY("farmland-destroy", true, LandFlagType.ENTITY, 2),
-    INTERACT_CONTAINERS("interact-containers", false, LandFlagType.PLAYER, 2),
-    SPONGE_ABSORB("sponge-absorb", false, LandFlagType.WORLD_TICK, 2),
-    ANIMAL_CAP("animal-cap", "250", LandFlagType.ENTITY, 1),
-    MONSTER_CAP("monster-cap", "250", LandFlagType.ENTITY, 1),
-    VILLAGER_CAP("villager-cap", "100", LandFlagType.ENTITY, 1);
+enum class LandFlag(val displayName: String, val landRole: LandRole) {
+
+    PVP("pvp", LandRole.MEMBER),
+    PVE("pve", LandRole.MEMBER),
+    REDSTONE("redstone", LandRole.VISITOR),
+    POTION_SPLASH("potion-splash", LandRole.MEMBER),
+    HANGING_BREAK("hanging-break", LandRole.MEMBER),
+    HANGING_PLACE("hanging-place", LandRole.MEMBER),
+    VEHICLE_USE("vehicle-use", LandRole.MEMBER),
+    VEHICLE_CREATE("vehicle-create", LandRole.MEMBER),
+    VEHICLE_DAMAGE("vehicle-damage", LandRole.MEMBER),
+    LEAVES_DECAY("leaves-decay", LandRole.MEMBER),
+    ENTITY_CHANGE_BLOCK("entity-change-block", LandRole.MEMBER),
+    EXPLOSIONS("explosions", LandRole.MEMBER),
+    MOB_GRIEFING("mob-griefing", LandRole.MEMBER),
+    ICE_FORM("ice-form", LandRole.MEMBER),
+    BLOCK_FORM("block-form", LandRole.MEMBER),
+    TURTLE_EGG_DESTROY("turtle-egg-destroy", LandRole.MEMBER),
+    UNKNOWN("unknown", LandRole.MEMBER),
+    INTERACT_CROPS("interact-crops", LandRole.MEMBER),
+    ENTITY_MOUNT("entity-mount", LandRole.MEMBER),
+    ENTITY_TAME("entity-tame", LandRole.MEMBER),
+    BUCKET_INTERACT("bucket-interact", LandRole.MEMBER),
+    SHEAR_BLOCK("shear-block", LandRole.MEMBER),
+    SHEAR_ENTITY("shear-entity", LandRole.MEMBER),
+    TAKE_LECTERN("take-lectern", LandRole.MEMBER),
+    ENTITY_LEASH("entity-leash", LandRole.MEMBER),
+    USE_BED("use-bed", LandRole.MEMBER),
+    VILLAGER_INTERACT("villager-interact", LandRole.MEMBER),
+    FIRE_PROTECTION("fire-protection", LandRole.MEMBER),
+    FARMLAND_DESTROY("farmland-destroy", LandRole.MEMBER),
+    INTERACT_CONTAINERS("interact-containers", LandRole.MEMBER),
+    SPONGE_ABSORB("sponge-absorb", LandRole.MEMBER);
+//    ANIMAL_CAP("animal-cap", "250", LandFlagType.ENTITY, 1),
+//    MONSTER_CAP("monster-cap", "250", LandFlagType.ENTITY, 1),
+//    VILLAGER_CAP("villager-cap", "100", LandFlagType.ENTITY, 1);
 
     companion object {
         val LAND_FLAGS = LandFlag.entries.toTypedArray()
@@ -56,7 +47,7 @@ enum class LandFlag(val flagName: String,
 
         fun filterFlagName(landFlag: LandFlag, flagName: String) =
             landFlag.name == flagName.uppercase() ||
-                    landFlag.flagName.equals(flagName, true)
+                    landFlag.displayName.equals(flagName, true)
     }
 }
 
