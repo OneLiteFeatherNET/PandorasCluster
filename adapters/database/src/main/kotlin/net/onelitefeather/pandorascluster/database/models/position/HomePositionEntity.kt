@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models.position
 
 import jakarta.persistence.*
+import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO
 
 @Entity
 @Table(name = "land_homes")
@@ -24,7 +25,7 @@ data class HomePositionEntity(
 
     @Column
     val pitch: Float = 1.0F
-) {
+): HomePositionDBO {
 
     override fun hashCode(): Int = javaClass.hashCode()
 
@@ -33,6 +34,18 @@ data class HomePositionEntity(
         this::class.simpleName +
                 "(id = $id , posX = $posX , posY = $posY , posZ = $posZ , " +
                 "yaw = $yaw , pitch = $pitch)"
+
+    override fun id(): Long? = id
+
+    override fun posX(): Double = posX
+
+    override fun posY(): Double = posY
+
+    override fun posZ(): Double = posZ
+
+    override fun yaw(): Float = yaw
+
+    override fun pitch(): Float = pitch
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
