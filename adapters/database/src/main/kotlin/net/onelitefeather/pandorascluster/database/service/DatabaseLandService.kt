@@ -2,10 +2,10 @@ package net.onelitefeather.pandorascluster.database.service
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
-import net.onelitefeather.pandorascluster.api.land.Land
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
-import net.onelitefeather.pandorascluster.api.builder.LandBuilder
+import net.onelitefeather.pandorascluster.api.builder.landBuilder
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk
+import net.onelitefeather.pandorascluster.api.land.Land
 import net.onelitefeather.pandorascluster.api.player.LandPlayer
 import net.onelitefeather.pandorascluster.api.position.HomePosition
 import net.onelitefeather.pandorascluster.api.service.DatabaseService
@@ -36,7 +36,7 @@ class DatabaseLandService(
     override fun getLands(): List<Land> {
         try {
             databaseService.sessionFactory().openSession().use { session ->
-                val query = session.createQuery("SELECT l FROM lands l", LandEntity::class.java)
+                val query = session.createQuery("SELECT l FROM LandEntity l", LandEntity::class.java)
                 val lands = query.list()
                 return lands.mapNotNull { databaseService.landMapper().entityToModel(it) }
             }
@@ -78,7 +78,7 @@ class DatabaseLandService(
     override fun addClaimedChunk(chunk: ClaimedChunk, land: Land?) {
         var transaction: Transaction? = null
         val claimedChunkEntity =
-            ClaimedChunkEntity(null, chunk.chunkIndex, databaseService.landMapper().modelToEntity(land))
+            ClaimedChunkEntity(null, chunk.chunkIndex, databaseService.landMapper().modelToEntity(land) as LandEntity)
         try {
 
             databaseService.sessionFactory().openSession().use { session ->
@@ -95,17 +95,20 @@ class DatabaseLandService(
         }
     }
 
-    override fun createLand(owner: LandPlayer, home: HomePosition, chunk: ClaimedChunk, world: String) {
+    override fun createLand(owner: LandPlayer, home: HomePosition, chunk: ClaimedChunk, world: String): Land? {
+
+        val land = getLand(chunk)
+        if (land != null) return land
+        if (hasPlayerLand(owner)) return getLand(owner)
+
         var transaction: Transaction? = null
         try {
             databaseService.sessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
-
                 val homeEntity = databaseService.homePositionMapper().modelToEntity(home)
-
                 session.persist(homeEntity)
 
-                val land = LandBuilder {
+                val createLand = landBuilder {
                     owner { owner }
                     homePosition { databaseService.homePositionMapper().entityToModel(homeEntity)!! }
                     world { world }
@@ -114,14 +117,20 @@ class DatabaseLandService(
                     flags { emptyList() }
                 }
 
-                session.persist(databaseService.landMapper().modelToEntity(land.build()))
-                session.persist(databaseService.claimedChunkMapper().modelToEntity(chunk))
+                val landEntity = databaseService.landMapper().modelToEntity(createLand) as LandEntity
+                val chunkEntity = ClaimedChunkEntity(null, chunk.chunkIndex, landEntity)
+
+                session.persist(landEntity)
+                session.persist(chunkEntity)
                 transaction?.commit()
+                return databaseService.landMapper().entityToModel(landEntity)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
             LOGGER.throwing(this::class.java.simpleName, "createLand", e)
         }
+
+        return null
     }
 
     override fun unclaimLand(land: Land) {
@@ -130,12 +139,14 @@ class DatabaseLandService(
             databaseService.sessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
 
-                session.remove(databaseService.landMapper().modelToEntity(land))
                 land.members.forEach { api.getLandPlayerService().removeLandMember(it) }
 
-                land.chunks.forEach(this::removeClaimedChunk)
-                land.flags.forEach { api.getLandFlagService().removeLandFlag(it) }
-                session.remove(land)
+                land.chunks.map(ClaimedChunk::chunkIndex).forEach(this::removeClaimedChunk)
+                land.flags.forEach { api.getLandFlagService().removeLandFlag(it, land) }
+
+                session.remove(databaseService.landMapper().modelToEntity(land))
+                session.remove(databaseService.homePositionMapper().modelToEntity(land.home))
+
                 transaction?.commit()
             }
         } catch (e: HibernateException) {
@@ -144,19 +155,26 @@ class DatabaseLandService(
         }
     }
 
-    override fun removeClaimedChunk(chunk: ClaimedChunk) {
+    override fun removeClaimedChunk(chunkIndex: Long): Boolean {
         var transaction: Transaction? = null
         try {
             databaseService.sessionFactory().openSession().use { session ->
                 transaction = session.beginTransaction()
-                session.remove(databaseService.claimedChunkMapper().modelToEntity(chunk))
-                transaction?.commit()
-                unclaimChunk(chunk)
+
+                val chunk = getClaimedChunk(chunkIndex)
+                if (chunk != null) {
+                    val chunkEntity = databaseService.claimedChunkMapper().modelToEntity(chunk) as ClaimedChunkEntity
+                    session.remove(chunkEntity)
+                    transaction?.commit()
+                    unclaimChunk(chunk)
+                    return true
+                }
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
             LOGGER.throwing(this::class.java.simpleName, "removeClaimedChunk", e)
         }
+        return false
     }
 
     override fun getLand(chunk: ClaimedChunk): Land? {
@@ -166,7 +184,7 @@ class DatabaseLandService(
         try {
             databaseService.sessionFactory().openSession().use { session ->
                 val query = session.createQuery(
-                    "SELECT ch FROM land_chunks ch JOIN FETCH ch.land WHERE ch.chunkIndex = :chunkIndex",
+                    "SELECT ch FROM ClaimedChunkEntity ch JOIN FETCH ch.landEntity WHERE ch.chunkIndex = :chunkIndex",
                     ClaimedChunkEntity::class.java
                 )
                 query.setParameter("chunkIndex", chunk.chunkIndex)
@@ -189,24 +207,9 @@ class DatabaseLandService(
      * @return true if the chunk is claimed.
      */
     override fun isChunkClaimed(chunk: ClaimedChunk): Boolean {
-
         val claimed = unclaimedChunkCache.getIfPresent(chunk)
         if (claimed == true) return true
-
-        try {
-            databaseService.sessionFactory().openSession().use { session ->
-                val query = session.createQuery(
-                    "SELECT ch FROM land_chunks ch WHERE chunkIndex = :chunkIndex",
-                    ClaimedChunkEntity::class.java
-                )
-                query.maxResults = 1
-                query.setParameter("chunkIndex", chunk.chunkIndex)
-                return query.uniqueResult() != null
-            }
-        } catch (e: HibernateException) {
-            LOGGER.throwing(this::class.java.simpleName, "isChunkClaimed", e)
-        }
-        return false
+        return getClaimedChunk(chunk.chunkIndex) != null
     }
 
     /**
@@ -215,12 +218,12 @@ class DatabaseLandService(
     override fun getLand(owner: LandPlayer): Land? {
         try {
             databaseService.sessionFactory().openSession().use { session ->
-                val landOfOwner = session.createQuery(
-                    "SELECT l FROM lands l JOIN l.owner o JOIN FETCH l.chunks WHERE o.uuid = :uuid",
+                val query = session.createQuery(
+                    "SELECT l FROM LandEntity l JOIN FETCH l.owner o WHERE o.uuid = :uuid",
                     LandEntity::class.java
                 )
-                landOfOwner.setParameter("uuid", owner.uniqueId.toString())
-                return databaseService.landMapper().entityToModel(landOfOwner.uniqueResult())
+                query.setParameter("uuid", owner.uniqueId.toString())
+                return databaseService.landMapper().entityToModel(query.uniqueResult())
             }
         } catch (e: HibernateException) {
             LOGGER.throwing(this::class.java.simpleName, "getLand", e)
@@ -232,6 +235,25 @@ class DatabaseLandService(
     override fun hasPlayerLand(player: LandPlayer): Boolean {
         val landPlayer = api.getLandPlayerService().getLandPlayer(player.uniqueId) ?: return false
         return getLand(landPlayer) != null
+    }
+
+    override fun getClaimedChunk(chunkIndex: Long): ClaimedChunk? {
+        try {
+            databaseService.sessionFactory().openSession().use { session ->
+                val query = session.createQuery(
+                    "SELECT c FROM ClaimedChunkEntity c WHERE c.chunkIndex = :chunkIndex",
+                    ClaimedChunkEntity::class.java
+                )
+
+                query.maxResults = 1
+                query.setParameter("chunkIndex", chunkIndex)
+                return databaseService.claimedChunkMapper().entityToModel(query.uniqueResult())
+            }
+        } catch (e: HibernateException) {
+            LOGGER.throwing(this::class.java.simpleName, "isChunkClaimed", e)
+        }
+
+        return null
     }
 
     /**
@@ -247,7 +269,10 @@ class DatabaseLandService(
         landCache.invalidate(chunk)
     }
 
-    private fun updateLoadedChunks(land: Land) {
-        landCache.refreshAll(land.chunks)
+    override fun updateLoadedChunks(land: Land) {
+        landCache.invalidateAll(land.chunks)
+        land.chunks.forEach {
+            landCache.put(it, land)
+        }
     }
 }

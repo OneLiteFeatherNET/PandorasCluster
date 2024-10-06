@@ -7,6 +7,7 @@ import net.onelitefeather.pandorascluster.api.player.LandPlayer
 import net.onelitefeather.pandorascluster.api.service.DatabaseService
 import net.onelitefeather.pandorascluster.api.service.LandPlayerService
 import net.onelitefeather.pandorascluster.api.utils.LOGGER
+import net.onelitefeather.pandorascluster.database.models.LandEntity
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity
 import org.hibernate.HibernateException
@@ -16,13 +17,12 @@ import java.util.*
 class DatabaseLandPlayerService(private val databaseService: DatabaseService) : LandPlayerService {
 
     override fun addLandMember(land: Land, member: LandPlayer, landRole: LandRole?) {
-
         val role = landRole ?: LandRole.VISITOR
 
         val landEntity = databaseService.landMapper().modelToEntity(land) ?: return
         val memberEntity = databaseService.landPlayerMapper().modelToEntity(member) ?: return
 
-        val landMember = LandMemberEntity(null, memberEntity, role, landEntity)
+        val landMember = LandMemberEntity(null, memberEntity as LandPlayerEntity, role, landEntity as LandEntity)
         var transaction: Transaction? = null
         try {
             databaseService.sessionFactory().openSession().use { session ->
@@ -41,9 +41,13 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
 
     override fun updateLandMember(land: Land, member: LandMember) {
         try {
+
+            val landEntity = databaseService.landMapper().modelToEntity(land) as LandEntity
+            val memberEntity = databaseService.landMemberMapper().modelToEntity(member) as LandMemberEntity
+
             databaseService.sessionFactory().openSession().use { session ->
                 session.beginTransaction()
-                session.merge(databaseService.landMemberMapper().modelToEntity(member))
+                session.merge(memberEntity.copy(land = landEntity))
                 session.transaction.commit()
             }
         } catch (e: HibernateException) {
@@ -69,13 +73,17 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
     }
 
     override fun getLandMember(land: Land, landPlayer: LandPlayer): LandMember? {
-        return land.members.firstOrNull { it.member == landPlayer }
+        return getLandMember(land, landPlayer.uniqueId)
+    }
+
+    override fun getLandMember(land: Land, uuid: UUID): LandMember? {
+        return land.members.firstOrNull { it.member.uniqueId == uuid }
     }
 
     override fun getLandPlayers(): List<LandPlayer> {
         try {
             databaseService.sessionFactory().openSession().use { session ->
-                val query = session.createQuery("SELECT lp FROM land_players lp", LandPlayerEntity::class.java)
+                val query = session.createQuery("SELECT lp FROM LandPlayerEntity lp", LandPlayerEntity::class.java)
                 val players = query.list()
                 return players.mapNotNull { databaseService.landPlayerMapper().entityToModel(it) }
             }
@@ -126,7 +134,7 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
         try {
             databaseService.sessionFactory().openSession().use { session ->
                 val chunkPlayerQuery = session.createQuery(
-                    "SELECT lp FROM land_players lp WHERE lp.uuid = :uuid",
+                    "SELECT lp FROM LandPlayerEntity lp WHERE lp.uuid = :uuid",
                     LandPlayerEntity::class.java
                 )
 
@@ -145,7 +153,7 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
     override fun getLandPlayer(name: String): LandPlayer? {
         try {
             databaseService.sessionFactory().openSession().use { session ->
-                val chunkPlayerQuery = session.createQuery("SELECT lp FROM land_players lp WHERE lp.name = :name",
+                val chunkPlayerQuery = session.createQuery("SELECT lp FROM LandPlayerEntity lp WHERE lp.name = :name",
                     LandPlayerEntity::class.java
                 )
                 chunkPlayerQuery.maxResults = 1
