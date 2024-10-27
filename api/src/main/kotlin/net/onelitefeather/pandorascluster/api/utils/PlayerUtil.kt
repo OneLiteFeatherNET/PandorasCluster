@@ -10,6 +10,8 @@ interface PlayerUtil {
 
     fun isOnline(uuid: UUID): Boolean
 
+    fun hasPermission(uuid: UUID, permission: String): Boolean
+
     object Instances {
 
         private val service: Optional<PlayerUtil> = Services.service(PlayerUtil::class.java)
