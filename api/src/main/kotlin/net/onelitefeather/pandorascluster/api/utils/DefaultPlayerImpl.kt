@@ -8,9 +8,7 @@ class DefaultPlayerImpl : PlayerUtil {
         throw NotImplementedException("This is not implemented yet!")
     }
 
-    override fun isOnline(uuid: UUID): Boolean {
-        throw NotImplementedException("This is not implemented yet!")
-    }
+    override fun isOnline(uuid: UUID) = false
 
-
+    override fun hasPermission(uuid: UUID, permission: String) = false
 }
