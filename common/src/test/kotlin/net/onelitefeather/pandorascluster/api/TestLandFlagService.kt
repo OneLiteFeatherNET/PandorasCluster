@@ -14,25 +14,36 @@ class TestLandFlagService {
     private val testLandService: TestLandService = TestLandService()
 
     @Test
-    fun testLandFlagService() {
-
+    fun testAddLandFlag() {
         testLandService.testLandCreation()
-        var land = api.getLandService().getLand(mainChunk)
+        val land = api.getLandService().getLand(mainChunk)
         assertNotNull(land)
-        
         landFlagService.addLandFlag(LandFlag.POTION_SPLASH, LandRole.MEMBER, land)
         landFlagService.addLandFlag(LandFlag.ENTITY_LEASH, LandRole.VISITOR, land)
         landFlagService.addLandFlag(LandFlag.VILLAGER_INTERACT, LandRole.ADMIN, land)
+    }
 
-        land = api.getLandService().getLand(mainChunk)
+    @Test
+    fun testRemoveLandFlag() {
+
+        testLandService.testLandCreation()
+        val land = api.getLandService().getLand(mainChunk)
         assertNotNull(land)
 
-        val landFlag = landFlagService.getLandFlag(LandFlag.ENTITY_LEASH, land)
+        val landFlag = land.getFlag(LandFlag.ENTITY_LEASH)
         assertNotNull(landFlag)
         landFlagService.removeLandFlag(landFlag, land)
+    }
 
-        val flag = land.getFlag(LandFlag.POTION_SPLASH).copy(role = LandRole.MEMBER)
+    @Test
+    fun testUpdateLandFlag() {
+
+        testLandService.testLandCreation()
+        val land = api.getLandService().getLand(mainChunk)
+        assertNotNull(land)
+
+        val flag = land.getFlag(LandFlag.POTION_SPLASH)
         assertNotNull(flag)
-        landFlagService.updateLandFlag(flag, land)
+        landFlagService.updateLandFlag(flag.copy(role = LandRole.ADMIN), land)
     }
 }
