@@ -13,9 +13,22 @@ class TestLandService {
     private val landService: LandService = api.getLandService()
 
     @Test
-    fun testUpdateLandHome() {
+    fun testCreateLandOwner() {
+        if (api.getLandPlayerService().playerExists(landOwnerUUID)) return
+        assertTrue(api.getLandPlayerService().createPlayer(landOwnerUUID, "theShadowsDust"))
+    }
 
-        testLandCreation()
+    @Test
+    fun testLandCreation() {
+        val landPlayer = api.getLandPlayerService().getLandPlayer(landOwnerUUID)
+        assertNotNull(landPlayer)
+
+        val land = landService.createLand(landPlayer, landHome, mainChunk, "world")
+        assertNotNull(land)
+    }
+
+    @Test
+    fun testUpdateLandHome() {
 
         val owner = api.getLandPlayerService().getLandPlayer(landOwnerUUID)
         assertNotNull(owner)
@@ -28,31 +41,12 @@ class TestLandService {
     }
 
     @Test
-    fun testCreateLandOwner() {
-        if (api.getLandPlayerService().playerExists(landOwnerUUID)) return
-        assertTrue(api.getLandPlayerService().createPlayer(landOwnerUUID, "TheMeinerLP"))
-    }
-
-    @Test
-    fun testLandCreation() {
-        testCreateLandOwner()
-        val landPlayer = api.getLandPlayerService().getLandPlayer(landOwnerUUID)
-        assertNotNull(landPlayer)
-
-        val land = landService.createLand(landPlayer, landHome, mainChunk, "world")
-        assertNotNull(land)
-    }
-
-    @Test
     fun testisChunkClaimed() {
-        testLandCreation()
         assertTrue(landService.isChunkClaimed(mainChunk))
     }
 
     @Test
     fun testhasPlayerLand() {
-        testLandCreation()
-
         val owner = api.getLandPlayerService().getLandPlayer(landOwnerUUID)
         assertNotNull(owner)
         assertTrue(landService.hasPlayerLand(owner))
@@ -60,8 +54,6 @@ class TestLandService {
 
     @Test
     fun testAddAndRemoveChunk() {
-
-        testLandCreation()
 
         val owner = api.getLandPlayerService().getLandPlayer(landOwnerUUID)
         assertNotNull(owner)
@@ -80,17 +72,18 @@ class TestLandService {
     @Test
     fun testgetLand() {
 
-        testLandCreation()
-        assertNotNull(landService.getLand(mainChunk))
 
-        val ownerByName = api.getLandPlayerService().getLandPlayer("TheMeinerLP")
+        val land = landService.getLand(mainChunk)
+        println("land = $land")
+        assertNotNull(land)
+
+        val ownerByName = api.getLandPlayerService().getLandPlayer("theShadowsDust")
         assertNotNull(ownerByName)
         assertNotNull(landService.getLand(ownerByName))
     }
 
     @Test
     fun testUnclaimLand() {
-        testLandCreation()
         val land = landService.getLand(mainChunk)
         assertNotNull(land)
         landService.unclaimLand(land)
