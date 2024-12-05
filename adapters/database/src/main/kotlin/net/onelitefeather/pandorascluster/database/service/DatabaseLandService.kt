@@ -2,6 +2,7 @@ package net.onelitefeather.pandorascluster.database.service
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
+import com.github.benmanes.caffeine.cache.RemovalCause
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.builder.landBuilder
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk
@@ -15,23 +16,29 @@ import net.onelitefeather.pandorascluster.database.models.ClaimedChunkEntity
 import net.onelitefeather.pandorascluster.database.models.LandEntity
 import org.hibernate.HibernateException
 import org.hibernate.Transaction
-import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
+
 
 class DatabaseLandService(
     private val api: PandorasClusterApi,
     private val databaseService: DatabaseService
 ) : LandService {
 
-    val landCache: LoadingCache<ClaimedChunk, Land> = Caffeine.newBuilder().maximumSize(5000)
-        .expireAfterAccess(Duration.ofMinutes(5))
-        .expireAfterWrite(Duration.ofMinutes(5))
-        .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> getLand(key) }
+    val landCache: LoadingCache<ClaimedChunk, Land> = Caffeine.newBuilder().maximumSize(500)
+        .removalListener { chunk: ClaimedChunk?, land: Land?, cause: RemovalCause? ->
+            refreshCache(chunk)
+        }
+        .refreshAfterWrite(1, TimeUnit.MINUTES)
+        .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build { key -> getLand(key) }
 
-    val unclaimedChunkCache: LoadingCache<ClaimedChunk, Boolean> = Caffeine.newBuilder().maximumSize(10_000)
-        .expireAfterAccess(Duration.ofMinutes(5))
-        .expireAfterWrite(Duration.ofMinutes(5))
-        .refreshAfterWrite(Duration.ofMinutes(1)).build { key -> isChunkClaimed(key) }
+    val unclaimedChunkCache: LoadingCache<ClaimedChunk, Boolean> = Caffeine.newBuilder().maximumSize(1000)
+        .removalListener { chunk: ClaimedChunk?, value: Boolean?, cause: RemovalCause? ->
+            refreshChunkCache(chunk)
+        }
+        .refreshAfterWrite(1, TimeUnit.MINUTES)
+        .expireAfterAccess(1, TimeUnit.MINUTES).build { key -> isChunkClaimed(key) }
 
     override fun getLands(): List<Land> {
         try {
@@ -67,7 +74,7 @@ class DatabaseLandService(
                 transaction = session.beginTransaction()
                 session.merge(databaseService.landMapper().modelToEntity(land))
                 transaction?.commit()
-                updateLoadedChunks(land)
+                land.chunks.forEach(this::refreshCache)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -76,6 +83,7 @@ class DatabaseLandService(
     }
 
     override fun addClaimedChunk(chunk: ClaimedChunk, land: Land?) {
+        if (land == null) return
         var transaction: Transaction? = null
         val claimedChunkEntity =
             ClaimedChunkEntity(null, chunk.chunkIndex, databaseService.landMapper().modelToEntity(land) as LandEntity)
@@ -87,7 +95,8 @@ class DatabaseLandService(
                 transaction?.commit()
             }
 
-            if (land != null) claimChunk(chunk, land)
+            claimChunk(chunk, land)
+            updateLand(land)
 
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -177,9 +186,17 @@ class DatabaseLandService(
         return false
     }
 
+    override fun getLand(chunkIndex: Long): Land? {
+        return getLand(ClaimedChunk(null, chunkIndex))
+    }
+
     override fun getLand(chunk: ClaimedChunk): Land? {
+        if (!isChunkClaimed(chunk)) return null
+
         var land = landCache.getIfPresent(chunk)
-        if (land != null) return land
+        if (land != null) {
+            return land
+        }
 
         try {
             databaseService.sessionFactory().openSession().use { session ->
@@ -207,9 +224,12 @@ class DatabaseLandService(
      * @return true if the chunk is claimed.
      */
     override fun isChunkClaimed(chunk: ClaimedChunk): Boolean {
-        val claimed = unclaimedChunkCache.getIfPresent(chunk)
-        if (claimed == true) return true
-        return getClaimedChunk(chunk.chunkIndex) != null
+        val claimedChunk = unclaimedChunkCache.getIfPresent(chunk)
+        return if (claimedChunk != null) false else getClaimedChunk(chunk.chunkIndex) != null
+    }
+
+    override fun isChunkClaimed(chunkIndex: Long): Boolean {
+        return isChunkClaimed(ClaimedChunk(null, chunkIndex))
     }
 
     /**
@@ -238,6 +258,7 @@ class DatabaseLandService(
     }
 
     override fun getClaimedChunk(chunkIndex: Long): ClaimedChunk? {
+
         try {
             databaseService.sessionFactory().openSession().use { session ->
                 val query = session.createQuery(
@@ -269,10 +290,13 @@ class DatabaseLandService(
         landCache.invalidate(chunk)
     }
 
-    override fun updateLoadedChunks(land: Land) {
-        landCache.invalidateAll(land.chunks)
-        land.chunks.forEach {
-            landCache.put(it, land)
-        }
+    private fun refreshCache(chunk: ClaimedChunk?) {
+        if (chunk == null) return
+        landCache.refresh(chunk)
+    }
+
+    private fun refreshChunkCache(chunk: ClaimedChunk?) {
+        if (chunk == null) return
+        unclaimedChunkCache.refresh(chunk)
     }
 }
