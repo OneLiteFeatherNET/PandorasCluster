@@ -19,13 +19,11 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
 
         val vehicle = event.vehicle
         val attacker = event.attacker
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(vehicle.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(vehicle.chunk.chunkKey)
         if (land != null) {
-            if (land.getFlag(LandFlag.VEHICLE_DAMAGE).getValue<Boolean>() == true) return
             if (attacker != null) {
-                if (land.hasMemberAccess(attacker.uniqueId)) return
-                if (hasPermission(attacker, LandFlag.VEHICLE_DAMAGE)) return
-                event.isCancelled = true
+                if (land.hasMemberAccess(attacker.uniqueId, LandFlag.VEHICLE_DAMAGE)) return
+                event.isCancelled = !land.hasFlag(LandFlag.VEHICLE_DAMAGE)
                 return
             }
             event.isCancelled = true
@@ -37,15 +35,11 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
 
         val vehicle = event.vehicle
         val attacker = event.attacker
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(vehicle.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(vehicle.chunk.chunkKey)
 
         if (land != null) {
-            if (attacker != null) {
-                if (land.hasMemberAccess(attacker.uniqueId)) return
-                if (hasPermission(attacker, LandFlag.VEHICLE_DAMAGE)) return
-            }
-            if (land.getFlag(LandFlag.VEHICLE_DAMAGE).getValue<Boolean>() == true) return
-            event.isCancelled = true
+            if (attacker != null && land.hasMemberAccess(attacker.uniqueId, LandFlag.VEHICLE_DAMAGE)) return
+            event.isCancelled = !land.hasFlag(LandFlag.VEHICLE_DAMAGE)
         }
     }
 
@@ -53,15 +47,15 @@ class LandVehicleListener(val pandorasClusterApi: PandorasClusterApi) : Listener
     fun handleVehicleCreation(event: VehicleCreateEvent) {
         val vehicle = event.vehicle
         if (vehicle.entitySpawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT) return
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(vehicle.chunk)) ?: return
-        event.isCancelled = land.getFlag(LandFlag.VEHICLE_CREATE).getValue<Boolean>() == false
+        val land = pandorasClusterApi.getLandService().getLand(vehicle.chunk.chunkKey) ?: return
+        event.isCancelled = !land.hasFlag(LandFlag.VEHICLE_CREATE)
     }
 
     @EventHandler
     fun handleVehicleMovement(event: VehicleMoveEvent) {
         val vehicle = event.vehicle
         val to = event.to
-        val toLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(to.chunk))
+        val toLand = pandorasClusterApi.getLandService().getLand(to.chunk.chunkKey)
         if (toLand != null) {
             vehicle.passengers.filter { toLand.isBanned(it.uniqueId) }.forEach { vehicle.removePassenger(it) }
         }

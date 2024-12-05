@@ -25,11 +25,11 @@ class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi
                     true
                 } else {
 
-                    val leftChunk = toClaimedChunk((sideLeft as BlockState).chunk)
-                    val rightChunk = toClaimedChunk((sideRight as BlockState).chunk)
+                    val leftChunk = (sideLeft as BlockState).chunk
+                    val rightChunk =(sideRight as BlockState).chunk
 
-                    val land = pandorasClusterApi.getLandService().getLand(leftChunk)
-                    val otherLand = pandorasClusterApi.getLandService().getLand(rightChunk)
+                    val land = pandorasClusterApi.getLandService().getLand(leftChunk.chunkKey)
+                    val otherLand = pandorasClusterApi.getLandService().getLand(rightChunk.chunkKey)
                     land == null || otherLand == null || !hasSameOwner(land, otherLand)
                 }
             } else {
@@ -42,8 +42,8 @@ class LandContainerProtectionListener(val pandorasClusterApi: PandorasClusterApi
 
         if (destinationInventory.holder is BlockState) {
 
-            val destinationChunk = toClaimedChunk((destinationInventory.holder as BlockState).block.chunk)
-            val holder = toClaimedChunk((event.source.holder as BlockState).block.chunk)
+            val destinationChunk = (destinationInventory.holder as BlockState).block.chunk.chunkKey
+            val holder = (event.source.holder as BlockState).block.chunk.chunkKey
 
             val land = pandorasClusterApi.getLandService().getLand(destinationChunk)
             val sourceLand = pandorasClusterApi.getLandService().getLand(holder)
