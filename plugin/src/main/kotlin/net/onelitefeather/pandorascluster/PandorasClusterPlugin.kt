@@ -61,7 +61,7 @@ class PandorasClusterPlugin : JavaPlugin() {
         api.getStaffNotification().addStaffNotification(MinecraftStaffNotification(api, this))
         val discordWebhook = buildDiscordWebhook()
         if(discordWebhook != null) {
-            api.getStaffNotification().addStaffNotification(DiscordStaffNotification(api, discordWebhook))
+            api.getStaffNotification().addStaffNotification(DiscordStaffNotification(api, discordWebhook, this))
         }
     }
 

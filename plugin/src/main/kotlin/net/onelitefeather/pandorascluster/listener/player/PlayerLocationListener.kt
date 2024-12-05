@@ -25,10 +25,10 @@ class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Liste
     fun handlePlayerMovement(event: PlayerMoveEvent) {
         if (!event.hasExplicitlyChangedBlock()) return
         val player = event.player
-        val toLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.to.chunk)) ?: return
+        val toLand = pandorasClusterApi.getLandService().getLand(event.to.chunk.chunkKey) ?: return
         if (canEnterLand(player, toLand)) return
 
-        val fromLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.from.chunk))
+        val fromLand = pandorasClusterApi.getLandService().getLand(event.from.chunk.chunkKey)
         if (fromLand != null && toLand.isBanned(player.uniqueId)) {
             event.to = world.spawnLocation
             return
@@ -44,8 +44,8 @@ class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Liste
         val from = event.from
         if (allowedReasons.contains(event.cause)) return
 
-        val fromLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(from.chunk))
-        val toLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(to.chunk))
+        val fromLand = pandorasClusterApi.getLandService().getLand(from.chunk.chunkKey)
+        val toLand = pandorasClusterApi.getLandService().getLand(to.chunk.chunkKey)
         val land = toLand ?: fromLand ?: return
 
         if (canEnterLand(player, land)) return
@@ -54,7 +54,7 @@ class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Liste
 
     @EventHandler
     fun handlePlayerRespawn(event: PlayerRespawnEvent) {
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.respawnLocation.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(event.respawnLocation.chunk.chunkKey)
         if (event.player.hasPermission(Permission.LAND_ENTRY_DENIED.permissionNode)) return
         if (land == null || !land.isBanned(event.player.uniqueId)) return
         event.respawnLocation = world.spawnLocation.toCenterLocation()
@@ -62,7 +62,7 @@ class PlayerLocationListener(val pandorasClusterApi: PandorasClusterApi) : Liste
 
     @EventHandler
     fun handlePlayerSpawn(event: PlayerSpawnLocationEvent) {
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.spawnLocation.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(event.spawnLocation.chunk.chunkKey)
         if (event.player.hasPermission(Permission.LAND_ENTRY_DENIED.permissionNode)) return
         if (land == null || !land.isBanned(event.player.uniqueId)) return
         event.spawnLocation = world.spawnLocation.toCenterLocation()

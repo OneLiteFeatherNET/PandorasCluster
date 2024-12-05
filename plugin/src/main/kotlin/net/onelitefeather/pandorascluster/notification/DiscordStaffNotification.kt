@@ -4,10 +4,10 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.enums.EntityCategory
 import net.onelitefeather.pandorascluster.api.land.Land
 import net.onelitefeather.pandorascluster.api.notification.StaffNotification
-import net.onelitefeather.pandorascluster.api.utils.propertyDiscordAvatarUrl
 import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.util.discord.DiscordWebhook
 import net.onelitefeather.pandorascluster.util.discord.embed.EmbedObject
+import net.onelitefeather.pandorascluster.util.propertyDiscordAvatarUrl
 import org.bukkit.plugin.Plugin
 import java.awt.Color
 
