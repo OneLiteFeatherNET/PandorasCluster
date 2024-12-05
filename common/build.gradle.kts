@@ -20,8 +20,6 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     implementation("org.postgresql:postgresql:42.7.4") //DATABASE
 
-    implementation("net.kyori:adventure-api:4.17.0")
-
     testImplementation(project(":adapters:database"))
     testImplementation(project(":api"))
     testImplementation("com.h2database:h2:2.3.232")
