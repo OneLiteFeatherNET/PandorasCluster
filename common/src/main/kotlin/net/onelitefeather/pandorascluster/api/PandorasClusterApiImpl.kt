@@ -1,12 +1,10 @@
 package net.onelitefeather.pandorascluster.api
 
-import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.service.*
 import net.onelitefeather.pandorascluster.database.service.DatabaseLandFlagService
 import net.onelitefeather.pandorascluster.database.service.DatabaseLandPlayerService
 import net.onelitefeather.pandorascluster.database.service.DatabaseLandService
 import net.onelitefeather.pandorascluster.database.service.DatabaseServiceImpl
-import java.nio.file.Path
 
 class PandorasClusterApiImpl : PandorasClusterApi {
 
@@ -16,19 +14,15 @@ class PandorasClusterApiImpl : PandorasClusterApi {
     private lateinit var landService: LandService
     private lateinit var staffNotification: StaffNotificationService
 
-    //pandorasClusterPlugin.dataFolder.toPath().resolve("hibernate.cfg.xml")
-
     init {
-        databaseService.connect(Path.of(""))
+        databaseService.connect("connection.cfg.xml")
         if (databaseService.isRunning()) {
-            landFlagService = DatabaseLandFlagService(databaseService)
-            landPlayerService = DatabaseLandPlayerService(databaseService)
             landService = DatabaseLandService(this, databaseService)
+            landFlagService = DatabaseLandFlagService(databaseService, landService)
+            landPlayerService = DatabaseLandPlayerService(databaseService, landService)
             staffNotification = StaffNotificationService(this)
         }
     }
-
-    override fun pluginPrefix(): Component = Component.translatable("prefix")
 
     override fun getDatabaseStorageService(): LandService = landService
 

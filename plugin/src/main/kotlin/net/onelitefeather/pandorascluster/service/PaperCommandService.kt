@@ -16,6 +16,7 @@ import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.command.commands.*
 import net.onelitefeather.pandorascluster.command.parser.LandFlagParser
 import net.onelitefeather.pandorascluster.command.parser.LandPlayerParser
+import net.onelitefeather.pandorascluster.util.PLUGIN_PREFIX
 import org.bukkit.command.CommandSender
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
@@ -65,12 +66,12 @@ class PaperCommandService(private val plugin: PandorasClusterPlugin) {
         val commandConfirmationManager = CommandConfirmationManager(
             20L, TimeUnit.SECONDS, { context: CommandPostprocessingContext<CommandSender> ->
                 plugin.bukkitAudiences.sender(context.commandContext.sender).sendMessage(
-                    Component.translatable("command.confirm").arguments(plugin.api.pluginPrefix())
+                    Component.translatable("command.confirm").arguments(PLUGIN_PREFIX)
                 )
             },
             { sender: CommandSender ->
                 plugin.bukkitAudiences.sender(sender).sendMessage(
-                    Component.translatable("command.confirm.no-pending-commands").arguments(plugin.api.pluginPrefix())
+                    Component.translatable("command.confirm.no-pending-commands").arguments(PLUGIN_PREFIX)
                 )
             }
         )

@@ -1,17 +1,8 @@
 package net.onelitefeather.pandorascluster.api
 
-import net.kyori.adventure.text.Component
-import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk
-import net.onelitefeather.pandorascluster.api.land.flag.LandFlag
-import net.onelitefeather.pandorascluster.api.player.LandPlayer
-import net.onelitefeather.pandorascluster.api.player.Player
 import net.onelitefeather.pandorascluster.api.service.*
-import java.util.*
-import java.util.logging.Logger
 
 interface PandorasClusterApi {
-
-    fun pluginPrefix(): Component
 
     fun getDatabaseStorageService(): LandService
 

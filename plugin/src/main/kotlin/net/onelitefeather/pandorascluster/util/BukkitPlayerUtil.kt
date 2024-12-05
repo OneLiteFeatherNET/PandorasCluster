@@ -11,8 +11,8 @@ class BukkitPlayerUtil : PlayerUtil {
 
     override fun isOnline(uuid: UUID): Boolean = getPlayer(uuid) != null
 
-    override fun hasPermission(uuid: UUID, permission: String): Boolean {
+    override fun hasPermission(uuid: UUID, permissionNode: String): Boolean {
         val player = getPlayer(uuid) ?: return false
-        return player.hasPermission(permission)
+        return player.hasPermission(permissionNode)
     }
 }
