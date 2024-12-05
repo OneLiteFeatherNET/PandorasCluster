@@ -25,28 +25,27 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         val causingEntity = event.damageSource.causingEntity ?: return
 
         val entity = event.entity
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(causingEntity.chunk)) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(causingEntity.chunk.chunkKey) ?: return
 
         if (causingEntity !is Arrow) return
 
         event.isCancelled = if (causingEntity.shooter is BlockProjectileSource) {
-            if (hasPermission(entity, LandFlag.PVE)) return
-            if (land.hasMemberAccess(entity.uniqueId)) return
-            land.getFlag(LandFlag.PVE).getValue<Boolean>() == false
+            if(land.hasMemberAccess(entity.uniqueId, LandFlag.PVE)) return
+            !land.hasFlag(LandFlag.PVE)
         } else {
             event.isCancelled
         }
     }
 
     @EventHandler
-    fun handleCloseCombat(event: EntityDamageByEntityEvent) {
+    fun handleMeleeAttack(event: EntityDamageByEntityEvent) {
 
         val target = event.entity
         val attacker = event.damager
 
         if (attacker is Projectile) return
 
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(target.chunk)) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(target.chunk.chunkKey) ?: return
         event.isCancelled = !canDamage(land, attacker, target)
     }
 
@@ -59,7 +58,7 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         } else null ?: return
 
         val hitEntity = event.hitEntity ?: return
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(hitEntity.chunk)) ?: return
+        val land = pandorasClusterApi.getLandService().getLand(hitEntity.chunk.chunkKey) ?: return
 
         event.isCancelled = !canDamage(land, shooter, hitEntity)
     }
@@ -73,28 +72,30 @@ class LandEntityDamageListener(private val pandorasClusterApi: PandorasClusterAp
         } else null ?: return
 
         val hitBlock = event.hitBlock ?: return
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(hitBlock.chunk)) ?: return
-        event.isCancelled = !land.hasMemberAccess(shooter.uniqueId)
+        val land = pandorasClusterApi.getLandService().getLand(hitBlock.chunk.chunkKey) ?: return
+
+        //TODO: Make a own flag
+        if(land.hasMemberAccess(shooter.uniqueId, LandFlag.BLOCK_BREAK)) return
+        event.isCancelled = !land.hasFlag(LandFlag.BLOCK_BREAK)
     }
 
     private fun canDamage(land: Land, attacker: Entity, target: Entity): Boolean {
 
         if (target is Player && attacker is Player) {
-            if (hasPermission(attacker, LandFlag.PVP)) return true
-            if (land.hasMemberAccess(attacker.uniqueId)) return true
-            return land.getFlag(LandFlag.PVP).getValue<Boolean>() == true
+            if(land.hasMemberAccess(attacker.uniqueId, LandFlag.PVP)) return true
+
+            val pvpAllowed = land.hasFlag(LandFlag.PVP)
+            return pvpAllowed
         }
 
-        val pveFlag = land.getFlag(LandFlag.PVE).getValue<Boolean>() == true
-
+        val pveAllowed = land.hasFlag(LandFlag.PVE)
         val targetPlayer = targetPlayer(attacker, target)
         if (targetPlayer != null) {
-            if (hasPermission(targetPlayer, LandFlag.PVE)) return true
-            if (land.hasMemberAccess(targetPlayer.uniqueId)) return true
-            return pveFlag
+            if (land.hasMemberAccess(targetPlayer.uniqueId, LandFlag.PVE)) return true
+            return pveAllowed
         }
 
-        return pveFlag
+        return pveAllowed
     }
 
     private fun targetPlayer(attacker: Entity, target: Entity): Player? {

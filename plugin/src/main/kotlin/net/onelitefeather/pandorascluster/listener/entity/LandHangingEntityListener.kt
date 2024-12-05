@@ -19,15 +19,15 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
     fun handleHangingBreak(event: HangingBreakEvent) {
         if (event.cause == HangingBreakEvent.RemoveCause.ENTITY) return
         val entity = event.entity
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(entity.chunk)) ?: return
-        event.isCancelled = land.getFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
+        val land = pandorasClusterApi.getLandService().getLand(entity.chunk.chunkKey) ?: return
+        event.isCancelled = !land.hasFlag(LandFlag.HANGING_BREAK)
     }
 
     @EventHandler
     fun handleHangingBreakByEntity(event: HangingBreakByEntityEvent) {
 
         val entity = event.entity
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(entity.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(entity.chunk.chunkKey)
         val remover = event.remover
 
         if(land == null) {
@@ -35,14 +35,13 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
             return
         }
 
-        if(land.hasMemberAccess(remover.uniqueId)) return
-        event.isCancelled = land.getFlag(LandFlag.HANGING_BREAK).getValue<Boolean>() == false
+        event.isCancelled = !land.hasMemberAccess(remover.uniqueId, LandFlag.HANGING_BREAK)
     }
 
     @EventHandler
     fun handleHangingPlace(event: HangingPlaceEvent) {
 
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.block.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(event.block.chunk.chunkKey)
         val player = event.player
         val landFlag = LandFlag.HANGING_PLACE
 
@@ -51,7 +50,11 @@ class LandHangingEntityListener(private val pandorasClusterApi: PandorasClusterA
             return
         }
 
-        if(player != null && (hasPermission(player, landFlag) || land?.hasMemberAccess(player.uniqueId) == true)) return
-        event.isCancelled = land?.getFlag(landFlag)?.getValue<Boolean>() == false
+        if(land == null) return
+        if(player != null) {
+            event.isCancelled = !land.hasMemberAccess(player.uniqueId, LandFlag.HANGING_PLACE)
+        } else {
+            event.isCancelled = !land.hasFlag(LandFlag.HANGING_PLACE)
+        }
     }
 }

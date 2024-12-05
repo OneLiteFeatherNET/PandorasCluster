@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.listener.player
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.util.PLUGIN_PREFIX
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -20,7 +21,7 @@ class PlayerConnectionListener(val api: PandorasClusterApi, private val plugin: 
         }
 
         if(api.getLandPlayerService().createPlayer(player.uniqueId, player.name)) {
-            player.sendMessage(Component.translatable("player-data-created").arguments(api.pluginPrefix()))
+            player.sendMessage(Component.translatable("player-data-created").arguments(PLUGIN_PREFIX))
         }
     }
 

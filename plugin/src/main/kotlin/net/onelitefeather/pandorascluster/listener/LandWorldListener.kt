@@ -17,7 +17,7 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
     @EventHandler
     fun handleRaidStart(event: RaidTriggerEvent) {
 
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(event.player.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(event.player.chunk.chunkKey)
         if(land == null) {
             event.isCancelled = true
             return
@@ -29,10 +29,8 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
 
     @EventHandler
     fun handleLeavesDecay(event: LeavesDecayEvent) {
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk((event.block.chunk))) ?: return
-        val landFlag = land.getFlag(LandFlag.LEAVES_DECAY)
-        if (landFlag.getValue<Boolean>() == false) return
-        event.isCancelled = true
+        val land = pandorasClusterApi.getLandService().getLand(event.block.chunk.chunkKey) ?: return
+        event.isCancelled = !land.hasFlag(LandFlag.LEAVES_DECAY)
     }
 
     @EventHandler
@@ -57,7 +55,7 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
 
         val blocksByChunks = blocks.groupBy(BlockState::getChunk)
         val firstChunk = blocks.first().chunk
-        val origin = pandorasClusterApi.getLandService().getLand(toClaimedChunk(firstChunk))
+        val origin = pandorasClusterApi.getLandService().getLand(firstChunk.chunkKey)
 
         if (origin == null && event is Cancellable) {
             event.isCancelled = true
@@ -75,9 +73,9 @@ class LandWorldListener(private val pandorasClusterApi: PandorasClusterApi) :
     }
 
     private fun filterHasSameOwner(map: Map.Entry<Chunk, List<BlockState>>): Boolean {
-        val plot = pandorasClusterApi.getLandService().getLand(toClaimedChunk(map.key))
+        val plot = pandorasClusterApi.getLandService().getLand(map.key.chunkKey)
         return map.value.firstOrNull {
-            val otherLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(it.chunk))
+            val otherLand = pandorasClusterApi.getLandService().getLand(it.chunk.chunkKey)
             plot == null || !hasSameOwner(plot, otherLand!!)
         } != null
     }
