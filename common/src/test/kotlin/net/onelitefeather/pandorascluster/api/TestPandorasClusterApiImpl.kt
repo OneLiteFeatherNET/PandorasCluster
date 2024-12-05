@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.api
 
-import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.api.service.*
 import net.onelitefeather.pandorascluster.database.service.DatabaseLandFlagService
 import net.onelitefeather.pandorascluster.database.service.DatabaseLandPlayerService
@@ -19,12 +18,10 @@ class TestPandorasClusterApiImpl : PandorasClusterApi {
         if (databaseService.isRunning()) {
             landService = DatabaseLandService(this, databaseService)
             landFlagService = DatabaseLandFlagService(databaseService, landService)
-            landPlayerService = DatabaseLandPlayerService(databaseService)
+            landPlayerService = DatabaseLandPlayerService(databaseService, landService)
             staffNotification = StaffNotificationService(this)
         }
     }
-
-    override fun pluginPrefix(): Component = Component.translatable("prefix")
 
     override fun getDatabaseStorageService(): LandService = landService
 
