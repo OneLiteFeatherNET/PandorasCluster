@@ -34,10 +34,10 @@ enum class LandFlag(val displayName: String, val landRole: LandRole) {
     FIRE_PROTECTION("fire-protection", LandRole.MEMBER),
     FARMLAND_DESTROY("farmland-destroy", LandRole.MEMBER),
     INTERACT_CONTAINERS("interact-containers", LandRole.MEMBER),
-    SPONGE_ABSORB("sponge-absorb", LandRole.MEMBER);
-//    ANIMAL_CAP("animal-cap", "250", LandFlagType.ENTITY, 1),
-//    MONSTER_CAP("monster-cap", "250", LandFlagType.ENTITY, 1),
-//    VILLAGER_CAP("villager-cap", "100", LandFlagType.ENTITY, 1);
+    SPONGE_ABSORB("sponge-absorb", LandRole.MEMBER),
+    BLOCK_BREAK("block-break", LandRole.MEMBER),
+    BLOCK_PLACE("block-place", LandRole.MEMBER),
+    INTERACT_JUKEBOX("jukebox-interact", LandRole.MEMBER);
 
     companion object {
         val LAND_FLAGS = LandFlag.entries.toTypedArray()
