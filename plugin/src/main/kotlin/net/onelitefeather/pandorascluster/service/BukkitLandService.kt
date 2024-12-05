@@ -35,7 +35,7 @@ class BukkitLandService(
     private val plugin: PandorasClusterPlugin
 ) : ChunkUtils {
 
-    val showBorderOfLand: List<Player> = mutableListOf()
+    val showBorderOfLand: MutableList<Player> = mutableListOf()
     var particleData: ParticleData = DEFAULT_PARTICLE_DATA
 
     init {
@@ -53,7 +53,7 @@ class BukkitLandService(
                 chunk.z + facing.modZ
             )
 
-            val fullLand = pandorasClusterApi.getLandService().getLand(toClaimedChunk(connectedChunk))
+            val fullLand = pandorasClusterApi.getLandService().getLand(connectedChunk.chunkKey)
             if (fullLand != null) {
                 land = fullLand
             }
@@ -62,7 +62,7 @@ class BukkitLandService(
         consumer.accept(land)
     }
 
-    @ScheduledForRemoval(inVersion = "1.2.1")
+    @ScheduledForRemoval(inVersion = "1.2.2")
     @Deprecated(message = "This method will be removed in future releases")
     fun checkWorldGuardRegion(chunk: Chunk): Boolean {
 
@@ -89,14 +89,14 @@ class BukkitLandService(
      * @param player the player
      */
     fun toggleShowBorder(player: Player): Boolean {
-        var currentState = showBorderOfLand.contains(player)
+        val currentState = showBorderOfLand.contains(player)
         if (currentState) {
-            showBorderOfLand.filterNot { it == player }
+            showBorderOfLand.remove(player)
+            return false
         } else {
-            showBorderOfLand.plus(player)
+            showBorderOfLand.add(player)
+            return true
         }
-        currentState = showBorderOfLand.contains(player)
-        return currentState
     }
 
     private fun spawnParticle(player: Player, trusted: Boolean, location: Location) {
@@ -125,7 +125,7 @@ class BukkitLandService(
 
         showBorderOfLand.forEach { player ->
 
-            val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk)) ?: return@forEach
+            val land = pandorasClusterApi.getLandService().getLand(player.chunk.chunkKey) ?: return@forEach
             val world = Bukkit.getWorld(land.world) ?: return@forEach
             val access = land.hasMemberAccess(player.uniqueId)
 
@@ -144,28 +144,28 @@ class BukkitLandService(
                 val west = world.getChunkAt(chunkX - 1, chunkZ)
                 val east = world.getChunkAt(chunkX + 1, chunkZ)
 
-                if (!land.isChunkMerged(toClaimedChunk(north))) {
+                if (!land.isChunkMerged(north.chunkKey)) {
                     (minX until minX + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt(it, playerLocation.blockY, minZ).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
-                if (!land.isChunkMerged(toClaimedChunk(south))) {
+                if (!land.isChunkMerged(south.chunkKey)) {
                     (minX until minX + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt(it, playerLocation.blockY, (minZ + chunkLength())).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
-                if (!land.isChunkMerged(toClaimedChunk(west))) {
+                if (!land.isChunkMerged(west.chunkKey)) {
                     (minZ until minZ + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt(minX, playerLocation.blockY, it).location }
                         .forEach { spawnParticle(player, access, it) }
                 }
 
-                if (!land.isChunkMerged(toClaimedChunk(east))) {
+                if (!land.isChunkMerged(east.chunkKey)) {
                     (minZ until minZ + chunkLength())
                         .asSequence()
                         .map { world.getBlockAt((minX + chunkLength()), playerLocation.blockY, it).location }
