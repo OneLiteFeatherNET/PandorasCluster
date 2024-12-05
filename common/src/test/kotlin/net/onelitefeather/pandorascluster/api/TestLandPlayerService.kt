@@ -27,7 +27,6 @@ class TestLandPlayerService {
 
     @Test
     fun testUpdateLandPlayer() {
-        testCreateLandPlayer()
         val landPlayer = landPlayerService.getLandPlayer(uuid)
         assertNotNull(landPlayer)
         landPlayerService.updateLandPlayer(landPlayer.copy(name = "theEvilReaper"))
@@ -35,7 +34,6 @@ class TestLandPlayerService {
 
     @Test
     fun testAddLandMember() {
-        testCreateLandPlayer()
         testLandService.testLandCreation()
         val land = landService.getLand(mainChunk)
         assertNotNull(land)
@@ -48,7 +46,6 @@ class TestLandPlayerService {
 
     @Test
     fun testUpdateLandMember() {
-        testCreateLandPlayer()
         testLandService.testLandCreation()
         val land = landService.getLand(mainChunk)
         assertNotNull(land)
@@ -61,7 +58,6 @@ class TestLandPlayerService {
 
     @Test
     fun testRemoveLandMember() {
-        testCreateLandPlayer()
         val land = landService.getLand(mainChunk)
         assertNotNull(land)
 
