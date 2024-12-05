@@ -22,8 +22,4 @@ interface LandFlagService {
      * @param flag the flag to remove from the land.
      */
     fun removeLandFlag(flag: FlagRoleAttachment, land: Land)
-
-    fun getLandFlag(landFlag: LandFlag, land: Land): FlagRoleAttachment?
-
-    fun getFlags(land: Land): List<FlagRoleAttachment>
 }
