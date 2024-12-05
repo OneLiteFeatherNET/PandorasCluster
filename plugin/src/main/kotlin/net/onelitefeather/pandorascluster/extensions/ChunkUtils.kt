@@ -13,10 +13,7 @@ import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.AbstractVillager
-import org.bukkit.entity.Animals
-import org.bukkit.entity.Monster
-import org.bukkit.entity.Player
+import org.bukkit.entity.*
 
 interface ChunkUtils {
 
@@ -26,24 +23,28 @@ interface ChunkUtils {
 
     fun hasSameOwner(it: Land, claimedLand: Land) = it.owner == claimedLand.owner
 
+    //FIXME
     fun getEntityLimit(land: Land, entityCategory: EntityCategory): Int {
 
+        val world = Bukkit.getWorld(land.world) ?: return 0
+
         if(entityCategory == EntityCategory.ANIMALS) {
-            return land.getFlag(LandFlag.ANIMAL_CAP).getValue() ?: 0
+            return world.getSpawnLimit(SpawnCategory.ANIMAL)
+//            return land.getFlag(LandFlag.ANIMAL_CAP).getValue() ?: 0
         }
 
         if(entityCategory == EntityCategory.MONSTER) {
-            return land.getFlag(LandFlag.MONSTER_CAP).getValue() ?: 0
+//            return land.getFlag(LandFlag.MONSTER_CAP).getValue() ?: 0
+            return world.getSpawnLimit(SpawnCategory.MONSTER)
         }
 
         if(entityCategory == EntityCategory.VILLAGER) {
-            return land.getFlag(LandFlag.VILLAGER_CAP).getValue() ?: 0
+//            return land.getFlag(LandFlag.VILLAGER_CAP).getValue() ?: 0
+            return world.getSpawnLimit(SpawnCategory.MISC)
         }
 
         return 0
     }
-
-    fun toClaimedChunk(chunk: Chunk): ClaimedChunk = ClaimedChunk(null, chunk.chunkKey)
 
     fun getEntityCount(land: Land, entityCategory: EntityCategory): Int {
 
