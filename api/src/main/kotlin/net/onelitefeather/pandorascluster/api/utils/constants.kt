@@ -9,6 +9,3 @@ val EVERYONE: UUID = UUID.fromString("1-1-3-3-7")
 val LOGGER: Logger = Logger.getLogger("PandorasCluster")
 
 const val IGNORE_CLAIM_LIMIT: Int = -2
-val propertyDiscordAvatarUrl: String = System.getProperty("discordAvatarUrl", "https://mc-heads.net/avatar/%s/100")
-val propertyDiscordWebhookUrl: String =
-    System.getProperty("discordWebhookUrl", "https://discord.com/api/webhooks/%s/%s")
