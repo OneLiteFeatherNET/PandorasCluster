@@ -1,7 +1,5 @@
 package net.onelitefeather.pandorascluster.api.position
 
-import net.onelitefeather.pandorascluster.api.utils.LocationUtil
-
 data class HomePosition(val id: Long?,
                         val posX: Double,
                         val posY: Double,
@@ -11,11 +9,11 @@ data class HomePosition(val id: Long?,
 
     constructor() : this(null, 0.0, 0.0, 0.0, 0.0F, 0.0F)
 
-    fun getBlockX(): Int = LocationUtil.Instances.instance.locToBlock(posX)
+    fun getBlockX(): Int = locToBlock(posX)
 
-    fun getBlockY(): Int = LocationUtil.Instances.instance.locToBlock(posY)
+    fun getBlockY(): Int = locToBlock(posY)
 
-    fun getBlockZ(): Int = LocationUtil.Instances.instance.locToBlock(posZ)
+    fun getBlockZ(): Int = locToBlock(posZ)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -45,5 +43,13 @@ data class HomePosition(val id: Long?,
         return "HomePosition(id=$id, posX=$posX, posY=$posY, posZ=$posZ, yaw=$yaw, pitch=$pitch)"
     }
 
+    private fun floor(num: Double): Int {
+        val floor = num.toInt()
+        return if (floor.toDouble() == num) floor else floor - (java.lang.Double.doubleToRawLongBits(num) ushr 63).toInt()
+    }
+
+    private fun locToBlock(loc: Double): Int {
+        return floor(loc)
+    }
 
 }
