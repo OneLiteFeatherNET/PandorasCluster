@@ -6,6 +6,7 @@ import net.onelitefeather.pandorascluster.api.player.LandMember
 import net.onelitefeather.pandorascluster.api.player.LandPlayer
 import net.onelitefeather.pandorascluster.api.service.DatabaseService
 import net.onelitefeather.pandorascluster.api.service.LandPlayerService
+import net.onelitefeather.pandorascluster.api.service.LandService
 import net.onelitefeather.pandorascluster.api.utils.LOGGER
 import net.onelitefeather.pandorascluster.database.models.LandEntity
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity
@@ -14,7 +15,8 @@ import org.hibernate.HibernateException
 import org.hibernate.Transaction
 import java.util.*
 
-class DatabaseLandPlayerService(private val databaseService: DatabaseService) : LandPlayerService {
+class DatabaseLandPlayerService(private val databaseService: DatabaseService,
+                                private val landService: LandService) : LandPlayerService {
 
     override fun addLandMember(land: Land, member: LandPlayer, landRole: LandRole?) {
         val role = landRole ?: LandRole.VISITOR
@@ -29,9 +31,7 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
                 transaction = session.beginTransaction()
                 session.persist(landMember)
                 transaction?.commit()
-
-                //FIXME
-//                pandorasClusterApi.getLandService().updateLoadedChunks(land0)
+                landService.updateLand(land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -49,6 +49,7 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
                 session.beginTransaction()
                 session.merge(memberEntity.copy(land = landEntity))
                 session.transaction.commit()
+                landService.updateLand(land)
             }
         } catch (e: HibernateException) {
             LOGGER.throwing(this::class.java.simpleName, "updateLandPlayer", e)
@@ -62,9 +63,6 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
                 transaction = session.beginTransaction()
                 session.remove(databaseService.landMemberMapper().modelToEntity(member))
                 transaction?.commit()
-
-                //FIXME
-//                pandorasClusterApi.getLandService().updateLoadedChunks(member.land)
             }
         } catch (e: HibernateException) {
             transaction?.rollback()
@@ -114,7 +112,14 @@ class DatabaseLandPlayerService(private val databaseService: DatabaseService) : 
     }
 
     override fun deletePlayer(uuid: UUID) {
-        val landPlayer = getLandPlayer(uuid)
+        val landPlayer = getLandPlayer(uuid) ?: return
+
+        val land = landService.getLand(landPlayer)
+
+        if(land != null) {
+            landService.unclaimLand(land)
+        }
+
         var transaction: Transaction? = null
         try {
            databaseService.sessionFactory().openSession().use { session ->
