@@ -11,6 +11,7 @@ import net.onelitefeather.pandorascluster.api.PandorasClusterApi
 import net.onelitefeather.pandorascluster.api.enums.LandRole
 import net.onelitefeather.pandorascluster.api.player.LandMember
 import net.onelitefeather.pandorascluster.extensions.ChunkUtils
+import net.onelitefeather.pandorascluster.util.PLUGIN_PREFIX
 import org.bukkit.entity.Player
 
 class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) : ChunkUtils {
@@ -20,27 +21,25 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) : Chun
     @CommandPermission("pandorascluster.command.land.info")
     fun execute(player: Player) {
 
-        val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
+        val land = pandorasClusterApi.getLandService().getLand(player.chunk.chunkKey)
         if (land == null) {
-            player.sendMessage(Component.translatable("chunk-already-claimed").arguments(pluginPrefix))
+            player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(PLUGIN_PREFIX))
             return
         }
 
         val accessMessage = if (land.hasMemberAccess(player.uniqueId))
             Component.translatable("boolean-true") else Component.translatable("boolean-false")
 
-        player.sendMessage(Component.translatable("command.info.owner").arguments(pluginPrefix,
+        player.sendMessage(Component.translatable("command.info.owner").arguments(PLUGIN_PREFIX,
             Component.text(land.owner?.name ?: player.name)))
 
-        player.sendMessage(Component.translatable("command.info.access").arguments(pluginPrefix, accessMessage))
-        player.sendMessage(Component.translatable("command.info.members").arguments(pandorasClusterApi.pluginPrefix(), buildMembers(land)))
+        player.sendMessage(Component.translatable("command.info.access").arguments(PLUGIN_PREFIX, accessMessage))
+        player.sendMessage(Component.translatable("command.info.members").arguments(PLUGIN_PREFIX, buildMembers(land)))
 
-        player.sendMessage(Component.translatable("command.info.members.banned").arguments(
-            pandorasClusterApi.pluginPrefix(), buildDeniedMembers(land)))
+        player.sendMessage(Component.translatable("command.info.members.banned").arguments(PLUGIN_PREFIX, buildDeniedMembers(land)))
 
-        player.sendMessage(Component.translatable("command.info.flags").arguments(pandorasClusterApi.pluginPrefix(), buildFlags(land)))
-        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(pluginPrefix, Component.text(land.chunks.size)))
+        player.sendMessage(Component.translatable("command.info.flags").arguments(PLUGIN_PREFIX, buildFlags(land)))
+        player.sendMessage(Component.translatable("command.info.total-chunk-count").arguments(PLUGIN_PREFIX, Component.text(land.chunks.size)))
     }
 
     private fun buildDeniedMembers(land: Land): Component {
@@ -71,26 +70,13 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) : Chun
     }
 
     private fun buildFlags(land: Land): Component {
-
         val flags = land.flags.map {
-            val value = it.value
             val flagName = it.flag.name
-
-            val booleanFlag = it.flag.type.toInt() == 2
-
-            val symbolColor = if (booleanFlag) {
-                val booleanValue = value.toBoolean()
-                if (booleanValue) {
-                    Component.translatable("command.info.flag.enabled")
-                } else {
-                    Component.translatable("command.info.flag.disabled")
-                }
-            } else {
-                Component.translatable("command.info.flag.disabled")
-            }
-
-            val suggestionValue = if (booleanFlag) !value.toBoolean() else value
-            MiniMessage.miniMessage().deserialize("<lang:command.info.flags.entry:\"$flagName\":\"$value\":\"$flagName\":\"$suggestionValue\":\"$symbolColor\">")
+            val symbolColor = Component.translatable("command.info.flag.enabled")
+            Component.translatable("command.info.flags.entry").arguments(
+                Component.text(flagName),
+                MiniMessage.miniMessage().deserialize(it.role.display),
+                symbolColor)
         }.toList()
 
         return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")

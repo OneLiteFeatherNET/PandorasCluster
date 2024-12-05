@@ -5,6 +5,7 @@ import cloud.commandframework.annotations.CommandMethod
 import net.kyori.adventure.text.Component
 import net.onelitefeather.pandorascluster.PandorasClusterPlugin
 import net.onelitefeather.pandorascluster.api.PandorasClusterApi
+import net.onelitefeather.pandorascluster.util.PLUGIN_PREFIX
 import org.bukkit.entity.Player
 
 class LandToggleBorderCommand(val pandorasClusterApi: PandorasClusterApi, private val plugin: PandorasClusterPlugin) {
@@ -19,8 +20,7 @@ class LandToggleBorderCommand(val pandorasClusterApi: PandorasClusterApi, privat
             Component.translatable("command.showborder.toggle.hidden")
         }
 
-        player.sendMessage(Component.translatable("command.showborder.toggle").arguments(
-            pandorasClusterApi.pluginPrefix(), stateMessage))
+        player.sendMessage(Component.translatable("command.showborder.toggle").arguments(PLUGIN_PREFIX, stateMessage))
 
     }
 }

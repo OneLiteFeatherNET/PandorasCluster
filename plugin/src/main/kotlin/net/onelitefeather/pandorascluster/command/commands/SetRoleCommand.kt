@@ -16,6 +16,7 @@ import net.onelitefeather.pandorascluster.api.enums.Permission
 import net.onelitefeather.pandorascluster.api.player.LandPlayer
 import net.onelitefeather.pandorascluster.extensions.ChunkUtils
 import net.onelitefeather.pandorascluster.extensions.EntityUtils
+import net.onelitefeather.pandorascluster.util.PLUGIN_PREFIX
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.*
@@ -30,43 +31,43 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
         @Argument("player", parserName = "landPlayer") landPlayer: LandPlayer,
         @Greedy @Argument("role", parserName = "landRole") landRole: LandRole
     ) {
-        val pluginPrefix = pandorasClusterApi.pluginPrefix()
-        val land = pandorasClusterApi.getLandService().getLand(toClaimedChunk(player.chunk))
+
+        val land = pandorasClusterApi.getLandService().getLand(player.chunk.chunkKey)
 
         if (land == null) {
-            player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(pluginPrefix))
+            player.sendMessage(Component.translatable("chunk-is-not-claimed").arguments(PLUGIN_PREFIX))
             return
         }
 
-        if(!land.isOwner(player.uniqueId) && !land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_ROLE)) {
-            player.sendMessage(Component.translatable("not-authorized").arguments(pluginPrefix))
+        if(!land.isAdmin(player.uniqueId) && !hasPermission(player, Permission.SET_LAND_ROLE)) {
+            player.sendMessage(Component.translatable("not-authorized").arguments(PLUGIN_PREFIX))
             return
         }
 
         if (!pandorasClusterApi.getLandPlayerService().playerExists(landPlayer.uniqueId)) {
             player.sendMessage(
                 Component.translatable("player-data-not-found").
-            arguments(pluginPrefix, Component.text(landPlayer.name)))
+            arguments(PLUGIN_PREFIX, Component.text(landPlayer.name)))
             return
         }
 
         if (!landRole.isGrantAble()) {
             player.sendMessage(Component.translatable("command.set-role.role-not.grantable").arguments(
-                pluginPrefix,
+                PLUGIN_PREFIX,
                 MiniMessage.miniMessage().deserialize(landRole.display)))
             return
         }
 
         if (land.isOwner(landPlayer.uniqueId)) {
-            player.sendMessage(Component.translatable("command.set-role.cannot-change-the-land-owner").arguments(pluginPrefix))
+            player.sendMessage(Component.translatable("command.set-role.cannot-change-the-land-owner").arguments(PLUGIN_PREFIX))
             return
         }
 
-        if (land.isOwner(player.uniqueId) || land.isAdmin(player.uniqueId) || hasPermission(player, Permission.SET_LAND_ROLE)) {
+        if (land.isAdmin(player.uniqueId) || hasPermission(player, Permission.SET_LAND_ROLE)) {
             if(landRole != LandRole.VISITOR) {
                 pandorasClusterApi.getLandPlayerService().addLandMember(land, landPlayer, landRole)
                 player.sendMessage(Component.translatable("command.set-role.access").arguments(
-                    pluginPrefix,
+                    PLUGIN_PREFIX,
                     Component.text(landPlayer.name),
                     MiniMessage.miniMessage().deserialize(landRole.display)))
             } else {
@@ -74,14 +75,14 @@ class SetRoleCommand(private val pandorasClusterApi: PandorasClusterApi) : Entit
                 val member = land.getLandMember(landPlayer.uniqueId)
                 if(member == null) {
                     player.sendMessage(Component.translatable("command.remove.not-found").arguments(
-                        pluginPrefix,
+                        PLUGIN_PREFIX,
                         Component.text(landPlayer.name)))
                     return
                 }
 
                 pandorasClusterApi.getLandPlayerService().removeLandMember(member)
                 player.sendMessage(Component.translatable("command.remove.success").arguments(
-                    pluginPrefix,
+                    PLUGIN_PREFIX,
                     Component.text(landPlayer.name)))
             }
         }
