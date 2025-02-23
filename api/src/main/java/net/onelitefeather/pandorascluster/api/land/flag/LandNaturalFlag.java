@@ -2,10 +2,11 @@ package net.onelitefeather.pandorascluster.api.land.flag;
 
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class LandNaturalFlag {
+public class LandNaturalFlag implements PandorasModel {
 
     private final Long id;
     private String name;

@@ -8,8 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class NaturalFlagMapper implements DatabaseEntityMapper<NaturalFlagDBO, LandNaturalFlag> {
 
-
-
     @Override
     public @Nullable LandNaturalFlag entityToModel(@Nullable NaturalFlagDBO entity) {
         if (entity == null) return null;
