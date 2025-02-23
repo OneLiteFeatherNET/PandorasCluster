@@ -8,7 +8,7 @@ import net.onelitefeather.pandorascluster.api.flag.impl.RoleFlagImpl;
 import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
-import net.onelitefeather.pandorascluster.api.utils.Constants;
+import net.onelitefeather.pandorascluster.api.util.Constants;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
