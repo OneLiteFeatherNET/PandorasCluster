@@ -1,11 +1,14 @@
 package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.service.*;
+import net.onelitefeather.pandorascluster.api.util.Constants;
 import net.onelitefeather.pandorascluster.database.service.*;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 
-public class PandorasClusterApiImpl implements PandorasCluster, ThreadHelper {
+import java.util.logging.Level;
+
+public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
 
     private DatabaseService databaseService;
     private LandPlayerService landPlayerService;
@@ -13,15 +16,15 @@ public class PandorasClusterApiImpl implements PandorasCluster, ThreadHelper {
     private LandService landService;
     private StaffNotificationService staffNotificationService;
 
-    public PandorasClusterApiImpl() {
+    public PandorasClusterImpl() {
 
         syncThreadForServiceLoader(() -> {
             try {
                 var sessionFactory = new Configuration().configure().configure("connection.cfg.xml").buildSessionFactory();
-                this.databaseService = new DatabaseServiceImpl(sessionFactory);
+                this.databaseService = new DatabaseServiceImpl(this, sessionFactory);
             } catch (HibernateException e) {
                 this.databaseService = null;
-                throw new HibernateException("Cannot build session factorty.", e);
+                Constants.LOGGER.log(Level.SEVERE, "Cannot build session factory.", e);
             }
         });
 
