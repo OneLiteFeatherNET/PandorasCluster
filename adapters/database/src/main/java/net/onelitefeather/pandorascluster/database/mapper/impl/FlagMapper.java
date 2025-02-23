@@ -1,8 +1,8 @@
 package net.onelitefeather.pandorascluster.database.mapper.impl;
 
-import net.onelitefeather.pandorascluster.api.land.flag.AreaEntityCapFlag;
-import net.onelitefeather.pandorascluster.api.land.flag.AreaNaturalFlag;
-import net.onelitefeather.pandorascluster.api.land.flag.AreaRoleFlag;
+import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
+import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
+import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
 import net.onelitefeather.pandorascluster.api.mapper.DatabaseEntityMapper;
 import net.onelitefeather.pandorascluster.database.models.flag.EntityCapFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.NaturalFlagEntity;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public final class FlagMapper {
 
 
-    public static class RoleFlagMapper implements DatabaseEntityMapper<RoleFlagDBO, AreaRoleFlag> {
+    public static class RoleFlagMapper implements DatabaseEntityMapper<RoleFlagDBO, LandRoleFlag> {
         private final LandAreaMapper landAreaMapper;
 
         public RoleFlagMapper(LandAreaMapper landAreaMapper) {
@@ -24,9 +24,9 @@ public final class FlagMapper {
         }
 
         @Override
-        public @Nullable AreaRoleFlag entityToModel(@Nullable RoleFlagDBO entity) {
+        public @Nullable LandRoleFlag entityToModel(@Nullable RoleFlagDBO entity) {
             if (entity == null) return null;
-            return new AreaRoleFlag(
+            return new LandRoleFlag(
                     entity.id(),
                     entity.name(),
                     entity.state(),
@@ -35,7 +35,7 @@ public final class FlagMapper {
         }
 
         @Override
-        public @Nullable RoleFlagDBO modelToEntity(@Nullable AreaRoleFlag model) {
+        public @Nullable RoleFlagDBO modelToEntity(@Nullable LandRoleFlag model) {
             if (model == null) return null;
             return new RoleFlagEntity(
                     model.getId(),
@@ -46,31 +46,31 @@ public final class FlagMapper {
         }
     }
 
-    public static class NaturalFlagMapper implements DatabaseEntityMapper<NaturalFlagDBO, AreaNaturalFlag> {
+    public static class NaturalFlagMapper implements DatabaseEntityMapper<NaturalFlagDBO, LandNaturalFlag> {
 
         @Override
-        public @Nullable AreaNaturalFlag entityToModel(@Nullable NaturalFlagDBO entity) {
+        public @Nullable LandNaturalFlag entityToModel(@Nullable NaturalFlagDBO entity) {
             if (entity == null) return null;
-            return new AreaNaturalFlag(entity.id(), entity.name(), entity.state());
+            return new LandNaturalFlag(entity.id(), entity.name(), entity.state());
         }
 
         @Override
-        public @Nullable NaturalFlagDBO modelToEntity(@Nullable AreaNaturalFlag model) {
+        public @Nullable NaturalFlagDBO modelToEntity(@Nullable LandNaturalFlag model) {
             if (model == null) return null;
             return new NaturalFlagEntity(model.getId(), model.getName(), model.getState());
         }
     }
 
-    public static class EntityCapFlagMapper implements DatabaseEntityMapper<EntityCapFlagDBO, AreaEntityCapFlag> {
+    public static class EntityCapFlagMapper implements DatabaseEntityMapper<EntityCapFlagDBO, LandEntityCapFlag> {
 
         @Override
-        public @Nullable AreaEntityCapFlag entityToModel(@Nullable EntityCapFlagDBO entity) {
+        public @Nullable LandEntityCapFlag entityToModel(@Nullable EntityCapFlagDBO entity) {
             if (entity == null) return null;
-            return new AreaEntityCapFlag(entity.id(), entity.name(), entity.spawnLimit());
+            return new LandEntityCapFlag(entity.id(), entity.name(), entity.spawnLimit());
         }
 
         @Override
-        public @Nullable EntityCapFlagDBO modelToEntity(@Nullable AreaEntityCapFlag model) {
+        public @Nullable EntityCapFlagDBO modelToEntity(@Nullable LandEntityCapFlag model) {
             if (model == null) return null;
             return new EntityCapFlagEntity(model.getId(), model.getName(), model.getSpawnLimit());
         }
