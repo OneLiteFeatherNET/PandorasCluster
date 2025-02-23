@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.utils;
+package net.onelitefeather.pandorascluster.api.util;
 
 public final class NumberUtil {
 

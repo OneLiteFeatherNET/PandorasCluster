@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.utils;
+package net.onelitefeather.pandorascluster.api.util;
 
 import java.nio.file.Path;
 import java.util.UUID;

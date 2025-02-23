@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.utils;
+package net.onelitefeather.pandorascluster.api.util;
 
 import net.onelitefeather.pandorascluster.api.enums.Permission;
 import org.jetbrains.annotations.NotNull;
