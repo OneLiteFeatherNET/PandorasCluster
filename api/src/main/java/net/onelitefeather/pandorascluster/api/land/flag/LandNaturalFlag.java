@@ -5,13 +5,13 @@ import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AreaNaturalFlag {
+public class LandNaturalFlag {
 
     private final Long id;
     private String name;
     private Boolean state;
 
-    public AreaNaturalFlag(Long id, String name, Boolean state) {
+    public LandNaturalFlag(Long id, String name, Boolean state) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -30,12 +30,12 @@ public class AreaNaturalFlag {
         return FlagRegistry.naturalFlagOf(name);
     }
 
-    public AreaNaturalFlag withFlag(@NotNull String name) {
+    public LandNaturalFlag withFlag(@NotNull String name) {
         this.name = name;
         return this;
     }
 
-    public AreaNaturalFlag withState(Boolean state) {
+    public LandNaturalFlag withState(Boolean state) {
         this.state = state;
         return this;
     }

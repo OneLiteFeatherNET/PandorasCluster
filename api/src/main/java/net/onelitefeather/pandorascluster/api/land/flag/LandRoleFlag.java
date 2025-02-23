@@ -7,7 +7,7 @@ import net.onelitefeather.pandorascluster.api.land.LandArea;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AreaRoleFlag {
+public class LandRoleFlag {
 
     private final Long id;
     private String name;
@@ -15,7 +15,7 @@ public class AreaRoleFlag {
     private LandRole role;
     private LandArea landArea;
 
-    public AreaRoleFlag(Long id, String name, Boolean state, LandRole role, LandArea landArea) {
+    public LandRoleFlag(Long id, String name, Boolean state, LandRole role, LandArea landArea) {
         this.id = id;
         this.name = name;
         this.state = state;
@@ -36,7 +36,7 @@ public class AreaRoleFlag {
         return FlagRegistry.roleFlagOf(name);
     }
 
-    public AreaRoleFlag withRole(LandRole role) {
+    public LandRoleFlag withRole(LandRole role) {
         this.role = role;
         return this;
     }
@@ -45,12 +45,12 @@ public class AreaRoleFlag {
         return role;
     }
 
-    public AreaRoleFlag withFlag(@NotNull String flag) {
+    public LandRoleFlag withFlag(@NotNull String flag) {
         this.name = flag;
         return this;
     }
 
-    public AreaRoleFlag withState(Boolean state) {
+    public LandRoleFlag withState(Boolean state) {
         this.state = state;
         return this;
     }

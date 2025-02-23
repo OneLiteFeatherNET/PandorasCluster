@@ -5,13 +5,13 @@ import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AreaEntityCapFlag {
+public class LandEntityCapFlag {
 
     private final Long id;
     private String name;
     private int spawnLimit;
 
-    public AreaEntityCapFlag(Long id, String name, int spawnLimit) {
+    public LandEntityCapFlag(Long id, String name, int spawnLimit) {
         this.id = id;
         this.name = name;
         this.spawnLimit = spawnLimit;
@@ -30,12 +30,12 @@ public class AreaEntityCapFlag {
         return FlagRegistry.entityCapFlagOf(this.name);
     }
 
-    public AreaEntityCapFlag withFlag(@NotNull String flag) {
+    public LandEntityCapFlag withFlag(@NotNull String flag) {
         this.name = flag;
         return this;
     }
 
-    public AreaEntityCapFlag withState(int spawnLimit) {
+    public LandEntityCapFlag withState(int spawnLimit) {
         this.spawnLimit = spawnLimit;
         return this;
     }
