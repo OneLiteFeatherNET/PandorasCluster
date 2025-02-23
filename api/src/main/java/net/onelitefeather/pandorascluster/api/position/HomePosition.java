@@ -1,20 +1,22 @@
 package net.onelitefeather.pandorascluster.api.position;
 
-import net.onelitefeather.pandorascluster.api.utils.NumberUtil;
+import net.onelitefeather.pandorascluster.api.util.NumberUtil;
 
 import java.util.Objects;
 
 public final class HomePosition {
 
     private Long id;
+    private String world;
     private Double posX;
     private Double posY;
     private Double posZ;
     private Float yaw;
     private Float pitch;
 
-    public HomePosition(Long id, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
+    public HomePosition(Long id, String world, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
         this.id = id;
+        this.world = world;
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
@@ -28,6 +30,14 @@ public final class HomePosition {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setWorld(String world) {
+        this.world = world;
+    }
+
+    public String getWorld() {
+        return world;
     }
 
     public int getBlockX() {
@@ -91,7 +101,8 @@ public final class HomePosition {
                 && Objects.equals(posY, that.posY)
                 && Objects.equals(posZ, that.posZ)
                 && Objects.equals(yaw, that.yaw)
-                && Objects.equals(pitch, that.pitch);
+                && Objects.equals(pitch, that.pitch)
+                && Objects.equals(world, that.world);
     }
 
     @Override
@@ -102,6 +113,7 @@ public final class HomePosition {
         result = 31 * result + Objects.hashCode(posZ);
         result = 31 * result + Objects.hashCode(yaw);
         result = 31 * result + Objects.hashCode(pitch);
+        result = 31 * result + Objects.hashCode(world);
         return result;
     }
 
@@ -114,6 +126,7 @@ public final class HomePosition {
                 ", posZ=" + getPosZ() +
                 ", yaw=" + getYaw() +
                 ", pitch=" + getPitch() +
+                ", world=" + getWorld() +
                 '}';
     }
 }
