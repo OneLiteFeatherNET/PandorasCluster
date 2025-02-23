@@ -10,7 +10,7 @@ import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
-import net.onelitefeather.pandorascluster.api.utils.Constants;
+import net.onelitefeather.pandorascluster.api.util.Constants;
 import net.onelitefeather.pandorascluster.database.mapper.impl.LandAreaMapper;
 import net.onelitefeather.pandorascluster.database.mapper.impl.LandMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
@@ -113,9 +113,6 @@ public class DatabaseLandService implements LandService {
         LandArea landArea = new LandArea(
                 null,
                 name,
-                Collections.emptyList(),
-                Collections.emptyList(),
-                Collections.emptyList(),
                 chunks,
                 Collections.emptyList(),
                 land);
@@ -162,7 +159,16 @@ public class DatabaseLandService implements LandService {
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
+
+            var flagContainer = land.getFlagContainer();
+
+            //FIXME: Remove all flags of a land.
+            flagContainer.getEntityCapFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
+            flagContainer.getRoleFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
+            flagContainer.getNaturalFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
+
             land.getAreas().forEach(this::unclaimLandArea);
+
             session.remove(land);
             session.remove(this.landMapper.getHomePositionMapper().modelToEntity(land.getHome()));
             transaction.commit();
@@ -202,10 +208,6 @@ public class DatabaseLandService implements LandService {
     private void unclaimLandArea(LandArea landArea) {
         landArea.getMembers().forEach(this.pandorasCluster.getLandPlayerService()::removeLandMember);
         landArea.getChunks().stream().map(ClaimedChunk::getChunkIndex).forEach(this::removeClaimedChunk);
-
-        landArea.getEntityCapFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
-        landArea.getRoleFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
-        landArea.getNaturalFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
     }
 
     private void refreshCache(Land land) {
