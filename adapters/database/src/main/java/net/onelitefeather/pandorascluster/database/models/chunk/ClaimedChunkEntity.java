@@ -20,10 +20,10 @@ public final class ClaimedChunkEntity implements ClaimedChunkDBO {
     @JoinColumn(name = "landArea_id")
     private LandAreaEntity landArea;
 
-    public ClaimedChunkEntity(Long id, Long chunkIndex) {
+    public ClaimedChunkEntity(Long id, Long chunkIndex, LandAreaEntity landArea) {
         this.id = id;
         this.chunkIndex = chunkIndex;
-        this.landArea = null;
+        this.landArea = landArea;
     }
 
     @Override

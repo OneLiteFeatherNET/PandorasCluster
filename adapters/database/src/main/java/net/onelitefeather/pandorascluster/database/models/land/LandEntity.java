@@ -1,8 +1,10 @@
 package net.onelitefeather.pandorascluster.database.models.land;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
+import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
 import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
 import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
@@ -10,9 +12,8 @@ import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "lands")
@@ -31,15 +32,19 @@ public class LandEntity implements LandDBO {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
     private List<LandAreaEntity> areas;
 
-    @Column
-    private String world;
+    @OneToOne
+    private FlagContainerEntity flagContainerEntity;
 
-    public LandEntity(Long id, LandPlayerEntity owner, HomePositionEntity home, List<LandAreaEntity> areas, String world) {
+    public LandEntity(Long id,
+                      LandPlayerEntity owner,
+                      HomePositionEntity home,
+                      List<LandAreaEntity> areas,
+                      FlagContainerEntity flagContainerEntity) {
         this.id = id;
         this.owner = owner;
         this.home = home;
         this.areas = areas;
-        this.world = world;
+        this.flagContainerEntity = flagContainerEntity;
     }
 
     @Override
@@ -59,11 +64,11 @@ public class LandEntity implements LandDBO {
 
     @Override
     public @NotNull List<LandAreaDBO> areas() {
-        return areas.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+        return Collections.unmodifiableList(areas);
     }
 
     @Override
-    public @NotNull String world() {
-        return world;
+    public FlagContainerDBO flagContainer() {
+        return this.flagContainerEntity;
     }
 }

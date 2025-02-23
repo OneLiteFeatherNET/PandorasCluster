@@ -2,6 +2,7 @@ package net.onelitefeather.pandorascluster.database.models.position;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -47,7 +48,8 @@ public final class HomePositionEntity implements HomePositionDBO {
         return id;
     }
 
-    public String getWorld() {
+    @Override
+    public @NotNull String world() {
         return world;
     }
 

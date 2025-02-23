@@ -2,15 +2,16 @@ package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
-import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
+import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
+import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import net.onelitefeather.pandorascluster.dbo.flag.RoleFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
+import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "role_flags")
-public class RoleFlagEntity implements RoleFlagDBO {
+public class LandRoleFlagEntity implements RoleFlagDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,15 +27,15 @@ public class RoleFlagEntity implements RoleFlagDBO {
     private LandRole role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "landArea_id")
-    private LandAreaEntity landArea;
+    @JoinColumn(name = "flagContainer_id")
+    private FlagContainerEntity flagContainer;
 
-    public RoleFlagEntity(Long id, String name, boolean state, LandRole role, LandAreaEntity landArea) {
+    public LandRoleFlagEntity(Long id, String name, boolean state, LandRole role, FlagContainerEntity flagContainer) {
         this.id = id;
         this.name = name;
         this.state = state;
         this.role = role;
-        this.landArea = landArea;
+        this.flagContainer = flagContainer;
     }
 
     @Override
@@ -58,11 +59,8 @@ public class RoleFlagEntity implements RoleFlagDBO {
     }
 
     @Override
-    public LandAreaDBO landArea() {
-        return this.landArea;
+    public FlagContainerDBO flagContainer() {
+        return this.flagContainer;
     }
 
-    public LandAreaEntity getLandArea() {
-        return landArea;
-    }
 }

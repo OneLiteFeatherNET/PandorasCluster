@@ -2,7 +2,10 @@ package net.onelitefeather.pandorascluster.database.models.player;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
+import net.onelitefeather.pandorascluster.api.land.LandArea;
+import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
+import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
 import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
 import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
 import org.jetbrains.annotations.NotNull;
@@ -25,14 +28,14 @@ public final class LandMemberEntity implements LandMemberDBO {
     private LandRole role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "land_id")
-    private LandEntity land;
+    @JoinColumn(name = "landArea_id")
+    private LandAreaEntity landArea;
 
-    public LandMemberEntity(Long id, LandPlayerEntity member, LandRole role, LandEntity land) {
+    public LandMemberEntity(Long id, LandPlayerEntity member, LandRole role, LandAreaEntity landArea) {
         this.id = id;
         this.member = member;
         this.role = role;
-        this.land = land;
+        this.landArea = landArea;
     }
 
     @Override
@@ -51,11 +54,16 @@ public final class LandMemberEntity implements LandMemberDBO {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public LandAreaDBO landArea() {
+        return this.landArea;
+    }
+
+    @Override
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LandMemberEntity that)) return false;
 
-        return Objects.equals(id, that.id) && Objects.equals(member, that.member) && role == that.role && Objects.equals(land, that.land);
+        return Objects.equals(id, that.id) && Objects.equals(member, that.member) && role == that.role && Objects.equals(landArea, that.landArea);
     }
 
     @Override
@@ -63,7 +71,7 @@ public final class LandMemberEntity implements LandMemberDBO {
         int result = Objects.hashCode(id);
         result = 31 * result + Objects.hashCode(member);
         result = 31 * result + Objects.hashCode(role);
-        result = 31 * result + Objects.hashCode(land);
+        result = 31 * result + Objects.hashCode(landArea);
         return result;
     }
 }
