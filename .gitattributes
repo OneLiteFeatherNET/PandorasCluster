@@ -4,4 +4,8 @@
 *.java filter=lfs diff=lfs merge=lfs -text
 *.gitkeep filter=lfs diff=lfs merge=lfs -text
 *.json filter=lfs diff=lfs merge=lfs -text
+*.jar filter=lfs diff=lfs merge=lfs -text
+*.properties filter=lfs diff=lfs merge=lfs -text
+/gradlew filter=lfs diff=lfs merge=lfs -text
+*.bat filter=lfs diff=lfs merge=lfs -text
 * !text !filter !merge !diff
