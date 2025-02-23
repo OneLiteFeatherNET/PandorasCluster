@@ -15,6 +15,9 @@ public final class HomePositionEntity implements HomePositionDBO {
     private Long id;
 
     @Column
+    private String world;
+
+    @Column
     private Double posX;
 
     @Column
@@ -29,8 +32,9 @@ public final class HomePositionEntity implements HomePositionDBO {
     @Column
     private Float pitch;
 
-    public HomePositionEntity(Long id, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
+    public HomePositionEntity(Long id, String world, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
         this.id = id;
+        this.world = world;
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
@@ -39,27 +43,12 @@ public final class HomePositionEntity implements HomePositionDBO {
     }
 
     @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof HomePositionEntity that)) return false;
-
-        return Objects.equals(id, that.id) && Objects.equals(posX, that.posX) && Objects.equals(posY, that.posY) && Objects.equals(posZ, that.posZ) && Objects.equals(yaw, that.yaw) && Objects.equals(pitch, that.pitch);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hashCode(id);
-        result = 31 * result + Objects.hashCode(posX);
-        result = 31 * result + Objects.hashCode(posY);
-        result = 31 * result + Objects.hashCode(posZ);
-        result = 31 * result + Objects.hashCode(yaw);
-        result = 31 * result + Objects.hashCode(pitch);
-        return result;
-    }
-
-    @Override
     public @Nullable Long id() {
         return id;
+    }
+
+    public String getWorld() {
+        return world;
     }
 
     @Override
@@ -85,5 +74,31 @@ public final class HomePositionEntity implements HomePositionDBO {
     @Override
     public float pitch() {
         return pitch;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HomePositionEntity that)) return false;
+
+        return Objects.equals(id, that.id) &&
+                Objects.equals(world, that.world) &&
+                Objects.equals(posX, that.posX) &&
+                Objects.equals(posY, that.posY) &&
+                Objects.equals(posZ, that.posZ) &&
+                Objects.equals(yaw, that.yaw) &&
+                Objects.equals(pitch, that.pitch);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(id);
+        result = 31 * result + Objects.hashCode(world);
+        result = 31 * result + Objects.hashCode(posX);
+        result = 31 * result + Objects.hashCode(posY);
+        result = 31 * result + Objects.hashCode(posZ);
+        result = 31 * result + Objects.hashCode(yaw);
+        result = 31 * result + Objects.hashCode(pitch);
+        return result;
     }
 }
