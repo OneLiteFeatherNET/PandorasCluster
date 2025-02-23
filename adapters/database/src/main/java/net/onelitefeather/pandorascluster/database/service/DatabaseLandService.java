@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
+import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
@@ -137,7 +138,10 @@ public class DatabaseLandService implements LandService {
         var landArea = getLandArea(chunk);
         if (landArea != null) return landArea.getLand();
 
-        Land land = new Land(null, owner, home, Collections.emptyList(), world);
+
+        //TODO: Add flagContainer
+        Land land = new Land(null, owner, home, Collections.emptyList(), null);
+
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -160,13 +164,7 @@ public class DatabaseLandService implements LandService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            var flagContainer = land.getFlagContainer();
-
-            //FIXME: Remove all flags of a land.
-            flagContainer.getEntityCapFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
-            flagContainer.getRoleFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
-            flagContainer.getNaturalFlags().forEach(pandorasCluster.getLandFlagService()::removeLandFlag);
-
+            removeFlagsFromLand(land);
             land.getAreas().forEach(this::unclaimLandArea);
 
             session.remove(land);
@@ -212,5 +210,13 @@ public class DatabaseLandService implements LandService {
 
     private void refreshCache(Land land) {
         land.getAreas().forEach(landArea -> this.landAreaCache.invalidateAll(landArea.getChunks()));
+    }
+
+    private void removeFlagsFromLand(Land land) {
+        var flagContainer = land.getFlagContainer();
+
+        flagContainer.getEntityCapFlags().forEach(flag -> pandorasCluster.getLandFlagService().removeLandEntityCapFlag(flag, land));
+        flagContainer.getRoleFlags().forEach(roleFlag -> pandorasCluster.getLandFlagService().removeLandRoleFlag(roleFlag, land));
+        flagContainer.getNaturalFlags().forEach(naturalFlag -> pandorasCluster.getLandFlagService().removeLandNaturalFlag(naturalFlag, land));
     }
 }

@@ -10,6 +10,7 @@ import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,10 +25,10 @@ public class LandAreaEntity implements LandAreaDBO {
 
     private final String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "landAreaEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "landArea")
     private final List<LandMemberEntity> members;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "landAreaEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "landArea")
     private final List<ClaimedChunkEntity> chunks;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,12 +59,12 @@ public class LandAreaEntity implements LandAreaDBO {
 
     @Override
     public @NotNull List<LandMemberDBO> members() {
-        return this.members.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+        return Collections.unmodifiableList(this.members);
     }
 
     @Override
     public @NotNull List<ClaimedChunkDBO> chunks() {
-        return this.chunks.stream().filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+        return Collections.unmodifiableList(this.chunks);
     }
 
     @Override

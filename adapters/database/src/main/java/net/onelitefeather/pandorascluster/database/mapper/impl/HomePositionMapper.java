@@ -11,12 +11,12 @@ public final class HomePositionMapper implements DatabaseEntityMapper<HomePositi
     @Override
     public @Nullable HomePosition entityToModel(@Nullable HomePositionDBO entity) {
         if(entity == null) return null;
-        return new HomePosition(entity.id(), entity.posX(), entity.posY(), entity.posZ(), entity.yaw(), entity.pitch());
+        return new HomePosition(entity.id(), entity.world(), entity.posX(), entity.posY(), entity.posZ(), entity.yaw(), entity.pitch());
     }
 
     @Override
     public @Nullable HomePositionDBO modelToEntity(@Nullable HomePosition model) {
         if(model == null) return null;
-        return new HomePositionEntity(model.getId(), model.getPosX(), model.getPosY(), model.getPosZ(), model.getYaw(), model.getPitch());
+        return new HomePositionEntity(model.getId(), model.getWorld(), model.getPosX(), model.getPosY(), model.getPosZ(), model.getYaw(), model.getPitch());
     }
 }

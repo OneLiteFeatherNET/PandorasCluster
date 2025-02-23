@@ -2,12 +2,13 @@ package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.dbo.flag.EntityCapFlagDBO;
+import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "entityCap_flags")
-public class EntityCapFlagEntity implements EntityCapFlagDBO {
+public class LandEntityCapFlagEntity implements EntityCapFlagDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,11 +20,17 @@ public class EntityCapFlagEntity implements EntityCapFlagDBO {
     @Column
     private Integer spawnLimit;
 
-    public EntityCapFlagEntity(Long id, String name, Integer spawnLimit) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flagContainer_id")
+    private FlagContainerEntity flagContainer;
+
+    public LandEntityCapFlagEntity(Long id, String name, Integer spawnLimit, FlagContainerEntity flagContainer) {
         this.id = id;
         this.name = name;
         this.spawnLimit = spawnLimit;
+        this.flagContainer = flagContainer;
     }
+
 
     @Override
     public @Nullable Long id() {
@@ -38,5 +45,10 @@ public class EntityCapFlagEntity implements EntityCapFlagDBO {
     @Override
     public Integer spawnLimit() {
         return this.spawnLimit;
+    }
+
+    @Override
+    public FlagContainerDBO flagContainer() {
+        return this.flagContainer;
     }
 }
