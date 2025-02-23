@@ -4,14 +4,16 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
-import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
+import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
+import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
+import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.impl.LandAreaMapper;
 import net.onelitefeather.pandorascluster.database.mapper.impl.LandMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
@@ -95,7 +97,7 @@ public class DatabaseLandService implements LandService {
     @Override
     public void claimChunk(@NotNull ClaimedChunk chunk, @Nullable LandArea landArea) {
 
-        var chunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex());
+        var chunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex(), null);
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
@@ -124,7 +126,10 @@ public class DatabaseLandService implements LandService {
 
             var landAreaEntity = this.databaseService.landAreaMapper().modelToEntity(landArea);
             session.persist(landAreaEntity);
-            landArea.getChunks().forEach(chunk -> session.persist(this.databaseService.chunkMapper().modelToEntity(chunk)));
+            MappingContext mappingContext = MappingContext.create();
+            mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
+            mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
+            landArea.getChunks().stream().map(mappingContext::<ClaimedChunk, ClaimedChunkEntity>doMapping).forEach(session::persist);
 
             transaction.commit();
         } catch (HibernateException e) {

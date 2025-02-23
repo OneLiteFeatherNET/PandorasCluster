@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.service;
 
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
-import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
@@ -9,7 +8,6 @@ import net.onelitefeather.pandorascluster.api.mapper.DatabaseEntityMapper;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.database.mapper.impl.*;
-import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO;
 import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
 import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
@@ -23,14 +21,12 @@ public class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
 
     private SessionFactory sessionFactory;
     private final LandMapper landMapper;
-    private final ClaimedChunkMapper chunkMapper;
     private final LandAreaMapper landAreaMapper;
     private final LandPlayerMapper landPlayerMapper;
     private final FlagContainerMapper flagContainerMapper;
 
     public DatabaseServiceImpl(PandorasCluster pandorasCluster, SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        this.chunkMapper = new ClaimedChunkMapper();
         this.landPlayerMapper = new LandPlayerMapper();
         this.landAreaMapper = new LandAreaMapper(this);
         this.landMapper = new LandMapper(this.landAreaMapper, this.landPlayerMapper);
@@ -78,11 +74,6 @@ public class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
     @Override
     public @NotNull DatabaseEntityMapper<LandAreaDBO, LandArea> landAreaMapper() {
         return this.landAreaMapper;
-    }
-
-    @Override
-    public @NotNull DatabaseEntityMapper<ClaimedChunkDBO, ClaimedChunk> chunkMapper() {
-        return this.chunkMapper;
     }
 
     @Override

@@ -3,10 +3,11 @@ package net.onelitefeather.pandorascluster.api.land.flag;
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class LandEntityCapFlag {
+public class LandEntityCapFlag implements PandorasModel {
 
     private final Long id;
     private String name;

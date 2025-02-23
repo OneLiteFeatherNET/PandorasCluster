@@ -1,10 +1,11 @@
 package net.onelitefeather.pandorascluster.api.player;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 
 import java.util.Objects;
 
-public final class LandMember {
+public final class LandMember implements PandorasModel {
 
     private final Long id;
     private LandPlayer member;
