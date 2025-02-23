@@ -1,8 +1,6 @@
 package net.onelitefeather.pandorascluster.api.land;
 
-import net.onelitefeather.pandorascluster.api.land.flag.AreaEntityCapFlag;
-import net.onelitefeather.pandorascluster.api.land.flag.AreaNaturalFlag;
-import net.onelitefeather.pandorascluster.api.land.flag.AreaRoleFlag;
+import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 
@@ -14,29 +12,20 @@ public final class Land {
 
     private Long id;
     private LandPlayer owner;
+    private final FlagContainer flagContainer;
     private HomePosition home;
     private final List<LandArea> areas;
-    private final List<AreaNaturalFlag> naturalFlags;
-    private final List<AreaRoleFlag> roleFlags;
-    private final List<AreaEntityCapFlag> entityCapFlags;
-    private String world;
 
     public Land(Long id,
                 LandPlayer owner,
                 HomePosition home,
                 List<LandArea> areas,
-                List<AreaNaturalFlag> naturalFlags,
-                List<AreaRoleFlag> roleFlags,
-                List<AreaEntityCapFlag> entityCapFlags,
-                String world) {
+                FlagContainer flagContainer) {
         this.id = id;
         this.owner = owner;
         this.home = home;
         this.areas = areas;
-        this.naturalFlags = naturalFlags;
-        this.roleFlags = roleFlags;
-        this.entityCapFlags = entityCapFlags;
-        this.world = world;
+        this.flagContainer = flagContainer;
     }
 
     public Long getId() {
@@ -67,24 +56,12 @@ public final class Land {
         return areas;
     }
 
-    public List<AreaNaturalFlag> getNaturalFlags() {
-        return naturalFlags;
-    }
-
-    public List<AreaRoleFlag> getRoleFlags() {
-        return roleFlags;
-    }
-
-    public List<AreaEntityCapFlag> getEntityCapFlags() {
-        return entityCapFlags;
+    public FlagContainer getFlagContainer() {
+        return flagContainer;
     }
 
     public String getWorld() {
-        return world;
-    }
-
-    public void setWorld(String world) {
-        this.world = world;
+        return this.home.getWorld();
     }
 
     public LandArea getDefaultArea() {
@@ -103,8 +80,7 @@ public final class Land {
         return Objects.equals(id, land.id) &&
                 Objects.equals(owner, land.owner) &&
                 Objects.equals(home, land.home) &&
-                Objects.equals(areas, land.areas) &&
-                Objects.equals(world, land.world);
+                Objects.equals(areas, land.areas);
     }
 
     @Override
@@ -113,7 +89,6 @@ public final class Land {
         result = 31 * result + Objects.hashCode(owner);
         result = 31 * result + Objects.hashCode(home);
         result = 31 * result + Objects.hashCode(areas);
-        result = 31 * result + Objects.hashCode(world);
         return result;
     }
 
@@ -122,9 +97,9 @@ public final class Land {
         return "Land{" +
                 "id=" + getId() +
                 ", owner=" + getOwner() +
+                ", flagContainer=" + getFlagContainer() +
                 ", home=" + getHome() +
                 ", areas=" + getAreas() +
-                ", world='" + getWorld() + '\'' +
                 '}';
     }
 }
