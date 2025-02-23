@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.dbo.land;
 
+import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
 import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,5 @@ public interface LandDBO {
     @NotNull
     List<LandAreaDBO> areas();
 
-    @NotNull
-    String world();
+    FlagContainerDBO flagContainer();
 }

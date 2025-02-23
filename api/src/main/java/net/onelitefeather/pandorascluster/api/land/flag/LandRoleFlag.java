@@ -3,6 +3,7 @@ package net.onelitefeather.pandorascluster.api.land.flag;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
+import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,14 +14,14 @@ public class LandRoleFlag {
     private String name;
     private Boolean state;
     private LandRole role;
-    private LandArea landArea;
+    private final Land land;
 
-    public LandRoleFlag(Long id, String name, Boolean state, LandRole role, LandArea landArea) {
+    public LandRoleFlag(Long id, String name, Boolean state, LandRole role, Land land) {
         this.id = id;
         this.name = name;
         this.state = state;
         this.role = role;
-        this.landArea = landArea;
+        this.land = land;
     }
 
     public Long getId() {
@@ -59,7 +60,7 @@ public class LandRoleFlag {
         return state;
     }
 
-    public LandArea getLandArea() {
-        return landArea;
+    public Land getLand() {
+        return land;
     }
 }
