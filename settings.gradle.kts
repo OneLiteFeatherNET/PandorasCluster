@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
 
-            version("paper", "1.20.6-R0.1-SNAPSHOT")
+            version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("plugin.yml", "0.6.0")
             version("run-paper", "2.3.1")
             version("publishdata", "1.2.5-DEV")
@@ -37,14 +37,15 @@ dependencyResolutionManagement {
             library("worldguard", "com.sk89q.worldguard", "worldguard-bukkit").version("7.1.0-SNAPSHOT")
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.11.1")
             library("faweCore", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.11.1")
+            library("jetbrainsAnnotations", "org.jetbrains", "annotations").version("26.0.2")
 
+            // Commands
             library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
             library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.4")
             library("cloudMinecraftExtras", "cloud.commandframework", "cloud-minecraft-extras").version("1.8.4")
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
             library("commodore", "me.lucko", "commodore").version("2.2")
 
-            library("guava", "com.google.guava", "guava").versionRef("guava")
 //            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
 
             // Database
