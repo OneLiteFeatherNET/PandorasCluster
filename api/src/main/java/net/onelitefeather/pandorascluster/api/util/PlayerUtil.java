@@ -11,13 +11,15 @@ import java.util.UUID;
 public interface PlayerUtil {
 
     @Nullable
-    Object getPlayer(@NotNull UUID var1);
+    Object getPlayer(@NotNull UUID uuid);
 
-    boolean isOnline(@NotNull UUID var1);
+    default boolean isOnline(@NotNull UUID uuid) {
+        return getPlayer(uuid) != null;
+    }
 
-    boolean hasPermission(@NotNull UUID var1, @NotNull String var2);
+    boolean hasPermission(@NotNull UUID uuid, @NotNull String permission);
 
-    boolean hasPermission(@NotNull UUID var1, @NotNull Permission var2);
+    boolean hasPermission(@NotNull UUID uuid, @NotNull Permission permission);
 
     final class Instances {
 
