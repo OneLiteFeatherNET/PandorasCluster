@@ -7,6 +7,7 @@ import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandPlayerService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
+import net.onelitefeather.pandorascluster.database.mapper.impl.LandAreaMapper;
 import net.onelitefeather.pandorascluster.database.mapper.impl.LandMemberMapper;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import org.hibernate.HibernateException;
@@ -26,9 +27,9 @@ public class DatabaseLandPlayerService implements LandPlayerService {
     private final DatabaseService databaseService;
     private final LandMemberMapper memberMapper;
 
-    public DatabaseLandPlayerService(DatabaseService databaseService, LandMemberMapper memberMapper) {
+    public DatabaseLandPlayerService(DatabaseService databaseService) {
         this.databaseService = databaseService;
-        this.memberMapper = memberMapper;
+        this.memberMapper = ((LandAreaMapper) databaseService.landAreaMapper()).getMemberMapper();
     }
 
     @Override
@@ -38,8 +39,8 @@ public class DatabaseLandPlayerService implements LandPlayerService {
         var landMember = new LandMember(null, member, role);
         Transaction transaction = null;
 
-        try(SessionFactory factory = this.databaseService.sessionFactory();
-            Session session = factory.openSession()) {
+        try (SessionFactory factory = this.databaseService.sessionFactory();
+             Session session = factory.openSession()) {
 
             transaction = session.beginTransaction();
             session.persist(this.memberMapper.modelToEntity(landMember));
@@ -171,8 +172,8 @@ public class DatabaseLandPlayerService implements LandPlayerService {
             if (transaction != null) transaction.rollback();
             Constants.LOGGER.log(Level.SEVERE,
                     "Cannot update land player with uuid %s and name %s".formatted(
-                    landPlayer.getUniqueId().toString(),
-                    landPlayer.getName()), e);
+                            landPlayer.getUniqueId().toString(),
+                            landPlayer.getName()), e);
         }
     }
 }
