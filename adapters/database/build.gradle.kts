@@ -7,7 +7,6 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.guava)
 
     // Database
     implementation(libs.hibernateCore)
