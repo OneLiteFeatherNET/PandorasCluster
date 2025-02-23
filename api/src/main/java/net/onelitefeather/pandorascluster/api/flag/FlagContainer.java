@@ -10,19 +10,26 @@ import java.util.Objects;
 
 public class FlagContainer {
 
+    private final Long id;
     private final Land land;
     private final List<LandNaturalFlag> naturalFlags;
     private final List<LandRoleFlag> roleFlags;
     private final List<LandEntityCapFlag> entityCapFlags;
 
-    public FlagContainer(Land land,
+    public FlagContainer(Long id,
+                         Land land,
                          List<LandNaturalFlag> naturalFlags,
                          List<LandRoleFlag> roleFlags,
                          List<LandEntityCapFlag> entityCapFlags) {
+        this.id = id;
         this.naturalFlags = naturalFlags;
         this.roleFlags = roleFlags;
         this.entityCapFlags = entityCapFlags;
         this.land = land;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Land getLand() {

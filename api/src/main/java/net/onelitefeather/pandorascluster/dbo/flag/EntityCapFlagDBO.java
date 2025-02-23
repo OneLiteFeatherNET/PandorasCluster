@@ -12,4 +12,6 @@ public interface EntityCapFlagDBO {
     String name();
 
     Integer spawnLimit();
+
+    FlagContainerDBO flagContainer();
 }

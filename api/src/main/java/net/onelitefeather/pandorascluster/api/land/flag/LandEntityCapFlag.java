@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.api.land.flag;
 
+import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 import org.jetbrains.annotations.NotNull;
@@ -10,11 +11,13 @@ public class LandEntityCapFlag {
     private final Long id;
     private String name;
     private int spawnLimit;
+    private FlagContainer parent;
 
-    public LandEntityCapFlag(Long id, String name, int spawnLimit) {
+    public LandEntityCapFlag(Long id, String name, int spawnLimit, FlagContainer parent) {
         this.id = id;
         this.name = name;
         this.spawnLimit = spawnLimit;
+        this.parent = parent;
     }
 
     public Long getId() {

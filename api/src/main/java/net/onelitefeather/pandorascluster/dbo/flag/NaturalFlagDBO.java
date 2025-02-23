@@ -12,4 +12,6 @@ public interface NaturalFlagDBO {
     String name();
 
     boolean state();
+
+    FlagContainerDBO flagContainer();
 }
