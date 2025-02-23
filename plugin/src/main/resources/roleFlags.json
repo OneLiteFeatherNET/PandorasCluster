@@ -1,0 +1,153 @@
+[
+ {
+  "name": "pvp",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "pve",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "potion_splash",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "hanging_break",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "hanging_place",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "vehicle_use",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "vehicle_create",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "vehicle_damage",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "turtle_egg",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "animal_riding",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "animal_taming",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "bucket_use",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "shear_block",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "shear_entity",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "shear_entity",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "shear_entity",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "lectern_interact",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "use_bed",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "villager_interact",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "farmland_destroy",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "container_interact",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "crop_interact",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "block_break",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "block_place",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ },
+ {
+  "name": "jukebox_interact",
+  "defaultState": true,
+  "role": "MEMBER",
+  "allowInWilderness": true
+ }
+]
+
