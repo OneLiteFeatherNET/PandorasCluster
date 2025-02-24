@@ -20,7 +20,7 @@ dependencyResolutionManagement {
             version("paper", "1.20.6-R0.1-SNAPSHOT")
             version("plugin.yml", "0.6.0")
             version("run-paper", "2.3.1")
-            version("publishdata", "1.2.5-DEV")
+            version("publishdata", "1.4.0")
             version("shadow", "8.1.1")
             version("liquibase", "2.2.2")
             version("guava", "33.4.0-jre")
