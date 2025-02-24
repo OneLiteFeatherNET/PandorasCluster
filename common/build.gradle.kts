@@ -7,7 +7,9 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.caffeine)
+    testImplementation(platform("org.junit:junit-bom:5.12.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
 
     // Database
     implementation(libs.hibernateCore)

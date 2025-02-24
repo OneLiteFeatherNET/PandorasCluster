@@ -18,38 +18,8 @@ repositories {
 }
 
 dependencies {
-
-    compileOnly(libs.paper)
-
-    //WorldGuard
-    compileOnly(libs.worldguard)
-    compileOnly(libs.faweCore)
-    compileOnly(libs.fawe) {
-        isTransitive = false
-    }
-
-    // Commands
-    implementation(libs.cloudPaper)
-    implementation(libs.cloudAnnotations)
-    implementation(libs.cloudMinecraftExtras)
-    implementation(libs.adventurePlatformBukkit)
-    implementation(libs.commodore) {
-        isTransitive = false
-    }
-
-    implementation(libs.caffeine)
-
-    // Database
-    implementation(libs.hibernateCore)
-    implementation(libs.mariadbJavaClient)
-    implementation(libs.hibernateHikariCP)
-
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("org.postgresql:postgresql:42.7.4") //DATABASE
-
-    implementation(project(":api"))
-    implementation(project(":common"))
-
+    testImplementation(platform("org.junit:junit-bom:5.12.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 publishData {
