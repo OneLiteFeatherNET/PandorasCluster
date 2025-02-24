@@ -23,6 +23,7 @@ dependencyResolutionManagement {
             version("publishdata", "1.2.5-DEV")
             version("shadow", "8.1.1")
             version("liquibase", "2.2.2")
+            version("guava", "33.4.0-jre")
 
             plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
             plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
