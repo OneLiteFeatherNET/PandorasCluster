@@ -13,4 +13,6 @@ public interface PandorasCluster {
     LandFlagService getLandFlagService();
 
     StaffNotificationService getStaffNotification();
+
+    LandAreaService getLandAreaService();
 }
