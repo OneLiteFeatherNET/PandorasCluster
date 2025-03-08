@@ -28,11 +28,6 @@ public interface LandService {
      */
     void updateLand(@NotNull Land land);
 
-    /**
-     * @param chunk the chunk to claim
-     * @param landArea the land area to add the chunk
-     */
-    void claimChunk(@NotNull ClaimedChunk chunk, @Nullable LandArea landArea);
 
     void addLandArea(Land land, String name, List<ClaimedChunk> chunks);
 
@@ -50,32 +45,12 @@ public interface LandService {
      */
     void unclaimLand(@NotNull Land land);
 
-    /**
-     * @param chunkIndex the chunk to remove from the land.
-     **/
-    boolean removeClaimedChunk(long chunkIndex);
-
-    @Nullable
-    LandArea getLandArea(long chunkIndex);
-
-    @Nullable
-    default LandArea getLandArea(@NotNull ClaimedChunk chunk) {
-        return getLandArea(chunk.getChunkIndex());
-    }
 
     @Nullable
     Land getLand(@NotNull LandPlayer landPlayer);
 
-    default boolean isChunkClaimed(@NotNull ClaimedChunk chunk) {
-        return isChunkClaimed(chunk.getChunkIndex());
-    }
-
-    boolean isChunkClaimed(long chunkIndex);
 
     default boolean hasPlayerLand(@NotNull LandPlayer landPlayer) {
         return getLand(landPlayer) != null;
     }
-
-    @Nullable
-    ClaimedChunk getClaimedChunk(long chunkIndex);
 }
