@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <!-- - Mapping files or annotated classes -->
-        <mapping class="net.onelitefeather.pandorascluster.database.models.ClaimedChunkEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity" />
