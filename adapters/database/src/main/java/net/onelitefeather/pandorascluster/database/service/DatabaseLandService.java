@@ -207,8 +207,8 @@ public class DatabaseLandService implements LandService {
 
     private void removeFlagsFromLand(Land land) {
         var flagContainer = land.getFlagContainer();
-        flagContainer.getEntityCapFlags().forEach(flag -> pandorasCluster.getLandFlagService().removeLandEntityCapFlag(flag, flagContainer));
-        flagContainer.getRoleFlags().forEach(roleFlag -> pandorasCluster.getLandFlagService().removeLandRoleFlag(roleFlag, flagContainer));
-        flagContainer.getNaturalFlags().forEach(naturalFlag -> pandorasCluster.getLandFlagService().removeLandNaturalFlag(naturalFlag, flagContainer));
+        flagContainer.getEntityCapFlags().forEach(flag -> pandorasCluster.getLandFlagService().removeEntityCapFlag(flag, flagContainer));
+        flagContainer.getRoleFlags().forEach(roleFlag -> pandorasCluster.getLandFlagService().removeRoleFlag(roleFlag, flagContainer));
+        flagContainer.getNaturalFlags().forEach(naturalFlag -> pandorasCluster.getLandFlagService().removeNaturalFlag(naturalFlag, flagContainer));
     }
 }
