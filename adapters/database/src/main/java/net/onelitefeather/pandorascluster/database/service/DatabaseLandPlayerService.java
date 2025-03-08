@@ -145,6 +145,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
              Session session = factory.openSession()) {
 
             var query = session.createQuery("SELECT lp FROM LandPlayerEntity lp WHERE lp.uuid = :uuid", LandPlayerEntity.class);
+            query.setParameter("uuid", uuid.toString());
             return toModel(query.uniqueResult());
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot find land player for uuid %s.".formatted(uuid.toString()), e);
