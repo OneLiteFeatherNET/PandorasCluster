@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.database.mapper;
+package net.onelitefeather.pandorascluster.database.mapper.player;
 
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
