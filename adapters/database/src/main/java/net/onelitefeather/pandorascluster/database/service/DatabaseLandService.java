@@ -13,9 +13,11 @@ import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
+import net.onelitefeather.pandorascluster.database.mapper.flag.FlagContainerMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.land.LandMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.position.HomePositionMappingStrategy;
+import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
@@ -78,7 +80,7 @@ public class DatabaseLandService implements LandService {
             transaction = session.beginTransaction();
 
             MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(HomePositionMappingStrategy.create());
+            mappingContext.setMappingStrategy(LandMappingStrategy.create());
             mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
 
             LandEntity landEntity = (LandEntity) mappingContext.doMapping(land);
@@ -113,6 +115,7 @@ public class DatabaseLandService implements LandService {
 
             transaction.commit();
         } catch (HibernateException e) {
+            Constants.LOGGER.log(Level.SEVERE, "Cannot add landArea to land", e);
             if (transaction != null) transaction.rollback();
         }
     }
@@ -123,19 +126,22 @@ public class DatabaseLandService implements LandService {
         var landArea = this.landAreaService.getLandArea(chunk);
         if (landArea != null) return landArea.getLand();
 
-
-        Land land = new Land(null, owner, home, Collections.emptyList(), null);
-        FlagContainer flagContainer = FlagContainer.EMPTY.withLand(land);
+        FlagContainer flagContainer = FlagContainer.EMPTY;
+        Land land = new Land(null, owner, home, Collections.emptyList(), flagContainer);
 
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            session.persist(toEntity(home));
             session.persist(toEntity(land));
+            session.persist(toEntity(flagContainer.withLand(land)));
+            session.persist(toEntity(home));
+
             addLandArea(land, "default", List.of(chunk));
+
             transaction.commit();
         } catch (HibernateException e) {
+            Constants.LOGGER.log(Level.SEVERE, "Cannot create land!", e);
             if (transaction != null) transaction.rollback();
         }
 
@@ -162,7 +168,20 @@ public class DatabaseLandService implements LandService {
 
     @Override
     public @Nullable Land getLand(@NotNull LandPlayer landPlayer) {
-        return null;
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
+            var query = session.createQuery("SELECT l FROM Land l JOIN l.owner o JOIN FETCH l.chunks WHERE o.uuid = :uuid", LandEntity.class);
+            return toModel(query.uniqueResult());
+        } catch (HibernateException e) {
+            Constants.LOGGER.log(Level.SEVERE, "Cannot find any land players.", e);
+            return null;
+        }
+    }
+
+    private FlagContainerEntity toEntity(FlagContainer flagContainer) {
+        MappingContext mappingContext = MappingContext.create();
+        mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());
+        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
+        return (FlagContainerEntity) mappingContext.doMapping(flagContainer);
     }
 
     private Land toModel(LandEntity land) {
