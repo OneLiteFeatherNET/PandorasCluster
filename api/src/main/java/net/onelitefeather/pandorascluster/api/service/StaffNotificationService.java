@@ -7,7 +7,7 @@ import net.onelitefeather.pandorascluster.api.notification.StaffNotification;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StaffNotificationService {
+public final class StaffNotificationService {
 
     private final List<StaffNotification> staffNotifications = new ArrayList<>();
 

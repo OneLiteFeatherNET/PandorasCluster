@@ -2,7 +2,7 @@ package net.onelitefeather.pandorascluster.api.flag.impl;
 
 import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 
-public class EntityCapImpl implements EntityCapFlag {
+public final class EntityCapImpl implements EntityCapFlag {
 
     private int spawnLimit;
     private final String name;

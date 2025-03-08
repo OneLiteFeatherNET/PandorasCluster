@@ -2,7 +2,7 @@ package net.onelitefeather.pandorascluster.api.flag.impl;
 
 import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
 
-public class NaturalFlagImpl implements NaturalFlag {
+public final class NaturalFlagImpl implements NaturalFlag {
 
     private final String name;
     private boolean state;

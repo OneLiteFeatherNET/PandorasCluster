@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class LandArea implements PandorasModel {
+public final class LandArea implements PandorasModel {
 
     private final Long id;
     private String name;

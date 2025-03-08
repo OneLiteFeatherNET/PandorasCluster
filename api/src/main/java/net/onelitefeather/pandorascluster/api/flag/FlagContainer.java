@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class FlagContainer implements PandorasModel {
+public final class FlagContainer implements PandorasModel {
 
     public static final FlagContainer EMPTY = new FlagContainer(
             null,
