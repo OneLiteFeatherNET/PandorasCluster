@@ -9,6 +9,7 @@ import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
 import net.onelitefeather.pandorascluster.api.util.Constants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -23,12 +24,6 @@ public class FlagRegistry {
 
     private static final List<Flag<?>> knownFlags = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
-
-    public FlagRegistry() {
-        registerRoleFlags();
-        registerNaturalFlags();
-        registerEntityCapFlags();
-    }
 
     public <T> void registerFlag(Flag<T> flag) {
         if (!knownFlags.contains(flag)) {
@@ -58,8 +53,14 @@ public class FlagRegistry {
                 .findFirst().orElse(null);
     }
 
-    private void registerEntityCapFlags() {
-        Path roleFlagsFlagsFilePath = Constants.DATA_FOLDER.resolve("entityCapFlags.json");
+    public void loadDefaultFlags(@NotNull Path dataFolder) {
+        registerRoleFlags(dataFolder);
+        registerNaturalFlags(dataFolder);
+        registerEntityCapFlags(dataFolder);
+    }
+
+    private void registerEntityCapFlags(@NotNull Path dataFolder) {
+        Path roleFlagsFlagsFilePath = dataFolder.resolve("entityCapFlags.json");
         try (BufferedReader bufferedReader = Files.newBufferedReader(roleFlagsFlagsFilePath)) {
             knownFlags.addAll(List.of(GSON.fromJson(bufferedReader, EntityCapImpl[].class)));
         } catch (IOException e) {
@@ -67,17 +68,17 @@ public class FlagRegistry {
         }
     }
 
-    private void registerRoleFlags() {
-        Path roleFlagsFlagsFilePath = Constants.DATA_FOLDER.resolve("roleFlags.json");
+    private void registerRoleFlags(@NotNull Path dataFolder) {
+        Path roleFlagsFlagsFilePath = dataFolder.resolve("roleFlags.json");
         try (BufferedReader bufferedReader = Files.newBufferedReader(roleFlagsFlagsFilePath)) {
             knownFlags.addAll(List.of(GSON.fromJson(bufferedReader, RoleFlagImpl[].class)));
         } catch (IOException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot register default role flags.", e);
         }
-     }
+    }
 
-    private void registerNaturalFlags() {
-        Path roleFlagsFlagsFilePath = Constants.DATA_FOLDER.resolve("naturalFlags.json");
+    private void registerNaturalFlags(@NotNull Path dataFolder) {
+        Path roleFlagsFlagsFilePath = dataFolder.resolve("naturalFlags.json");
         try (BufferedReader bufferedReader = Files.newBufferedReader(roleFlagsFlagsFilePath)) {
             knownFlags.addAll(List.of(GSON.fromJson(bufferedReader, NaturalFlagImpl[].class)));
         } catch (IOException e) {

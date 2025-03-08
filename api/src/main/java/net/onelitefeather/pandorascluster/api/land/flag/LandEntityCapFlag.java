@@ -7,6 +7,8 @@ import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class LandEntityCapFlag implements PandorasModel {
 
     private final Long id;
@@ -29,9 +31,18 @@ public class LandEntityCapFlag implements PandorasModel {
         return name;
     }
 
+    public FlagContainer getParent() {
+        return parent;
+    }
+
     @Nullable
     public EntityCapFlag getFlag() {
         return FlagRegistry.entityCapFlagOf(this.name);
+    }
+
+    public LandEntityCapFlag withParent(FlagContainer parent) {
+        this.parent = parent;
+        return this;
     }
 
     public LandEntityCapFlag withFlag(@NotNull String flag) {
@@ -46,5 +57,25 @@ public class LandEntityCapFlag implements PandorasModel {
 
     public int getSpawnLimit() {
         return spawnLimit;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LandEntityCapFlag that)) return false;
+
+        return spawnLimit == that.spawnLimit &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(parent, that.parent);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(id);
+        result = 31 * result + Objects.hashCode(name);
+        result = 31 * result + spawnLimit;
+        result = 31 * result + Objects.hashCode(parent);
+        return result;
     }
 }
