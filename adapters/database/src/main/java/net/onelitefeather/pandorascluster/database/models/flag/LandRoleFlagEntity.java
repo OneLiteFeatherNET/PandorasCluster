@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "role_flags")
-public class LandRoleFlagEntity implements RoleFlagDBO {
+public final class LandRoleFlagEntity implements RoleFlagDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

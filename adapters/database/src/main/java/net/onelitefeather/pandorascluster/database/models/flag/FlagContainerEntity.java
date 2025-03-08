@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "flag_containers")
-public class FlagContainerEntity implements FlagContainerDBO {
+public final class FlagContainerEntity implements FlagContainerDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

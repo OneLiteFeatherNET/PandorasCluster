@@ -19,7 +19,7 @@ import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
 import java.util.List;
 import java.util.function.Function;
 
-public class LandMappingStrategy implements MapperStrategy {
+public final class LandMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {

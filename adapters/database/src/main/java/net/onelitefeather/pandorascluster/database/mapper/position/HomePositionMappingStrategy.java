@@ -7,7 +7,7 @@ import net.onelitefeather.pandorascluster.database.models.position.HomePositionE
 
 import java.util.function.Function;
 
-public class HomePositionMappingStrategy implements MapperStrategy {
+public final class HomePositionMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {

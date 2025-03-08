@@ -19,7 +19,7 @@ import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
 import java.util.List;
 import java.util.function.Function;
 
-public class FlagContainerMappingStrategy implements MapperStrategy {
+public final class FlagContainerMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {

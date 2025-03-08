@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "land_areas")
-public class LandAreaEntity implements LandAreaDBO {
+public final class LandAreaEntity implements LandAreaDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

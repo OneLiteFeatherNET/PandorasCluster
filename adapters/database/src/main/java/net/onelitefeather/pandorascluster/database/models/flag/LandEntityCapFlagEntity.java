@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "entityCap_flags")
-public class LandEntityCapFlagEntity implements EntityCapFlagDBO {
+public final class LandEntityCapFlagEntity implements EntityCapFlagDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

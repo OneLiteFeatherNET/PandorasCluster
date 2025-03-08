@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "natural_flags")
-public class LandNaturalFlagEntity implements NaturalFlagDBO {
+public final class LandNaturalFlagEntity implements NaturalFlagDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
