@@ -203,7 +203,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
 
     private LandNaturalFlagEntity getNaturalFlagEntity(LandNaturalFlag naturalFlag) {
         var flagContainer = getFlagContainer(naturalFlag.getParent());
-        return (LandNaturalFlagEntity) flagContainer.entityCapFlags()
+        return (LandNaturalFlagEntity) flagContainer.naturalFlags()
                 .stream()
                 .filter(naturalFlagDBO -> naturalFlagDBO.name().equals(naturalFlag.getName()))
                 .findFirst().orElse(null);
