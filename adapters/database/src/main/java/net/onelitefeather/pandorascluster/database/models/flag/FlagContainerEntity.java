@@ -32,10 +32,10 @@ public class FlagContainerEntity implements FlagContainerDBO {
     private LandEntity landEntity;
 
     public FlagContainerEntity(Long id,
+                               LandEntity landEntity,
                                List<LandNaturalFlagEntity> naturalFlags,
                                List<LandRoleFlagEntity> roleFlags,
-                               List<LandEntityCapFlagEntity> entityCapFlags,
-                               LandEntity landEntity) {
+                               List<LandEntityCapFlagEntity> entityCapFlags) {
         this.id = id;
         this.naturalFlags = naturalFlags;
         this.roleFlags = roleFlags;
