@@ -22,7 +22,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
 
         syncThreadForServiceLoader(() -> {
             try {
-                var sessionFactory = new Configuration().configure().configure("connection.cfg.xml").buildSessionFactory();
+                var sessionFactory = new Configuration().configure().configure("hibernate.cfg.xml").buildSessionFactory();
                 this.databaseService = new DatabaseServiceImpl(sessionFactory);
             } catch (HibernateException e) {
                 this.databaseService = null;
