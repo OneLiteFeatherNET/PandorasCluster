@@ -5,8 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface DatabaseService {
 
-    void connect(@NotNull String configFileResource);
-
     void shutdown();
 
     boolean isRunning();
