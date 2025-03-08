@@ -4,11 +4,12 @@ import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 
 import java.util.List;
 import java.util.Objects;
 
-public class FlagContainer {
+public class FlagContainer implements PandorasModel {
 
     private final Long id;
     private final Land land;
