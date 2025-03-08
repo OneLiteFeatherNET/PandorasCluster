@@ -37,4 +37,8 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
             return new LandMemberEntity(landMember.getId(), (LandPlayerEntity) mappingContext.doMapping(landMember.getMember()), landMember.getRole(), null);
         };
     }
+
+    public static LandMemberMappingStrategy create() {
+        return new LandMemberMappingStrategy();
+    }
 }
