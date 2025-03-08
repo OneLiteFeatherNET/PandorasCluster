@@ -14,6 +14,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     private LandPlayerService landPlayerService;
     private LandFlagService landFlagService;
     private LandService landService;
+    private LandAreaService landAreaService;
     private StaffNotificationService staffNotificationService;
 
     public PandorasClusterImpl() {
@@ -21,7 +22,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
         syncThreadForServiceLoader(() -> {
             try {
                 var sessionFactory = new Configuration().configure().configure("connection.cfg.xml").buildSessionFactory();
-                this.databaseService = new DatabaseServiceImpl(this, sessionFactory);
+                this.databaseService = new DatabaseServiceImpl(sessionFactory);
             } catch (HibernateException e) {
                 this.databaseService = null;
                 Constants.LOGGER.log(Level.SEVERE, "Cannot build session factory.", e);
@@ -31,6 +32,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
         if (databaseService == null) return;
         this.landPlayerService = new DatabaseLandPlayerService(databaseService);
         this.landFlagService = new DatabaseLandFlagService(this);
+        this.landAreaService = new DatabaseLandAreaService(this, databaseService);
         this.landService = new DatabaseLandService(this);
         this.staffNotificationService = new StaffNotificationService();
     }
@@ -58,5 +60,10 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     @Override
     public StaffNotificationService getStaffNotification() {
         return this.staffNotificationService;
+    }
+
+    @Override
+    public LandAreaService getLandAreaService() {
+        return this.landAreaService;
     }
 }
