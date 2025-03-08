@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.api.land;
 
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public final class Land {
+public final class Land implements PandorasModel {
 
     private Long id;
     private LandPlayer owner;
