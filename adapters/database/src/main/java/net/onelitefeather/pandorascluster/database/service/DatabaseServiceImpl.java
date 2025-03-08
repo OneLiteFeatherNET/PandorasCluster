@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.database.service;
 
-import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -11,7 +10,7 @@ public class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
 
     private SessionFactory sessionFactory;
 
-    public DatabaseServiceImpl(PandorasCluster pandorasCluster, SessionFactory sessionFactory) {
+    public DatabaseServiceImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
