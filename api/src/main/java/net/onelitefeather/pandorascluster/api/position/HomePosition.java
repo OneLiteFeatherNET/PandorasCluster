@@ -1,10 +1,11 @@
 package net.onelitefeather.pandorascluster.api.position;
 
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.util.NumberUtil;
 
 import java.util.Objects;
 
-public final class HomePosition {
+public final class HomePosition implements PandorasModel {
 
     private Long id;
     private String world;

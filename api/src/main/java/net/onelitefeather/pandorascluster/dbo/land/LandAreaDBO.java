@@ -1,5 +1,6 @@
 package net.onelitefeather.pandorascluster.dbo.land;
 
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO;
 import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface LandAreaDBO {
+public interface LandAreaDBO extends PandorasModel {
 
     @Nullable
     Long id();
