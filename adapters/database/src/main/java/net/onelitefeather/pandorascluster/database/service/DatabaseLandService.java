@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class DatabaseLandService implements LandService {
+public final class DatabaseLandService implements LandService {
 
     private final PandorasCluster pandorasCluster;
     private final LandAreaService landAreaService;

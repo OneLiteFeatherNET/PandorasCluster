@@ -17,7 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "lands")
-public class LandEntity implements LandDBO {
+public final class LandEntity implements LandDBO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,7 +11,7 @@ import net.onelitefeather.pandorascluster.dbo.flag.RoleFlagDBO;
 
 import java.util.function.Function;
 
-public class RoleFlagMappingStrategy implements MapperStrategy {
+public final class RoleFlagMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public class DatabaseLandAreaService implements LandAreaService {
+public final class DatabaseLandAreaService implements LandAreaService {
 
     private final PandorasCluster pandorasCluster;
     private final DatabaseService databaseService;

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class DatabaseLandPlayerService implements LandPlayerService {
+public final class DatabaseLandPlayerService implements LandPlayerService {
 
     private final DatabaseService databaseService;
 

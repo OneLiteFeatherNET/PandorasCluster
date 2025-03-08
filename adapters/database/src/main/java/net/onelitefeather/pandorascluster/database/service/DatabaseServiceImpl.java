@@ -6,7 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 
-public class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
+public final class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
 
     private SessionFactory sessionFactory;
 
