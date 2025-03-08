@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class FlagRegistry {
+public final class FlagRegistry {
 
     private static final List<Flag<?>> knownFlags = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();

@@ -4,7 +4,7 @@ import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.flag.types.DefaultStateFlag;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
 
-public class RoleFlagImpl implements RoleFlag {
+public final class RoleFlagImpl implements RoleFlag {
 
     private final String name;
     private boolean state;

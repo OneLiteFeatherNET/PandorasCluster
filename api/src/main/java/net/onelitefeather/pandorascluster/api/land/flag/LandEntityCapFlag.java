@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class LandEntityCapFlag implements PandorasModel {
+public final class LandEntityCapFlag implements PandorasModel {
 
     private final Long id;
     private String name;
