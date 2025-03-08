@@ -1,10 +1,11 @@
-package net.onelitefeather.pandorascluster.database.mapper;
+package net.onelitefeather.pandorascluster.database.mapper.player;
 
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
+import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
