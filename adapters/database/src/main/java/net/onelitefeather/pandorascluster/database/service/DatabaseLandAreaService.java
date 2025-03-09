@@ -1,7 +1,5 @@
 package net.onelitefeather.pandorascluster.database.service;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
@@ -21,20 +19,12 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public final class DatabaseLandAreaService implements LandAreaService {
 
     private final PandorasCluster pandorasCluster;
     private final DatabaseService databaseService;
-
-    private final LoadingCache<ClaimedChunk, LandArea> landAreaCache = Caffeine
-            .newBuilder()
-            .maximumSize(500)
-            .refreshAfterWrite(1, TimeUnit.MINUTES)
-            .build(this::getLandArea);
-
 
     public DatabaseLandAreaService(PandorasCluster pandorasCluster, DatabaseService databaseService) {
         this.pandorasCluster = pandorasCluster;
@@ -119,7 +109,8 @@ public final class DatabaseLandAreaService implements LandAreaService {
     }
 
     private void refreshCache(LandArea landArea) {
-        landArea.getChunks().forEach(this.landAreaCache::invalidate);
+        //TODO: Implement cache
+//        landArea.getChunks().forEach(this.landAreaCache::invalidate);
     }
 
     public ClaimedChunkEntity toEntity(ClaimedChunk chunk) {
