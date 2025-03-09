@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    id("java")
 }
 
 repositories {
@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.caffeine)
+    implementation(libs.guava)
 
     // Database
     implementation(libs.hibernateCore)
@@ -20,7 +20,6 @@ dependencies {
 
     implementation("net.kyori:adventure-api:4.19.0")
     testImplementation("com.h2database:h2:2.3.232")
-    testImplementation(kotlin("test"))
 }
 
 tasks {

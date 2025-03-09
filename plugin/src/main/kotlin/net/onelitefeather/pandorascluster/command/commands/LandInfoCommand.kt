@@ -79,7 +79,8 @@ class LandInfoCommand(private val pandorasClusterApi: PandorasClusterApi) : Chun
                 symbolColor)
         }.toList()
 
-        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else MiniMessage.miniMessage().deserialize("<lang:command.info.flags.none>")
+        return if (flags.isNotEmpty()) Component.join(JoinConfiguration.noSeparators(), flags) else
+            Component.translatable("command.info.flags.none")
     }
 
     private fun filterDeniedMembers(landMember: LandMember): Boolean = landMember.role == LandRole.BANNED

@@ -31,7 +31,7 @@ dependencyResolutionManagement {
             plugin("shadow", "com.github.johnrengelman.shadow").versionRef("shadow")
             plugin("liquibase", "org.liquibase.gradle").versionRef("liquibase")
 
-            library("paper", "io.papermc.paper", "paper-api").version("1.20.4-R0.1-SNAPSHOT")
+            library("paper", "io.papermc.paper", "paper-api").versionRef("paper")
 
             //Worldguard
             library("worldguard", "com.sk89q.worldguard", "worldguard-bukkit").version("7.1.0-SNAPSHOT")
@@ -44,8 +44,8 @@ dependencyResolutionManagement {
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
             library("commodore", "me.lucko", "commodore").version("2.2")
 
-
-            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
+            library("guava", "com.google.guava", "guava").versionRef("guava")
+//            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
 
             // Database
             library("hibernateCore", "org.hibernate", "hibernate-core").version("6.6.0.Final")

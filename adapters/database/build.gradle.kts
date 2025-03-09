@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    id("java")
 }
 
 repositories {
@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.caffeine)
+    implementation(libs.guava)
 
     // Database
     implementation(libs.hibernateCore)
