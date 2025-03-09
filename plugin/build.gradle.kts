@@ -29,14 +29,10 @@ dependencies {
     }
 
     // Commands
-//    implementation(libs.cloudPaper)
-//    implementation(libs.cloudAnnotations)
-//    implementation(libs.cloudMinecraftExtras)
-//    implementation(libs.adventurePlatformBukkit)
-//    implementation(libs.commodore) {
-//        isTransitive = false
-//    }
-
+    implementation(libs.cloudPaper)
+    implementation(libs.cloudAnnotations)
+    implementation(libs.cloudMinecraftExtras)
+    implementation(libs.adventurePlatformBukkit)
 
     // Database
     implementation(libs.hibernateCore)
