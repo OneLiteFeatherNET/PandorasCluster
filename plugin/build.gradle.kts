@@ -40,7 +40,6 @@ dependencies {
 
     // Database
     implementation(libs.hibernateCore)
-    implementation(libs.mariadbJavaClient)
     implementation(libs.hibernateHikariCP)
 
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
