@@ -36,7 +36,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
     public void addLandMember(@NotNull LandArea landArea, @NotNull LandPlayer member, @Nullable LandRole landRole) {
 
         LandRole role = landRole != null ? landRole : LandRole.VISITOR;
-        var landMember = new LandMember(null, member, role);
+        var landMember = new LandMember(null, member, role, landArea);
         Transaction transaction = null;
 
         try (Session session = this.databaseService.sessionFactory().openSession()) {
