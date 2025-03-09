@@ -40,13 +40,12 @@ dependencyResolutionManagement {
             library("jetbrainsAnnotations", "org.jetbrains", "annotations").version("26.0.2")
 
             // Commands
-            library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
-            library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.3")
-            library("cloudMinecraftExtras", "cloud.commandframework", "cloud-minecraft-extras").version("1.8.4")
+            library("cloudPaper", "org.incendo", "cloud-paper").version("2.0.0-beta.10")
+            library("cloudAnnotations", "org.incendo", "cloud-annotations").version("2.0.0")
+            library("cloudMinecraftExtras", "org.incendo", "cloud-minecraft-extras").version("2.0.0-beta.10")
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
-            library("commodore", "me.lucko", "commodore").version("2.2")
 
-//            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
+            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.2.0")
 
             // Database
             library("hibernateCore", "org.hibernate", "hibernate-core").version("6.6.9.Final")
