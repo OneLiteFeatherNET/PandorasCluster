@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             version("publishdata", "1.2.5-DEV")
             version("shadow", "8.1.1")
             version("liquibase", "2.2.2")
-            version("guava", "33.4.0-jre")
+            version("guava", "33.3.1-jre")
 
             plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
             plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
@@ -41,7 +41,7 @@ dependencyResolutionManagement {
 
             // Commands
             library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
-            library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.4")
+            library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.3")
             library("cloudMinecraftExtras", "cloud.commandframework", "cloud-minecraft-extras").version("1.8.4")
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
             library("commodore", "me.lucko", "commodore").version("2.2")
