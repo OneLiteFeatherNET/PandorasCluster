@@ -14,7 +14,6 @@ import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEnti
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +35,7 @@ public final class DatabaseLandAreaService implements LandAreaService {
 
         var chunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex(), null);
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.merge(chunkEntity);
@@ -57,8 +55,7 @@ public final class DatabaseLandAreaService implements LandAreaService {
 
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.remove(toEntity(claimedChunk));
@@ -74,8 +71,7 @@ public final class DatabaseLandAreaService implements LandAreaService {
 
     @Override
     public @Nullable ClaimedChunk getClaimedChunk(long chunkIndex) {
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc WHERE cc.chunkIndex = :chunkIndex", ClaimedChunkEntity.class);
             return toModel(query.uniqueResult());
@@ -87,12 +83,15 @@ public final class DatabaseLandAreaService implements LandAreaService {
 
     @Override
     public @Nullable LandArea getLandArea(long chunkIndex) {
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
-            var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc JOIN FETCH cc.landArea WHERE cc.chunkIndex = :chunkIndex", ClaimedChunkEntity.class);
+            var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc JOIN FETCH cc.landArea WHERE cc.chunkIndex = :chunkindex", ClaimedChunkEntity.class);
+            query.setParameter("chunkindex", chunkIndex);
 
-            LandAreaEntity landArea = (LandAreaEntity) query.uniqueResult().landArea();
+            ClaimedChunkEntity claimedChunk = query.uniqueResult();
+            if (claimedChunk == null) return null;
+
+            LandAreaEntity landArea = (LandAreaEntity) claimedChunk.landArea();
             return toModel(landArea);
 
         } catch (HibernateException e) {
