@@ -15,6 +15,9 @@ public class PlayerConnectionListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if(this.pandorasCluster.getLandPlayerService().playerExists(event.getPlayer().getUniqueId())) {
+            return;
+        }
         this.pandorasCluster.getLandPlayerService().createPlayer(event.getPlayer().getUniqueId(), event.getPlayer().getName());
     }
 
