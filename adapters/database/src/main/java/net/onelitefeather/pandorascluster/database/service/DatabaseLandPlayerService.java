@@ -15,7 +15,6 @@ import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntit
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,8 +39,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
         var landMember = new LandMember(null, member, role);
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.persist(toEntity(landMember));
             transaction.commit();
@@ -58,8 +56,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
         if (landMember == null) return;
 
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.merge(toEntity(member));
             transaction.commit();
@@ -72,8 +69,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
     @Override
     public void removeLandMember(@NotNull LandMember member) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.remove(toEntity(member));
             transaction.commit();
@@ -85,8 +81,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
 
     @Override
     public @NotNull List<LandPlayer> getLandPlayers() {
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             var query = session.createQuery("SELECT lp FROM LandPlayerEntity lp", LandPlayerEntity.class);
             var players = query.list();
             return players.stream().map(this::toModel).toList();
@@ -102,8 +97,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
 
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             LandPlayerEntity landPlayerEntity = new LandPlayerEntity(null, uuid.toString(), name);
@@ -126,8 +120,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
 
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.remove(toEntity(landPlayer));
@@ -141,8 +134,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
 
     @Override
     public @Nullable LandPlayer getLandPlayer(@NotNull UUID uuid) {
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             var query = session.createQuery("SELECT lp FROM LandPlayerEntity lp WHERE lp.uuid = :uuid", LandPlayerEntity.class);
             query.setParameter("uuid", uuid.toString());
@@ -162,8 +154,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
     public void updateLandPlayer(@NotNull LandPlayer landPlayer) {
         if (!playerExists(landPlayer.getUniqueId())) return;
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.merge(toEntity(landPlayer));
