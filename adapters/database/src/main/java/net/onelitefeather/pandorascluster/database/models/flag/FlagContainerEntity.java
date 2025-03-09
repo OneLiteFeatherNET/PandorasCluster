@@ -29,14 +29,21 @@ public final class FlagContainerEntity implements FlagContainerDBO {
     private List<LandEntityCapFlagEntity> entityCapFlags;
 
     @OneToOne
-    private LandEntity landEntity;
+    private LandEntity land;
+
+    public static final FlagContainerEntity EMPTY = new FlagContainerEntity(
+            null,
+            null,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            Collections.emptyList());
 
     public FlagContainerEntity() {
         // Empty constructor for Hibernate
     }
 
     public FlagContainerEntity(Long id,
-                               LandEntity landEntity,
+                               LandEntity land,
                                List<LandNaturalFlagEntity> naturalFlags,
                                List<LandRoleFlagEntity> roleFlags,
                                List<LandEntityCapFlagEntity> entityCapFlags) {
@@ -44,12 +51,17 @@ public final class FlagContainerEntity implements FlagContainerDBO {
         this.naturalFlags = naturalFlags;
         this.roleFlags = roleFlags;
         this.entityCapFlags = entityCapFlags;
-        this.landEntity = landEntity;
+        this.land = land;
     }
 
     @Override
     public Long id() {
         return this.id;
+    }
+
+    public FlagContainerEntity withLand(LandEntity land) {
+        this.land = land;
+        return this;
     }
 
     @Override
@@ -69,6 +81,6 @@ public final class FlagContainerEntity implements FlagContainerDBO {
 
     @Override
     public LandDBO land() {
-        return this.landEntity;
+        return this.land;
     }
 }
