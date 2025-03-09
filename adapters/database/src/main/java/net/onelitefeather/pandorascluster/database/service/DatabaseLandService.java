@@ -4,7 +4,6 @@ import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.Land;
-import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
@@ -13,13 +12,14 @@ import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
-import net.onelitefeather.pandorascluster.database.mapper.flag.FlagContainerMappingStrategy;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.land.LandMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.player.LandPlayerMappingStrategy;
 import net.onelitefeather.pandorascluster.database.mapper.position.HomePositionMappingStrategy;
+import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
+import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -94,24 +94,16 @@ public final class DatabaseLandService implements LandService {
 
     @Override
     public void addLandArea(Land land, String name, List<ClaimedChunk> chunks) {
-        LandArea landArea = new LandArea(
-                null,
-                name,
-                chunks,
-                Collections.emptyList(),
-                land);
 
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-            mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
+            var landAreaEntity = new LandAreaEntity(null, name, Collections.emptyList(), Collections.emptyList(), toLandEntity(land));
+            List<ClaimedChunkEntity> claimedChunks = chunks.stream().map(claimedChunk -> new ClaimedChunkEntity(null, claimedChunk.getChunkIndex(), landAreaEntity)).toList();
 
-            LandAreaEntity landAreaEntity = (LandAreaEntity) mappingContext.doMapping(landArea);
             session.persist(landAreaEntity);
-            landArea.getChunks().stream().map(mappingContext::doMapping).forEach(session::persist);
+            claimedChunks.forEach(session::persist);
 
             transaction.commit();
         } catch (HibernateException e) {
@@ -121,31 +113,33 @@ public final class DatabaseLandService implements LandService {
     }
 
     @Override
-    public @Nullable Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk, @NotNull String world) {
-
-        var landArea = this.landAreaService.getLandArea(chunk);
-        if (landArea != null) return landArea.getLand();
-
-        FlagContainer flagContainer = FlagContainer.EMPTY;
-        Land land = new Land(null, owner, home, Collections.emptyList(), flagContainer);
+    public @Nullable Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk) {
 
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            session.persist(toEntity(land));
-            session.persist(toEntity(flagContainer.withLand(land)));
-            session.persist(toEntity(home));
+            var land = new Land(null, owner, home, Collections.emptyList(), FlagContainer.EMPTY);
+            var landEntity = new LandEntity(null,
+                    new LandPlayerEntity(owner.getId(), owner.getUniqueId().toString(), owner.getName()),
+                    toHomePositionEntity(home),
+                    Collections.emptyList(),
+                    FlagContainerEntity.EMPTY);
+
+            session.persist(landEntity);
+            session.persist(FlagContainerEntity.EMPTY.withLand(landEntity));
+            session.persist(landEntity.home());
 
             addLandArea(land, "default", List.of(chunk));
 
             transaction.commit();
+            return land;
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot create land!", e);
             if (transaction != null) transaction.rollback();
         }
 
-        return land;
+        return null;
     }
 
     @Override
@@ -169,7 +163,8 @@ public final class DatabaseLandService implements LandService {
     @Override
     public @Nullable Land getLand(@NotNull LandPlayer landPlayer) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
-            var query = session.createQuery("SELECT l FROM Land l JOIN l.owner o JOIN FETCH l.chunks WHERE o.uuid = :uuid", LandEntity.class);
+            var query = session.createQuery("SELECT l FROM LandEntity l JOIN l.owner o JOIN FETCH l.areas WHERE o.uuid = :uuid", LandEntity.class);
+            query.setParameter("uuid", landPlayer.getUniqueId().toString());
             return toModel(query.uniqueResult());
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot find any land players.", e);
@@ -177,11 +172,11 @@ public final class DatabaseLandService implements LandService {
         }
     }
 
-    private FlagContainerEntity toEntity(FlagContainer flagContainer) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (FlagContainerEntity) mappingContext.doMapping(flagContainer);
+    @Override
+    public boolean hasPlayerLand(@NotNull UUID uuid) {
+        var landPlayer = this.pandorasCluster.getLandPlayerService().getLandPlayer(uuid);
+        if (landPlayer == null) return false;
+        return getLand(landPlayer) != null;
     }
 
     private Land toModel(LandEntity land) {
@@ -191,7 +186,7 @@ public final class DatabaseLandService implements LandService {
         return (Land) mappingContext.doMapping(land);
     }
 
-    private LandEntity toEntity(Land land) {
+    private LandEntity toLandEntity(Land land) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandMappingStrategy.create());
         mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
@@ -204,6 +199,26 @@ public final class DatabaseLandService implements LandService {
         mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
         return (HomePositionEntity) mappingContext.doMapping(homePosition);
     }
+
+    private LandPlayerEntity toLandPlayerEntity(LandPlayer landPlayer) {
+        MappingContext mappingContext = MappingContext.create();
+        mappingContext.setMappingStrategy(LandPlayerMappingStrategy.create());
+        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
+        return (LandPlayerEntity) mappingContext.doMapping(landPlayer);
+    }
+
+    private HomePositionEntity toHomePositionEntity(HomePosition homePosition) {
+        return new HomePositionEntity(
+                null,
+                homePosition.getWorld(),
+                homePosition.getPosX(),
+                homePosition.getPosY(),
+                homePosition.getPosZ(),
+                homePosition.getYaw(),
+                homePosition.getPitch());
+
+    }
+
 
     private void removeFlagsFromLand(Land land) {
         var flagContainer = land.getFlagContainer();

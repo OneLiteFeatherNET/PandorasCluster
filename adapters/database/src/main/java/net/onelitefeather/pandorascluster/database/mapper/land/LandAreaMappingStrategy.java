@@ -7,13 +7,13 @@ import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
-import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.player.LandMemberMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
-import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -31,7 +31,7 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
             if (!(entity instanceof LandAreaEntity landArea)) return null;
 
             MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
+            mappingContext.setMappingStrategy(LandMappingStrategy.create());
             mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
 
             List<ClaimedChunk> claimedChunks = landArea.chunks().stream().map(chunk -> (ClaimedChunk) mappingContext.doMapping(chunk)).toList();
@@ -49,7 +49,7 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
             if (!(model instanceof LandArea landArea)) return null;
 
             MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
+            mappingContext.setMappingStrategy(LandMappingStrategy.create());
             mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
 
             List<ClaimedChunkEntity> claimedChunks = landArea.getChunks().stream().map(chunk -> (ClaimedChunkEntity) mappingContext.doMapping(chunk)).toList();
