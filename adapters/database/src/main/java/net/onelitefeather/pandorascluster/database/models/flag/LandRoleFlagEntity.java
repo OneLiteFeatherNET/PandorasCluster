@@ -30,6 +30,10 @@ public final class LandRoleFlagEntity implements RoleFlagDBO {
     @JoinColumn(name = "flagContainer_id")
     private FlagContainerEntity flagContainer;
 
+    public LandRoleFlagEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandRoleFlagEntity(Long id, String name, boolean state, LandRole role, FlagContainerEntity flagContainer) {
         this.id = id;
         this.name = name;

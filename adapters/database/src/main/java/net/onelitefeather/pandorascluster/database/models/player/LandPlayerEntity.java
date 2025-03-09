@@ -21,6 +21,10 @@ public final class LandPlayerEntity implements LandPlayerDBO {
     @Column(columnDefinition = "VARCHAR(16)")
     private String name;
 
+    public LandPlayerEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandPlayerEntity(Long id, String uuid, String name) {
         this.id = id;
         this.uuid = uuid;

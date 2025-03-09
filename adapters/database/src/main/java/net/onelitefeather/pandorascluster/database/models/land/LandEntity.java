@@ -35,6 +35,10 @@ public final class LandEntity implements LandDBO {
     @OneToOne
     private FlagContainerEntity flagContainerEntity;
 
+    public LandEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandEntity(Long id,
                       LandPlayerEntity owner,
                       HomePositionEntity home,

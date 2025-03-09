@@ -20,16 +20,20 @@ public final class FlagContainerEntity implements FlagContainerDBO {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "flagContainer")
-    private final List<LandNaturalFlagEntity> naturalFlags;
+    private List<LandNaturalFlagEntity> naturalFlags;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "flagContainer")
-    private final List<LandRoleFlagEntity> roleFlags;
+    private List<LandRoleFlagEntity> roleFlags;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "flagContainer")
-    private final List<LandEntityCapFlagEntity> entityCapFlags;
+    private List<LandEntityCapFlagEntity> entityCapFlags;
 
     @OneToOne
     private LandEntity landEntity;
+
+    public FlagContainerEntity() {
+        // Empty constructor for Hibernate
+    }
 
     public FlagContainerEntity(Long id,
                                LandEntity landEntity,

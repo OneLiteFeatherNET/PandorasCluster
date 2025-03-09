@@ -12,8 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "land_areas")
@@ -23,17 +21,21 @@ public final class LandAreaEntity implements LandAreaDBO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private final String name;
+    private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "landArea")
-    private final List<LandMemberEntity> members;
+    private List<LandMemberEntity> members;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "landArea")
-    private final List<ClaimedChunkEntity> chunks;
+    private List<ClaimedChunkEntity> chunks;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "land_id")
     private LandEntity land;
+
+    public LandAreaEntity() {
+        // Empty constructor for Hibernate
+    }
 
     public LandAreaEntity(Long id,
                           String name,

@@ -24,6 +24,10 @@ public final class LandNaturalFlagEntity implements NaturalFlagDBO {
     @JoinColumn(name = "flagContainer_id")
     private FlagContainerEntity flagContainer;
 
+    public LandNaturalFlagEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandNaturalFlagEntity(Long id, String name, boolean state, FlagContainerEntity flagContainer) {
         this.id = id;
         this.name = name;

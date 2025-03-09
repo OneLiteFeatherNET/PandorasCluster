@@ -24,6 +24,11 @@ public final class LandEntityCapFlagEntity implements EntityCapFlagDBO {
     @JoinColumn(name = "flagContainer_id")
     private FlagContainerEntity flagContainer;
 
+
+    public LandEntityCapFlagEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandEntityCapFlagEntity(Long id, String name, Integer spawnLimit, FlagContainerEntity flagContainer) {
         this.id = id;
         this.name = name;

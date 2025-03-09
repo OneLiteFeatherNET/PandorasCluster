@@ -33,6 +33,10 @@ public final class HomePositionEntity implements HomePositionDBO {
     @Column
     private Float pitch;
 
+    public HomePositionEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public HomePositionEntity(Long id, String world, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
         this.id = id;
         this.world = world;

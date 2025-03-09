@@ -31,6 +31,10 @@ public final class LandMemberEntity implements LandMemberDBO {
     @JoinColumn(name = "landArea_id")
     private LandAreaEntity landArea;
 
+    public LandMemberEntity() {
+        // Empty constructor for Hibernate
+    }
+
     public LandMemberEntity(Long id, LandPlayerEntity member, LandRole role, LandAreaEntity landArea) {
         this.id = id;
         this.member = member;
