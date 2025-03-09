@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
 
-//    implementation(libs.caffeine)
+    implementation(libs.caffeine)
 
     // Database
     implementation(libs.hibernateCore)
