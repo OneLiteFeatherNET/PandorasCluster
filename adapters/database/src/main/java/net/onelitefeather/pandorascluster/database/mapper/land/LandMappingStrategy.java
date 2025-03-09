@@ -8,7 +8,6 @@ import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
-import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
@@ -28,11 +27,10 @@ public final class LandMappingStrategy implements MapperStrategy {
             if(!(model instanceof LandDBO land)) return null;
 
             MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
+            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
             mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
 
             List<LandArea> landAreas = land.areas().stream().map(area -> (LandArea) mappingContext.doMapping(area)).toList();
-
             LandPlayer owner = (LandPlayer) mappingContext.doMapping(land.owner());
             FlagContainer flagContainer = (FlagContainer) mappingContext.doMapping(land.flagContainer());
             HomePosition homePosition = (HomePosition) mappingContext.doMapping(land.home());
@@ -47,7 +45,7 @@ public final class LandMappingStrategy implements MapperStrategy {
             if(!(entity instanceof Land land)) return null;
 
             MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
+            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
             mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
 
             List<LandAreaEntity> landAreas = land.getAreas().stream().map(area -> (LandAreaEntity) mappingContext.doMapping(area)).toList();
