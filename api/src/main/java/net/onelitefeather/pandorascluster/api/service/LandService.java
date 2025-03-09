@@ -2,7 +2,6 @@ package net.onelitefeather.pandorascluster.api.service;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.Land;
-import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,7 @@ public interface LandService {
 
     /**
      * @param homePosition the home position of the land
-     * @param ownerId the new owner uuid
+     * @param ownerId      the new owner uuid
      */
     void updateLandHome(@NotNull HomePosition homePosition, @NotNull UUID ownerId);
 
@@ -33,12 +32,11 @@ public interface LandService {
 
     /**
      * @param owner the owner of the land.
-     * @param home the home position of the land
-     * @param world the name of the world.
+     * @param home  the home position of the land
      * @param chunk the first claimed chunk
      */
     @Nullable
-    Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk, @NotNull String world);
+    Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk);
 
     /**
      * @param land the land to unclaim.
@@ -50,7 +48,9 @@ public interface LandService {
     Land getLand(@NotNull LandPlayer landPlayer);
 
 
+    boolean hasPlayerLand(@NotNull UUID uuid);
+
     default boolean hasPlayerLand(@NotNull LandPlayer landPlayer) {
-        return getLand(landPlayer) != null;
+        return hasPlayerLand(landPlayer.getUniqueId());
     }
 }
