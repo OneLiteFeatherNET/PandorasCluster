@@ -36,7 +36,7 @@ dependencyResolutionManagement {
             //Worldguard
             library("worldguard", "com.sk89q.worldguard", "worldguard-bukkit").version("7.1.0-SNAPSHOT")
             library("fawe", "com.fastasyncworldedit", "FastAsyncWorldEdit-Bukkit").version("2.11.1")
-            library("faweCore", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.11.1")
+            library("faweCore", "com.fastasyncworldedit", "FastAsyncWorldEdit-Core").version("2.13.0")
 
             library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
             library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.4")
