@@ -41,12 +41,12 @@ public final class LandAreaEntity implements LandAreaDBO {
                           String name,
                           List<LandMemberEntity> members,
                           List<ClaimedChunkEntity> chunks,
-                          LandEntity land) {
+                          LandEntity landEntity) {
         this.id = id;
         this.name = name;
         this.members = members;
         this.chunks = chunks;
-        this.land = land;
+        this.land = landEntity;
     }
 
     @Override
