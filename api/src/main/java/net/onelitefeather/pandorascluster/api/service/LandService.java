@@ -43,11 +43,6 @@ public interface LandService {
      */
     void unclaimLand(@NotNull Land land);
 
-
-    @Nullable
-    Land getLand(@NotNull LandPlayer landPlayer);
-
-
     boolean hasPlayerLand(@NotNull UUID uuid);
 
     default boolean hasPlayerLand(@NotNull LandPlayer landPlayer) {
