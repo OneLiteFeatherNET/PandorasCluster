@@ -52,8 +52,9 @@ public final class LandArea implements PandorasModel {
         return members;
     }
 
-    public void setLand(Land land) {
+    public LandArea setLand(Land land) {
         this.land = land;
+        return this;
     }
 
     public Land getLand() {
