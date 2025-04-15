@@ -23,10 +23,10 @@ public final class LandEntity implements LandDBO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private LandPlayerEntity owner;
 
-    @OneToOne
+    @ManyToOne
     private HomePositionEntity home;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
