@@ -13,21 +13,23 @@ public class LandCommand {
         this.pandorasCluster = pandorasCluster;
     }
 
-    @Command("land")
+    @Command("land create")
     public void commandLand(Player player) {
 
         var hasPlayerLand = this.pandorasCluster.getLandService().hasPlayerLand(player.getUniqueId());
         var landPlayer = this.pandorasCluster.getLandPlayerService().getLandPlayer(player.getUniqueId());
 
-        if (hasPlayerLand) {
-            player.sendMessage("You already have a land!");
-        } else {
-            var land = this.pandorasCluster.getLandService().createLand(
-                    landPlayer,
-                    LocationUtil.of(player.getLocation()),
-                    LocationUtil.toClaimedChunk(player.getChunk()));
-            player.sendMessage("Land created! " + land.getOwner().getName());
+        var landArea = this.pandorasCluster.getLandAreaService().getLandArea(player.getChunk().getChunkKey());
+        if (landArea != null) {
+            player.sendMessage("This chunk is already claimed!");
+            return;
         }
+
+        var land = this.pandorasCluster.getLandService().createLand(
+                landPlayer,
+                LocationUtil.of(player.getLocation()),
+                LocationUtil.toClaimedChunk(player.getChunk()));
+        player.sendMessage("Land created! " + land.getId());
     }
 
     @Command("land info")
@@ -40,10 +42,11 @@ public class LandCommand {
         }
 
         var land = landArea.getLand();
-        if(land == null) {
-            player.sendMessage("You´re not on a Land!");
+        if (land == null) {
+            player.sendMessage("You're not on a Land!");
             return;
         }
+
         player.sendMessage("Owner: %s".formatted(land.getOwner().getName()));
         player.sendMessage("Home: X: %s Y: %S Z: %s".formatted(land.getHome().getBlockX(), land.getHome().getBlockY(), land.getHome().getBlockZ()));
     }
