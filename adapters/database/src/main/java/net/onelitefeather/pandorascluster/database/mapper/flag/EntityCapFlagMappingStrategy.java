@@ -7,7 +7,7 @@ import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity;
-import net.onelitefeather.pandorascluster.dbo.flag.EntityCapFlagDBO;
+import net.onelitefeather.pandorascluster.dto.flag.EntityCapFlagDto;
 
 import java.util.function.Function;
 
@@ -17,7 +17,7 @@ public final class EntityCapFlagMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return entity -> {
             if (entity == null) return null;
-            if (!(entity instanceof EntityCapFlagDBO flag)) return null;
+            if (!(entity instanceof EntityCapFlagDto flag)) return null;
 
             MappingContext mappingContext = MappingContext.create();
             mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());

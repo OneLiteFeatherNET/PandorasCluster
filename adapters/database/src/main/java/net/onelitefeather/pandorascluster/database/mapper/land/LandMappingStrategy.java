@@ -13,7 +13,7 @@ import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
-import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
+import net.onelitefeather.pandorascluster.dto.land.LandDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -24,7 +24,7 @@ public final class LandMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return model -> {
             if(model == null) return null;
-            if(!(model instanceof LandDBO land)) return null;
+            if(!(model instanceof LandDto land)) return null;
 
             MappingContext mappingContext = MappingContext.create();
             mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());

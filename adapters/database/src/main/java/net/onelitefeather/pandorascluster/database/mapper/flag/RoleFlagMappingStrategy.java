@@ -7,7 +7,7 @@ import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity;
-import net.onelitefeather.pandorascluster.dbo.flag.RoleFlagDBO;
+import net.onelitefeather.pandorascluster.dto.flag.RoleFlagDto;
 
 import java.util.function.Function;
 
@@ -17,7 +17,7 @@ public final class RoleFlagMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return entity -> {
             if (entity == null) return null;
-            if (!(entity instanceof RoleFlagDBO flag)) return null;
+            if (!(entity instanceof RoleFlagDto flag)) return null;
 
             MappingContext mappingContext = MappingContext.create();
             mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());

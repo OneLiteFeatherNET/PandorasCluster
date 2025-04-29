@@ -10,9 +10,9 @@ import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingSt
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
-import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
-import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
-import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
+import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
+import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
+import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 
 import java.util.function.Function;
 
@@ -22,12 +22,12 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return databaseEntity -> {
             if (databaseEntity == null) return null;
-            if (!(databaseEntity instanceof LandMemberDBO landMemberDBO)) return null;
+            if (!(databaseEntity instanceof LandMemberDto landMemberDto)) return null;
             return new LandMember(
-                    landMemberDBO.id(),
-                    getLandPlayer(landMemberDBO.member()),
-                    landMemberDBO.role(),
-                    getLandArea(landMemberDBO.landArea()));
+                    landMemberDto.id(),
+                    getLandPlayer(landMemberDto.member()),
+                    landMemberDto.role(),
+                    getLandArea(landMemberDto.landArea()));
         };
     }
 
@@ -44,7 +44,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
         };
     }
 
-    private LandPlayer getLandPlayer(LandPlayerDBO landPlayer) {
+    private LandPlayer getLandPlayer(LandPlayerDto landPlayer) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandPlayerMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
@@ -58,7 +58,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
         return (LandPlayerEntity) mappingContext.doMapping(landPlayer);
     }
 
-    private LandArea getLandArea(LandAreaDBO area) {
+    private LandArea getLandArea(LandAreaDto area) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);

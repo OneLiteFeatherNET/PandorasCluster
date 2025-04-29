@@ -13,9 +13,9 @@ import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEnti
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
-import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
-import net.onelitefeather.pandorascluster.dbo.player.LandMemberDBO;
+import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
+import net.onelitefeather.pandorascluster.dto.land.LandDto;
+import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -52,21 +52,21 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
         };
     }
 
-    private Land getLand(LandDBO land) {
+    private Land getLand(LandDto land) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
         return (Land) mappingContext.doMapping(land);
     }
 
-    private List<ClaimedChunk> getChunks(List<ClaimedChunkDBO> chunks) {
+    private List<ClaimedChunk> getChunks(List<ClaimedChunkDto> chunks) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
         return chunks.stream().map(chunk -> (ClaimedChunk) mappingContext.doMapping(chunk)).toList();
     }
 
-    private List<LandMember> getMembers(List<LandMemberDBO> members) {
+    private List<LandMember> getMembers(List<LandMemberDto> members) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandMemberMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
