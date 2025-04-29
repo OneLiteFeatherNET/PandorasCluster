@@ -1,10 +1,10 @@
-package net.onelitefeather.pandorascluster.dbo.flag;
+package net.onelitefeather.pandorascluster.dto.flag;
 
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface EntityCapFlagDBO extends PandorasModel {
+public interface EntityCapFlagDto extends PandorasModel {
 
     @Nullable
     Long id();
@@ -14,5 +14,5 @@ public interface EntityCapFlagDBO extends PandorasModel {
 
     Integer spawnLimit();
 
-    FlagContainerDBO flagContainer();
+    FlagContainerDto flagContainer();
 }

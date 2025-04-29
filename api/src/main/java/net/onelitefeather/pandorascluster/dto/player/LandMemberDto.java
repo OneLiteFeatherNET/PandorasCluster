@@ -1,22 +1,21 @@
-package net.onelitefeather.pandorascluster.dbo.flag;
+package net.onelitefeather.pandorascluster.dto.player;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
+import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface RoleFlagDBO extends PandorasModel {
+public interface LandMemberDto extends PandorasModel {
 
     @Nullable
     Long id();
 
     @NotNull
-    String name();
-
-    boolean state();
+    LandPlayerDto member();
 
     @NotNull
     LandRole role();
 
-    FlagContainerDBO flagContainer();
+    LandAreaDto landArea();
 }

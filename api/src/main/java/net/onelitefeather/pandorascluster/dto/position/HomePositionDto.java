@@ -1,10 +1,10 @@
-package net.onelitefeather.pandorascluster.dbo.position;
+package net.onelitefeather.pandorascluster.dto.position;
 
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface HomePositionDBO extends PandorasModel {
+public interface HomePositionDto extends PandorasModel {
 
     @Nullable
     Long id();

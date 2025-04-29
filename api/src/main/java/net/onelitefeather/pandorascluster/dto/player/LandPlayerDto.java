@@ -1,18 +1,17 @@
-package net.onelitefeather.pandorascluster.dbo.flag;
+package net.onelitefeather.pandorascluster.dto.player;
 
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface NaturalFlagDBO extends PandorasModel {
+public interface LandPlayerDto extends PandorasModel {
 
     @Nullable
     Long id();
 
     @NotNull
+    String uuid();
+
+    @NotNull
     String name();
-
-    boolean state();
-
-    FlagContainerDBO flagContainer();
 }
