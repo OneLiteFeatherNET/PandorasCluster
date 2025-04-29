@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
-import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
-import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
-import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO;
+import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
+import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
+import net.onelitefeather.pandorascluster.dto.land.LandDto;
+import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
+import net.onelitefeather.pandorascluster.dto.position.HomePositionDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "lands")
-public final class LandEntity implements LandDBO {
+public final class LandEntity implements LandDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,22 +57,22 @@ public final class LandEntity implements LandDBO {
     }
 
     @Override
-    public @NotNull LandPlayerDBO owner() {
+    public @NotNull LandPlayerDto owner() {
         return owner;
     }
 
     @Override
-    public @NotNull HomePositionDBO home() {
+    public @NotNull HomePositionDto home() {
         return home;
     }
 
     @Override
-    public @NotNull List<LandAreaDBO> areas() {
+    public @NotNull List<LandAreaDto> areas() {
         return Collections.unmodifiableList(areas);
     }
 
     @Override
-    public FlagContainerDBO flagContainer() {
+    public FlagContainerDto flagContainer() {
         return this.flagContainerEntity;
     }
 }

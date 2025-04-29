@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models.player;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dbo.player.LandPlayerDBO;
+import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_players")
-public final class LandPlayerEntity implements LandPlayerDBO {
+public final class LandPlayerEntity implements LandPlayerDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

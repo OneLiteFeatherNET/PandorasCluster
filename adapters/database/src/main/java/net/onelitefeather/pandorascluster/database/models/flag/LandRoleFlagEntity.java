@@ -2,16 +2,14 @@ package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
-import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
-import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.RoleFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
+import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
+import net.onelitefeather.pandorascluster.dto.flag.RoleFlagDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "role_flags")
-public final class LandRoleFlagEntity implements RoleFlagDBO {
+public final class LandRoleFlagEntity implements RoleFlagDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +61,7 @@ public final class LandRoleFlagEntity implements RoleFlagDBO {
     }
 
     @Override
-    public FlagContainerDBO flagContainer() {
+    public FlagContainerDto flagContainer() {
         return this.flagContainer;
     }
 

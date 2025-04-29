@@ -2,12 +2,12 @@ package net.onelitefeather.pandorascluster.database.models.chunk;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
-import net.onelitefeather.pandorascluster.dbo.chunk.ClaimedChunkDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandAreaDBO;
+import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
+import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
 
 @Entity
 @Table(name = "land_chunks")
-public final class ClaimedChunkEntity implements ClaimedChunkDBO {
+public final class ClaimedChunkEntity implements ClaimedChunkDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public final class ClaimedChunkEntity implements ClaimedChunkDBO {
         return chunkIndex;
     }
 
-    public LandAreaDBO landArea() {
+    public LandAreaDto landArea() {
         return landArea;
     }
 }

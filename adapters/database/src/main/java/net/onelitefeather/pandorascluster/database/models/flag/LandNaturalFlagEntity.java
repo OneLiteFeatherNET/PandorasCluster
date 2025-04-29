@@ -1,14 +1,14 @@
 package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.NaturalFlagDBO;
+import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
+import net.onelitefeather.pandorascluster.dto.flag.NaturalFlagDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "natural_flags")
-public final class LandNaturalFlagEntity implements NaturalFlagDBO {
+public final class LandNaturalFlagEntity implements NaturalFlagDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +51,7 @@ public final class LandNaturalFlagEntity implements NaturalFlagDBO {
     }
 
     @Override
-    public FlagContainerDBO flagContainer() {
+    public FlagContainerDto flagContainer() {
         return flagContainer;
     }
 }

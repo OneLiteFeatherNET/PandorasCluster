@@ -1,14 +1,14 @@
 package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dbo.flag.EntityCapFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
+import net.onelitefeather.pandorascluster.dto.flag.EntityCapFlagDto;
+import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "entityCap_flags")
-public final class LandEntityCapFlagEntity implements EntityCapFlagDBO {
+public final class LandEntityCapFlagEntity implements EntityCapFlagDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +53,7 @@ public final class LandEntityCapFlagEntity implements EntityCapFlagDBO {
     }
 
     @Override
-    public FlagContainerDBO flagContainer() {
+    public FlagContainerDto flagContainer() {
         return this.flagContainer;
     }
 }

@@ -2,18 +2,18 @@ package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
-import net.onelitefeather.pandorascluster.dbo.flag.EntityCapFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.FlagContainerDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.NaturalFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.flag.RoleFlagDBO;
-import net.onelitefeather.pandorascluster.dbo.land.LandDBO;
+import net.onelitefeather.pandorascluster.dto.flag.EntityCapFlagDto;
+import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
+import net.onelitefeather.pandorascluster.dto.flag.NaturalFlagDto;
+import net.onelitefeather.pandorascluster.dto.flag.RoleFlagDto;
+import net.onelitefeather.pandorascluster.dto.land.LandDto;
 
 import java.util.Collections;
 import java.util.List;
 
 @Entity
 @Table(name = "flag_containers")
-public final class FlagContainerEntity implements FlagContainerDBO {
+public final class FlagContainerEntity implements FlagContainerDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,22 +65,22 @@ public final class FlagContainerEntity implements FlagContainerDBO {
     }
 
     @Override
-    public List<NaturalFlagDBO> naturalFlags() {
+    public List<NaturalFlagDto> naturalFlags() {
         return Collections.unmodifiableList(this.naturalFlags);
     }
 
     @Override
-    public List<EntityCapFlagDBO> entityCapFlags() {
+    public List<EntityCapFlagDto> entityCapFlags() {
         return Collections.unmodifiableList(this.entityCapFlags);
     }
 
     @Override
-    public List<RoleFlagDBO> roleFlags() {
+    public List<RoleFlagDto> roleFlags() {
         return Collections.unmodifiableList(this.roleFlags);
     }
 
     @Override
-    public LandDBO land() {
+    public LandDto land() {
         return this.land;
     }
 }

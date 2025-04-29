@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models.position;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dbo.position.HomePositionDBO;
+import net.onelitefeather.pandorascluster.dto.position.HomePositionDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_homes")
-public final class HomePositionEntity implements HomePositionDBO {
+public final class HomePositionEntity implements HomePositionDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
