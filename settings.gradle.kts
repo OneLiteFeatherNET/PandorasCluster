@@ -41,16 +41,16 @@ dependencyResolutionManagement {
             library("cloudPaper", "cloud.commandframework", "cloud-paper").version("1.8.4")
             library("cloudAnnotations", "cloud.commandframework", "cloud-annotations").version("1.8.4")
             library("cloudMinecraftExtras", "cloud.commandframework", "cloud-minecraft-extras").version("1.8.4")
-            library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
+            library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.4.0")
             library("commodore", "me.lucko", "commodore").version("2.2")
 
             library("guava", "com.google.guava", "guava").versionRef("guava")
 //            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.1.1")
 
             // Database
-            library("hibernateCore", "org.hibernate", "hibernate-core").version("6.6.17.Final")
+            library("hibernateCore", "org.hibernate", "hibernate-core").version("7.0.0.Final")
             library("mariadbJavaClient","org.mariadb.jdbc", "mariadb-java-client").version("3.5.3")
-            library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("6.6.13.Final")
+            library("hibernateHikariCP","org.hibernate.orm", "hibernate-hikaricp").version("7.0.0.Final")
         }
     }
 }
