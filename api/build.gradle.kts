@@ -18,7 +18,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.7") //DATABASE
     implementation("com.google.code.gson:gson:2.13.1")
 
-    implementation("net.kyori:adventure-api:4.21.0")
+    implementation("net.kyori:adventure-api:4.22.0")
     testImplementation("com.h2database:h2:2.3.232")
 }
 
