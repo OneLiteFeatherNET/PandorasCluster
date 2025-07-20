@@ -40,7 +40,7 @@ dependencyResolutionManagement {
             library("cloudMinecraftExtras", "org.incendo", "cloud-minecraft-extras").version("2.0.0-SNAPSHOT")
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
 
-            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.2.0")
+            library("caffeine", "com.github.ben-manes.caffeine", "caffeine").version("3.2.2")
 
             // Database
             library("hibernateCore", "org.hibernate", "hibernate-core").version("6.6.9.Final")
