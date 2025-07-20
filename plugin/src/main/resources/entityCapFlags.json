@@ -1,0 +1,14 @@
+[
+  {
+    "name": "animal_cap",
+    "spawnLimit": 100
+  },
+  {
+    "name": "monster_cap",
+    "spawnLimit": 100
+  },
+  {
+    "name": "villager_cap",
+    "spawnLimit": 100
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "redstone",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "leaves_decay",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "explosions",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "mob_griefing",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "ice_form",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "sponge_absorb",
+    "defaultState": false,
+    "allowInWilderness": false
+  },
+  {
+    "name": "fire_protection",
+    "defaultState": false,
+    "allowInWilderness": false
+  }
+]

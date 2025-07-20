@@ -1,0 +1,20 @@
+# docker compose up -d
+services:
+  postgres:
+    image: postgres
+    container_name: 'pandoras_cluster_postgresql'
+    ports:
+      - 5432:5432
+    shm_size: 128mb
+    volumes:
+      - ./postgresql/data/:/var/lib/postgresql
+    environment:
+      POSTGRES_PASSWORD: pandoras_cluster
+      POSTGRES_USER: pandoras_cluster
+      POSTGRES_DB: pandoras_cluster
+    networks:
+      - pandoras_cluster_postgresql_go_net
+
+networks:
+  pandoras_cluster_postgresql_go_net:
+    driver: bridge
