@@ -20,7 +20,7 @@ dependencies {
     testImplementation(project(":adapters:database"))
     testImplementation(project(":api"))
 
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation(platform("org.junit:junit-bom:5.13.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
 }
