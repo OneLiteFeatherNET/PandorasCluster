@@ -29,7 +29,7 @@ dependencies {
     implementation(libs.hibernateHikariCP)
 
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("org.postgresql:postgresql:42.7.4") //DATABASE
+    implementation("org.postgresql:postgresql:42.7.7") //DATABASE
 
     implementation(project(":api"))
     implementation(project(":common"))
