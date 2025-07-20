@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             library("jetbrainsAnnotations", "org.jetbrains", "annotations").version("26.0.2")
 
             // Commands
-            library("cloudPaper", "org.incendo", "cloud-paper").version("2.0.0-beta.10")
+            library("cloudPaper", "org.incendo", "cloud-paper").version("2.0.0-SNAPSHOT")
             library("cloudAnnotations", "org.incendo", "cloud-annotations").version("2.0.0")
             library("cloudMinecraftExtras", "org.incendo", "cloud-minecraft-extras").version("2.0.0-SNAPSHOT")
             library("adventurePlatformBukkit", "net.kyori", "adventure-platform-bukkit").version("4.3.4")
