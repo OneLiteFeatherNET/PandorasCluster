@@ -1,18 +1,15 @@
-rootProject.name = "PandorasCluster"
+import org.gradle.kotlin.dsl.mavenCentral
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        maven("https://eldonexus.de/repository/maven-public/")
-    }
-}
+rootProject.name = "pandoras-cluster"
 
 dependencyResolutionManagement {
-    if (System.getenv("CI") != null) {
-        repositoriesMode = RepositoriesMode.PREFER_SETTINGS
-        repositories {
-            maven("https://repo.htl-md.schule/repository/Gitlab-Runner/")
-        }
+    repositories {
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://oss.sonatype.org/content/groups/public/")
+        maven("https://libraries.minecraft.net")
+        maven("https://jitpack.io")
+        maven("https://maven.enginehub.org/repo/")
     }
     versionCatalogs {
         create("libs") {
@@ -20,14 +17,12 @@ dependencyResolutionManagement {
             version("paper", "1.21.4-R0.1-SNAPSHOT")
             version("plugin.yml", "0.6.0")
             version("run-paper", "2.3.1")
-            version("publishdata", "1.2.5-DEV")
             version("shadow", "8.1.1")
             version("liquibase", "2.2.2")
             version("guava", "33.3.1-jre")
 
             plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
             plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
-            plugin("publishdata", "de.chojo.publishdata").versionRef("publishdata")
             plugin("shadow", "com.github.johnrengelman.shadow").versionRef("shadow")
             plugin("liquibase", "org.liquibase.gradle").versionRef("liquibase")
 

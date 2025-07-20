@@ -2,12 +2,6 @@ plugins {
     id("java")
 }
 
-group = "net.onelitefeather"
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
 
     implementation(libs.caffeine)

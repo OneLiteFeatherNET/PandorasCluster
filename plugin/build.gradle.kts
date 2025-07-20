@@ -4,17 +4,7 @@ plugins {
     alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
     alias(libs.plugins.liquibase)
-    alias(libs.plugins.publishdata)
     `maven-publish`
-}
-
-repositories {
-    mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://libraries.minecraft.net")
-    maven("https://jitpack.io")
-    maven("https://maven.enginehub.org/repo/")
 }
 
 dependencies {
@@ -46,11 +36,6 @@ dependencies {
 
 }
 
-publishData {
-    addBuildData()
-    useGitlabReposForProject("66", "https://gitlab.onelitefeather.dev/")
-    publishTask("shadowJar")
-}
 
 java {
     toolchain {
@@ -71,7 +56,6 @@ tasks {
 }
 
 paper {
-    version = publishData.getVersion(true)
     main = "${rootProject.group}.pandorascluster.PandorasClusterPlugin"
     apiVersion = "1.20"
     name = rootProject.name
@@ -168,25 +152,58 @@ paper {
 
 publishing {
     publications.create<MavenPublication>("maven") {
-        // configure the publication as defined previously.
-        publishData.configurePublication(this)
-        version = publishData.getVersion(false)
+        artifact(project.tasks.getByName("shadowJar"))
+        version = rootProject.version as String
+        artifactId = "pandoras-cluster"
+        groupId = rootProject.group as String
+        pom {
+            name = "PandorasCluster"
+            description =
+                "A simple land management plugin for OneLiteFeather servers, providing basic features and utilities."
+            url = "https://github.com/OneLiteFeatherNET/PandorasCluster"
+            licenses {
+                license {
+                    name = "AGPL-3.0"
+                    url = "https://www.gnu.org/licenses/agpl-3.0.en.html"
+                }
+            }
+            developers {
+                developer {
+                    id = "theShadowsDust"
+                    name = "theShadowsDust"
+                    email = "theShadowDust@onelitefeather.net"
+                }
+                developer {
+                    id = "themeinerlp"
+                    name = "Phillipp Glanz"
+                    email = "p.glanz@madfix.me"
+                }
+            }
+            scm {
+                connection = "scm:git:git://github.com:OneLiteFeatherNET/PandorasCluster.git"
+                developerConnection = "scm:git:ssh://git@github.com:OneLiteFeatherNET/PandorasCluster.git"
+                url = "https://github.com/OneLiteFeatherNET/PandorasCluster"
+            }
+        }
     }
 
     repositories {
         maven {
-            credentials(HttpHeaderCredentials::class) {
-                name = "Job-Token"
-                value = System.getenv("CI_JOB_TOKEN")
-            }
             authentication {
-                create("header", HttpHeaderAuthentication::class)
+                credentials(PasswordCredentials::class) {
+                    // Those credentials need to be set under "Settings -> Secrets -> Actions" in your repository
+                    username = System.getenv("ONELITEFEATHER_MAVEN_USERNAME")
+                    password = System.getenv("ONELITEFEATHER_MAVEN_PASSWORD")
+                }
             }
 
-
-            name = "Gitlab"
-            // Get the detected repository from the publish data
-            url = uri(publishData.getRepository())
+            name = "OneLiteFeatherRepository"
+            val releasesRepoUrl = uri("https://repo.onelitefeather.dev/onelitefeather-releases")
+            val snapshotsRepoUrl = uri("https://repo.onelitefeather.dev/onelitefeather-snapshots")
+            url =
+                if (version.toString().contains("SNAPSHOT") || version.toString().contains("BETA") || version.toString()
+                        .contains("ALPHA")
+                ) snapshotsRepoUrl else releasesRepoUrl
         }
     }
 }
