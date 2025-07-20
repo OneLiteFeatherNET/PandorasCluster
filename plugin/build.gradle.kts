@@ -44,11 +44,6 @@ java {
 }
 
 tasks {
-    compileJava {
-        options.encoding = "UTF-8"
-        options.release.set(21)
-    }
-
     runServer {
         minecraftVersion("1.21.4")
         jvmArgs("-Xmx4G", "-Dcom.mojang.eula.agree=true")
