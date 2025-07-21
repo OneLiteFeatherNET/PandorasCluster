@@ -10,7 +10,7 @@
     ":semanticCommits",
     ":label(renovate)",
     ":enableVulnerabilityAlerts",
-    "github>onelitefeathernew/renovate:paper"
+    "github>onelitefeathernet/renovate:paper"
   ],
   "rebaseWhen": "conflicted"
 }
