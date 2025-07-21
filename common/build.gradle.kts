@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
 
+    // Caching
     implementation(libs.caffeine)
 
     // Database
@@ -14,14 +15,14 @@ dependencies {
     implementation(project(":adapters:database"))
     implementation(project(":api"))
 
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("org.postgresql:postgresql:42.7.7") //DATABASE
+    implementation(libs.jaxbRuntime) // JAXB Runtime for XML binding of hibernate
+    implementation(libs.postgresql) // For PostgreSQL database
 
     testImplementation(project(":adapters:database"))
     testImplementation(project(":api"))
 
-    testImplementation(platform("org.junit:junit-bom:5.13.4"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform(libs.junitBom))
+    testImplementation(libs.junitApi)
 
 }
 

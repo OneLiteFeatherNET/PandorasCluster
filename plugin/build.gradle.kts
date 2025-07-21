@@ -28,8 +28,9 @@ dependencies {
     implementation(libs.hibernateCore)
     implementation(libs.hibernateHikariCP)
 
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("org.postgresql:postgresql:42.7.7") //DATABASE
+    implementation(libs.mariadbJavaClient)
+    implementation(libs.postgresql)
+    implementation(libs.jaxbRuntime) // JAXB Runtime for XML binding of hibernate
 
     implementation(project(":api"))
     implementation(project(":common"))

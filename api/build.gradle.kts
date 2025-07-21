@@ -7,13 +7,14 @@ dependencies {
     implementation(libs.hibernateCore)
     implementation(libs.mariadbJavaClient)
     implementation(libs.hibernateHikariCP)
+    implementation(libs.jaxbRuntime) // JAXB Runtime for XML binding of hibernate
+    implementation(libs.postgresql)
+    implementation(libs.h2)
+    // JSON
+    implementation(libs.gson)
 
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
-    implementation("org.postgresql:postgresql:42.7.7") //DATABASE
-    implementation("com.google.code.gson:gson:2.13.1")
-
-    implementation("net.kyori:adventure-api:4.23.0")
-    testImplementation("com.h2database:h2:2.3.232")
+    // Minecraft Component API
+    implementation(libs.adventureApi)
 }
 
 tasks {

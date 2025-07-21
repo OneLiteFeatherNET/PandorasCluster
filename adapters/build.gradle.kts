@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.13.4"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform(libs.junitBom))
+    testImplementation(libs.junitApi)
 }
 
 tasks.test {
