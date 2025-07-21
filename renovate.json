@@ -1,18 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":automergePatch",
+    ":assignee(onelitefeather/pandorascluster-maintainers)",
+    ":timezone(Europe/Berlin)",
+    "schedule:officeHours",
+    "schedule:automergeOfficeHours",
+    ":semanticCommits",
+    ":label(renovate)",
+    ":enableVulnerabilityAlerts"
   ],
-  "labels": [
-    "renovate"
-  ],
-  "rebaseWhen": "conflicted",
-  "packageRules": [
-    {
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "automerge": true
-    }
-  ]
+  "rebaseWhen": "conflicted"
 }
