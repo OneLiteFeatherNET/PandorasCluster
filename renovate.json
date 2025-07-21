@@ -9,7 +9,8 @@
     "schedule:automergeOfficeHours",
     ":semanticCommits",
     ":label(renovate)",
-    ":enableVulnerabilityAlerts"
+    ":enableVulnerabilityAlerts",
+    "github>onelitefeathernew/renovate:paper"
   ],
   "rebaseWhen": "conflicted"
 }
