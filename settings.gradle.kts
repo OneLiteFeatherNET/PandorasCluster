@@ -34,7 +34,7 @@ dependencyResolutionManagement {
             version("adventure-api", "4.23.0")
             version("cloud", "2.0.0-SNAPSHOT")
             version("cloudAnnotations", "2.0.0")
-            version("adventure-platform-bukkit", "4.4.0")
+            version("adventure-platform-bukkit", "4.4.1")
             version("fawe", "2.13.0")
             version("worldguard", "7.1.0-SNAPSHOT")
 
