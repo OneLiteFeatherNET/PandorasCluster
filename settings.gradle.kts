@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             version("caffeine", "3.2.2")
             version("h2", "2.3.232")
             version("mariadb-java-client", "3.5.4")
-            version("hibernate-core", "7.0.8.Final")
+            version("hibernate-core", "7.1.0.Final")
             version("jetbrains-annotations", "26.0.2")
             version("postgresql", "42.7.7")
             version("gson", "2.13.1")
@@ -31,7 +31,7 @@ dependencyResolutionManagement {
 
             // Paper Dependencies
             version("paper", "1.21.8-R0.1-SNAPSHOT")
-            version("adventure-api", "4.23.0")
+            version("adventure-api", "4.24.0")
             version("cloud", "2.0.0-SNAPSHOT")
             version("cloudAnnotations", "2.0.0")
             version("adventure-platform-bukkit", "4.4.1")
