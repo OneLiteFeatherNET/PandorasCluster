@@ -15,7 +15,7 @@ dependencyResolutionManagement {
         create("libs") {
 
             // Non Paper
-            version("liquibase", "2.2.2")
+            version("liquibase", "3.0.2")
             version("guava", "33.3.1-jre")
             version("jaxb-runtime", "4.0.5")
             version("caffeine", "3.2.2")
