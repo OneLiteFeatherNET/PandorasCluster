@@ -30,7 +30,7 @@ dependencyResolutionManagement {
             version("junit", "5.13.4")
 
             // Paper Dependencies
-            version("paper", "1.21.8-R0.1-SNAPSHOT")
+            version("paper", "1.21.9-pre4-R0.1-SNAPSHOT")
             version("adventure-api", "4.24.0")
             version("cloud", "2.0.0-SNAPSHOT")
             version("cloudAnnotations", "2.0.0")
