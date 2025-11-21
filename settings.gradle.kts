@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             version("caffeine", "3.2.3")
             version("h2", "2.4.240")
             version("mariadb-java-client", "3.5.6")
-            version("hibernate-core", "7.1.8.Final")
+            version("hibernate-core", "7.1.9.Final")
             version("jetbrains-annotations", "26.0.2-1")
             version("postgresql", "42.7.8")
             version("gson", "2.13.2")
