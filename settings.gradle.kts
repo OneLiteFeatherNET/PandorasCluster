@@ -17,7 +17,7 @@ dependencyResolutionManagement {
             // Non Paper
             version("liquibase", "2.2.2")
             version("guava", "33.3.1-jre")
-            version("jaxb-runtime", "4.0.6")
+            version("jaxb-runtime", "4.0.7")
             version("caffeine", "3.2.3")
             version("h2", "2.4.240")
             version("mariadb-java-client", "3.5.7")
