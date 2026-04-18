@@ -1,21 +1,22 @@
 package net.onelitefeather.pandorascluster.database.mapper.player;
 
-import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
-import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
-import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
 import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 
 import java.util.function.Function;
 
+/**
+ * The member↔land-area back-reference is intentionally left null to avoid the
+ * mapper cycle (LandArea → members → member.landArea → …). Callers that need
+ * the parent area must look it up separately via {@code LandAreaService}.
+ */
 public final class LandMemberMappingStrategy implements MapperStrategy {
 
     @Override
@@ -27,7 +28,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
                     landMemberDto.id(),
                     getLandPlayer(landMemberDto.member()),
                     landMemberDto.role(),
-                    getLandArea(landMemberDto.landArea()));
+                    null);
         };
     }
 
@@ -40,7 +41,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
                     landMember.getId(),
                     getLandPlayerEntity(landMember.getMember()),
                     landMember.getRole(),
-                    getLandAreaEntity(landMember.getLandArea()));
+                    null);
         };
     }
 
@@ -57,21 +58,6 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
         mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
         return (LandPlayerEntity) mappingContext.doMapping(landPlayer);
     }
-
-    private LandArea getLandArea(LandAreaDto area) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-        mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
-        return (LandArea) mappingContext.doMapping(area);
-    }
-
-    private LandAreaEntity getLandAreaEntity(LandArea area) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-        mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
-        return (LandAreaEntity) mappingContext.doMapping(area);
-    }
-
 
     public static LandMemberMappingStrategy create() {
         return new LandMemberMappingStrategy();
