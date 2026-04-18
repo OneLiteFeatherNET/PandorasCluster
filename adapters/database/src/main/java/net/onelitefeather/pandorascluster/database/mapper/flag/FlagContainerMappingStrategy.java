@@ -1,19 +1,16 @@
 package net.onelitefeather.pandorascluster.database.mapper.flag;
 
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
-import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity;
-import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
 
 import java.util.List;
@@ -21,8 +18,12 @@ import java.util.function.Function;
 
 /**
  * Must be invoked while the Hibernate {@link org.hibernate.Session} that loaded the entity
- * is still open — this strategy traverses {@code land}, {@code naturalFlags},
- * {@code roleFlags} and {@code entityCapFlags} lazy associations.
+ * is still open — this strategy traverses {@code naturalFlags}, {@code roleFlags} and
+ * {@code entityCapFlags} lazy associations.
+ *
+ * <p>The flag-container↔land back-reference is intentionally left null to avoid the
+ * mapper cycle (Land → flagContainer → flagContainer.land → …). Callers that need the
+ * parent land must look it up separately via {@code LandService}.
  */
 public final class FlagContainerMappingStrategy implements MapperStrategy {
 
@@ -31,11 +32,6 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
         return entity -> {
             if (entity == null) return null;
             if (!(entity instanceof FlagContainerDto flagContainer)) return null;
-
-            MappingContext landCtx = MappingContext.create();
-            landCtx.setMappingStrategy(LandMappingStrategy.create());
-            landCtx.setMappingType(MapperType.ENTITY_TO_MODEL);
-            Land land = (Land) landCtx.doMapping(flagContainer.land());
 
             MappingContext naturalCtx = MappingContext.create();
             naturalCtx.setMappingStrategy(NaturalFlagMappingStrategy.create());
@@ -61,7 +57,7 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
                     .map(flag -> (LandEntityCapFlag) capCtx.doMapping(flag))
                     .toList();
 
-            return new FlagContainer(flagContainer.id(), land, naturalFlags, roleFlags, entityCapFlags);
+            return new FlagContainer(flagContainer.id(), null, naturalFlags, roleFlags, entityCapFlags);
         };
     }
 
@@ -71,11 +67,6 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
 
             if (model == null) return null;
             if(!(model instanceof FlagContainer flagContainer)) return null;
-
-            MappingContext landCtx = MappingContext.create();
-            landCtx.setMappingStrategy(LandMappingStrategy.create());
-            landCtx.setMappingType(MapperType.MODEL_TO_ENTITY);
-            LandEntity land = (LandEntity) landCtx.doMapping(flagContainer.getLand());
 
             MappingContext naturalCtx = MappingContext.create();
             naturalCtx.setMappingStrategy(NaturalFlagMappingStrategy.create());
@@ -101,7 +92,7 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
                     .map(flag -> (LandEntityCapFlagEntity) capCtx.doMapping(flag))
                     .toList();
 
-            return new FlagContainerEntity(flagContainer.getId(), land, naturalFlags, roleFlags, entityCapFlags);
+            return new FlagContainerEntity(flagContainer.getId(), null, naturalFlags, roleFlags, entityCapFlags);
         };
     }
 
