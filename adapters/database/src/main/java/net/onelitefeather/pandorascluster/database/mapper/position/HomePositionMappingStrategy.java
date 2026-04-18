@@ -14,7 +14,7 @@ public final class HomePositionMappingStrategy implements MapperStrategy {
         return entity -> {
             if(entity == null) return null;
             if(!(entity instanceof HomePositionEntity home)) return null;
-            return new HomePositionEntity(home.id(), home.world(), home.posX(), home.posY(), home.posZ(), home.yaw(), home.pitch());
+            return new HomePosition(home.id(), home.world(), home.posX(), home.posY(), home.posZ(), home.yaw(), home.pitch());
         };
     }
 

@@ -15,10 +15,10 @@ public final class LandPlayerEntity implements LandPlayerDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "VARCHAR(36)")
+    @Column(name = "uuid", length = 36, nullable = false, unique = true)
     private String uuid;
 
-    @Column(columnDefinition = "VARCHAR(16)")
+    @Column(name = "name", length = 16, nullable = false)
     private String name;
 
     public LandPlayerEntity() {
