@@ -27,8 +27,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
             return new LandMember(
                     landMemberDto.id(),
                     getLandPlayer(landMemberDto.member()),
-                    landMemberDto.role(),
-                    null);
+                    landMemberDto.role());
         };
     }
 

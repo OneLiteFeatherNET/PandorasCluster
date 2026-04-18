@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.api.player;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
-import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 
 import java.util.Objects;
@@ -9,14 +8,13 @@ import java.util.Objects;
 public final class LandMember implements PandorasModel {
 
     private final Long id;
-    private LandPlayer member;
-    private LandRole role;
-    private LandArea landArea;
-    public LandMember(Long id, LandPlayer member, LandRole role, LandArea landArea) {
+    private final LandPlayer member;
+    private final LandRole role;
+
+    public LandMember(Long id, LandPlayer member, LandRole role) {
         this.id = id;
         this.member = member;
         this.role = role;
-        this.landArea = landArea;
     }
 
     public Long getId() {
@@ -27,24 +25,8 @@ public final class LandMember implements PandorasModel {
         return member;
     }
 
-    public void setMember(LandPlayer member) {
-        this.member = member;
-    }
-
     public LandRole getRole() {
         return role;
-    }
-
-    public void setRole(LandRole role) {
-        this.role = role;
-    }
-
-    public void setLandArea(LandArea landArea) {
-        this.landArea = landArea;
-    }
-
-    public LandArea getLandArea() {
-        return landArea;
     }
 
     @Override
