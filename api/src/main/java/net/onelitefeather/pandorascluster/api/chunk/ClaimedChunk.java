@@ -3,17 +3,7 @@ package net.onelitefeather.pandorascluster.api.chunk;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
-public final class ClaimedChunk implements PandorasModel {
-
-    private final Long id;
-    private final Long chunkIndex;
-
-    public ClaimedChunk(Long id, Long chunkIndex) {
-        this.id = id;
-        this.chunkIndex = chunkIndex;
-    }
+public record ClaimedChunk(Long id, @NotNull Long chunkIndex) implements PandorasModel {
 
     public Long getId() {
         return id;
@@ -22,28 +12,5 @@ public final class ClaimedChunk implements PandorasModel {
     @NotNull
     public Long getChunkIndex() {
         return chunkIndex;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ClaimedChunk that)) return false;
-
-        return Objects.equals(id, that.id) && Objects.equals(chunkIndex, that.chunkIndex);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hashCode(id);
-        result = 31 * result + Objects.hashCode(chunkIndex);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ClaimedChunk{" +
-                "id=" + getId() +
-                ", chunkIndex=" + getChunkIndex() +
-                '}';
     }
 }
