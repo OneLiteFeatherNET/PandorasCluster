@@ -16,6 +16,13 @@ public interface LandService {
     List<Land> getLands();
 
     /**
+     * @param id the primary key of the land
+     * @return the land, or {@code null} if no land with the given id exists
+     */
+    @Nullable
+    Land getLand(@NotNull Long id);
+
+    /**
      * @param homePosition the home position of the land
      * @param ownerId      the new owner uuid
      */
