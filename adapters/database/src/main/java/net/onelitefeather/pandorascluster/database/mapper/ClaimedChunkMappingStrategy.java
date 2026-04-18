@@ -22,7 +22,7 @@ public final class ClaimedChunkMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return entity -> {
             if (!(entity instanceof ClaimedChunkEntity claimedChunkEntity)) return null;
-            return new ClaimedChunk(claimedChunkEntity.id(), claimedChunkEntity.chunkIndex(), null);
+            return new ClaimedChunk(claimedChunkEntity.id(), claimedChunkEntity.chunkIndex());
         };
     }
 
