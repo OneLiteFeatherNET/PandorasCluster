@@ -45,6 +45,18 @@ public final class DatabaseLandService implements LandService {
     }
 
     @Override
+    public @Nullable Land getLand(@NotNull Long id) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
+            LandEntity landEntity = session.find(LandEntity.class, id);
+            if (landEntity == null) return null;
+            return toModel(landEntity);
+        } catch (HibernateException e) {
+            Constants.LOGGER.log(Level.SEVERE, "Cannot find land with id %s".formatted(id), e);
+            return null;
+        }
+    }
+
+    @Override
     public @NotNull List<Land> getLands() {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             var query = session.createQuery(
