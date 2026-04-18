@@ -6,7 +6,9 @@ import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
+import net.onelitefeather.pandorascluster.api.service.CreateLandResult;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
+import net.onelitefeather.pandorascluster.api.service.GetLandResult;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
@@ -42,14 +44,14 @@ public final class DatabaseLandService implements LandService {
     }
 
     @Override
-    public @Nullable Land getLand(@NotNull Long id) {
+    public @NotNull GetLandResult getLand(@NotNull Long id) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             LandEntity landEntity = session.find(LandEntity.class, id);
-            if (landEntity == null) return null;
-            return toModel(landEntity);
+            if (landEntity == null) return new GetLandResult.NotFound();
+            return new GetLandResult.Found(toModel(landEntity));
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot find land with id %s".formatted(id), e);
-            return null;
+            return new GetLandResult.Failed("Cannot find land with id %s".formatted(id), e);
         }
     }
 
@@ -122,7 +124,7 @@ public final class DatabaseLandService implements LandService {
     }
 
     @Override
-    public @Nullable Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk) {
+    public @NotNull CreateLandResult createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk) {
 
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
@@ -149,13 +151,12 @@ public final class DatabaseLandService implements LandService {
 
             transaction.commit();
 
-            return new Land(landEntity.id(), owner, home, Collections.emptyList(), FlagContainer.EMPTY);
+            return new CreateLandResult.Created(new Land(landEntity.id(), owner, home, Collections.emptyList(), FlagContainer.EMPTY));
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot create land!", e);
             if (transaction != null) transaction.rollback();
+            return new CreateLandResult.Failed("Cannot create land", e);
         }
-
-        return null;
     }
 
     @Override

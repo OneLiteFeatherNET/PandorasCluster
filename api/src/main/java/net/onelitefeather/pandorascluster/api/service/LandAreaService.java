@@ -24,17 +24,17 @@ public interface LandAreaService {
     }
 
     default boolean isChunkClaimed(long chunkIndex) {
-        return getClaimedChunk(chunkIndex) != null;
+        return getClaimedChunk(chunkIndex) instanceof GetClaimedChunkResult.Found;
     }
 
-    @Nullable
-    ClaimedChunk getClaimedChunk(long chunkIndex);
+    @NotNull
+    GetClaimedChunkResult getClaimedChunk(long chunkIndex);
 
-    @Nullable
-    LandArea getLandArea(long chunkIndex);
+    @NotNull
+    GetLandAreaResult getLandArea(long chunkIndex);
 
-    @Nullable
-    default LandArea getLandArea(@NotNull ClaimedChunk chunk) {
+    @NotNull
+    default GetLandAreaResult getLandArea(@NotNull ClaimedChunk chunk) {
         return getLandArea(chunk.getChunkIndex());
     }
 

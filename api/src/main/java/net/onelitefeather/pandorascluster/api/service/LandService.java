@@ -5,7 +5,6 @@ import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,10 +16,11 @@ public interface LandService {
 
     /**
      * @param id the primary key of the land
-     * @return the land, or {@code null} if no land with the given id exists
+     * @return a {@link GetLandResult} variant — callers must pattern-match on
+     *         {@code Found}, {@code NotFound} and {@code Failed}
      */
-    @Nullable
-    Land getLand(@NotNull Long id);
+    @NotNull
+    GetLandResult getLand(@NotNull Long id);
 
     /**
      * @param homePosition the home position of the land
@@ -41,9 +41,11 @@ public interface LandService {
      * @param owner the owner of the land.
      * @param home  the home position of the land
      * @param chunk the first claimed chunk
+     * @return a {@link CreateLandResult} variant — exhaustive switch forces
+     *         callers to handle {@code Created} and {@code Failed}
      */
-    @Nullable
-    Land createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk);
+    @NotNull
+    CreateLandResult createLand(@NotNull LandPlayer owner, @NotNull HomePosition home, @NotNull ClaimedChunk chunk);
 
     /**
      * @param land the land to unclaim.

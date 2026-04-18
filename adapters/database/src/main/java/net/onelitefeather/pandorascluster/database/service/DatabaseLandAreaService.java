@@ -4,6 +4,8 @@ import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
+import net.onelitefeather.pandorascluster.api.service.GetClaimedChunkResult;
+import net.onelitefeather.pandorascluster.api.service.GetLandAreaResult;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
 import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMapper;
@@ -49,11 +51,11 @@ public final class DatabaseLandAreaService implements LandAreaService {
     @Override
     public boolean removeClaimedChunk(long chunkIndex) {
 
-        var claimedChunk = getClaimedChunk(chunkIndex);
-        if (claimedChunk == null) return false;
+        if (!(getClaimedChunk(chunkIndex) instanceof GetClaimedChunkResult.Found(ClaimedChunk claimedChunk))) {
+            return false;
+        }
 
         Transaction transaction = null;
-
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
@@ -69,20 +71,22 @@ public final class DatabaseLandAreaService implements LandAreaService {
     }
 
     @Override
-    public @Nullable ClaimedChunk getClaimedChunk(long chunkIndex) {
+    public @NotNull GetClaimedChunkResult getClaimedChunk(long chunkIndex) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc WHERE cc.chunkIndex = :chunkIndex", ClaimedChunkEntity.class);
             query.setParameter("chunkIndex", chunkIndex);
-            return toModel(query.uniqueResult());
+            ClaimedChunkEntity row = query.uniqueResult();
+            if (row == null) return new GetClaimedChunkResult.NotFound();
+            return new GetClaimedChunkResult.Found(toModel(row));
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Could not find any chunk with chunkIndex %s".formatted(chunkIndex), e);
-            return null;
+            return new GetClaimedChunkResult.Failed("Could not find any chunk with chunkIndex %s".formatted(chunkIndex), e);
         }
     }
 
     @Override
-    public @Nullable LandArea getLandArea(long chunkIndex) {
+    public @NotNull GetLandAreaResult getLandArea(long chunkIndex) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             var chunkQuery = session.createQuery(
@@ -94,7 +98,7 @@ public final class DatabaseLandAreaService implements LandAreaService {
             chunkQuery.setParameter("chunkindex", chunkIndex);
 
             ClaimedChunkEntity claimedChunk = chunkQuery.uniqueResult();
-            if (claimedChunk == null) return null;
+            if (claimedChunk == null) return new GetLandAreaResult.NotFound();
 
             LandAreaEntity landArea = (LandAreaEntity) claimedChunk.landArea();
 
@@ -104,11 +108,11 @@ public final class DatabaseLandAreaService implements LandAreaService {
             Hibernate.initialize(landArea.members());
             Hibernate.initialize(landArea.chunks());
 
-            return toModel(landArea);
+            return new GetLandAreaResult.Found(toModel(landArea));
 
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Could not find any land area for the given chunk. (%s)".formatted(chunkIndex), e);
-            return null;
+            return new GetLandAreaResult.Failed("Could not find any land area for the given chunk. (%s)".formatted(chunkIndex), e);
         }
     }
 
