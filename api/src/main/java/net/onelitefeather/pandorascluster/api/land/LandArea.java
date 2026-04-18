@@ -11,24 +11,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public final class LandArea implements PandorasModel {
+public record LandArea(Long id,
+                       Long landId,
+                       String name,
+                       List<ClaimedChunk> chunks,
+                       List<LandMember> members) implements PandorasModel {
 
-    private final Long id;
-    private final Long landId;
-    private final String name;
-    private final List<ClaimedChunk> chunks;
-    private final List<LandMember> members;
-
-    public LandArea(Long id,
-                    Long landId,
-                    String name,
-                    List<ClaimedChunk> chunks,
-                    List<LandMember> members) {
-        this.id = id;
-        this.landId = landId;
-        this.name = name;
-        this.chunks = chunks;
-        this.members = members;
+    public LandArea {
+        chunks = List.copyOf(chunks);
+        members = List.copyOf(members);
     }
 
     public Long getId() {
