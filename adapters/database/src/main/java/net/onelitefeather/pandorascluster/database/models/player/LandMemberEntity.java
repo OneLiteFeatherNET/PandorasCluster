@@ -2,10 +2,8 @@ package net.onelitefeather.pandorascluster.database.models.player;
 
 import jakarta.persistence.*;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
-import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
-import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
-import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_members")
-public final class LandMemberEntity implements LandMemberDto {
+public final class LandMemberEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,23 +39,19 @@ public final class LandMemberEntity implements LandMemberDto {
         this.landArea = landArea;
     }
 
-    @Override
     public @Nullable Long id() {
         return id;
     }
 
-    @Override
-    public @NotNull LandPlayerDto member() {
+    public @NotNull LandPlayerEntity member() {
         return member;
     }
 
-    @Override
     public @NotNull LandRole role() {
         return role;
     }
 
-    @Override
-    public LandAreaDto landArea() {
+    public LandAreaEntity landArea() {
         return this.landArea;
     }
 

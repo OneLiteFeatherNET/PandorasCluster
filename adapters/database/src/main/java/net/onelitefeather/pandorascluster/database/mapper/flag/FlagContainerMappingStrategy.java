@@ -11,7 +11,6 @@ import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEnti
 import net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity;
-import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -31,7 +30,7 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return entity -> {
             if (entity == null) return null;
-            if (!(entity instanceof FlagContainerDto flagContainer)) return null;
+            if (!(entity instanceof FlagContainerEntity flagContainer)) return null;
 
             MappingContext naturalCtx = MappingContext.create();
             naturalCtx.setMappingStrategy(NaturalFlagMappingStrategy.create());

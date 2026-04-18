@@ -1,8 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
-import net.onelitefeather.pandorascluster.dto.flag.NaturalFlagDto;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +15,7 @@ import java.util.Objects;
                 columnNames = {"flagContainer_id", "name"}
         )
 )
-public final class LandNaturalFlagEntity implements NaturalFlagDto {
+public final class LandNaturalFlagEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,23 +42,19 @@ public final class LandNaturalFlagEntity implements NaturalFlagDto {
         this.flagContainer = flagContainer;
     }
 
-    @Override
     public @Nullable Long id() {
         return this.id;
     }
 
-    @Override
     public @NotNull String name() {
         return this.name;
     }
 
-    @Override
     public boolean state() {
         return this.state;
     }
 
-    @Override
-    public FlagContainerDto flagContainer() {
+    public FlagContainerEntity flagContainer() {
         return flagContainer;
     }
 

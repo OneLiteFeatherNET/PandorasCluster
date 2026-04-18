@@ -12,8 +12,6 @@ import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEnti
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
-import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
-import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -58,14 +56,14 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
         };
     }
 
-    private List<ClaimedChunk> getChunks(List<ClaimedChunkDto> chunks) {
+    private List<ClaimedChunk> getChunks(List<ClaimedChunkEntity> chunks) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
         return chunks.stream().map(chunk -> (ClaimedChunk) mappingContext.doMapping(chunk)).toList();
     }
 
-    private List<LandMember> getMembers(List<LandMemberDto> members) {
+    private List<LandMember> getMembers(List<LandMemberEntity> members) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandMemberMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);

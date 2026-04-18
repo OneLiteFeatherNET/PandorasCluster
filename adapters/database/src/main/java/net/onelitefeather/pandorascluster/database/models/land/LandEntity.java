@@ -1,14 +1,10 @@
 package net.onelitefeather.pandorascluster.database.models.land;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
-import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
-import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
-import net.onelitefeather.pandorascluster.dto.land.LandDto;
-import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
-import net.onelitefeather.pandorascluster.dto.position.HomePositionDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +14,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "lands")
-public final class LandEntity implements LandDto {
+public final class LandEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,28 +51,23 @@ public final class LandEntity implements LandDto {
         this.flagContainerEntity = flagContainerEntity;
     }
 
-    @Override
     public @Nullable Long id() {
         return id;
     }
 
-    @Override
-    public @NotNull LandPlayerDto owner() {
+    public @NotNull LandPlayerEntity owner() {
         return owner;
     }
 
-    @Override
-    public @NotNull HomePositionDto home() {
+    public @NotNull HomePositionEntity home() {
         return home;
     }
 
-    @Override
-    public @NotNull List<LandAreaDto> areas() {
+    public @NotNull List<LandAreaEntity> areas() {
         return Collections.unmodifiableList(areas);
     }
 
-    @Override
-    public FlagContainerDto flagContainer() {
+    public FlagContainerEntity flagContainer() {
         return this.flagContainerEntity;
     }
 

@@ -7,8 +7,6 @@ import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
-import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
-import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 
 import java.util.function.Function;
 
@@ -23,11 +21,11 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return databaseEntity -> {
             if (databaseEntity == null) return null;
-            if (!(databaseEntity instanceof LandMemberDto landMemberDto)) return null;
+            if (!(databaseEntity instanceof LandMemberEntity landMemberEntity)) return null;
             return new LandMember(
-                    landMemberDto.id(),
-                    getLandPlayer(landMemberDto.member()),
-                    landMemberDto.role());
+                    landMemberEntity.id(),
+                    getLandPlayer(landMemberEntity.member()),
+                    landMemberEntity.role());
         };
     }
 
@@ -44,7 +42,7 @@ public final class LandMemberMappingStrategy implements MapperStrategy {
         };
     }
 
-    private LandPlayer getLandPlayer(LandPlayerDto landPlayer) {
+    private LandPlayer getLandPlayer(LandPlayerEntity landPlayer) {
         MappingContext mappingContext = MappingContext.create();
         mappingContext.setMappingStrategy(LandPlayerMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);

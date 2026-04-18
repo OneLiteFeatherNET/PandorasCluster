@@ -1,9 +1,8 @@
 package net.onelitefeather.pandorascluster.database.models.chunk;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
-import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
-import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
 
 import java.util.Objects;
 
@@ -15,7 +14,7 @@ import java.util.Objects;
                 columnNames = {"landArea_id", "chunk_index"}
         )
 )
-public final class ClaimedChunkEntity implements ClaimedChunkDto {
+public final class ClaimedChunkEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,17 +37,15 @@ public final class ClaimedChunkEntity implements ClaimedChunkDto {
         this.landArea = landArea;
     }
 
-    @Override
     public Long id() {
         return id;
     }
 
-    @Override
     public Long chunkIndex() {
         return chunkIndex;
     }
 
-    public LandAreaDto landArea() {
+    public LandAreaEntity landArea() {
         return landArea;
     }
 

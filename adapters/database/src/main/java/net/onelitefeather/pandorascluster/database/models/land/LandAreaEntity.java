@@ -1,12 +1,9 @@
 package net.onelitefeather.pandorascluster.database.models.land;
 
 import jakarta.persistence.*;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
-import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
-import net.onelitefeather.pandorascluster.dto.land.LandAreaDto;
-import net.onelitefeather.pandorascluster.dto.land.LandDto;
-import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +13,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_areas")
-public final class LandAreaEntity implements LandAreaDto {
+public final class LandAreaEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,28 +48,23 @@ public final class LandAreaEntity implements LandAreaDto {
         this.land = landEntity;
     }
 
-    @Override
     public @Nullable Long id() {
         return this.id;
     }
 
-    @Override
     public @NotNull String name() {
         return this.name;
     }
 
-    @Override
-    public @NotNull List<LandMemberDto> members() {
+    public @NotNull List<LandMemberEntity> members() {
         return Collections.unmodifiableList(this.members);
     }
 
-    @Override
-    public @NotNull List<ClaimedChunkDto> chunks() {
+    public @NotNull List<ClaimedChunkEntity> chunks() {
         return Collections.unmodifiableList(this.chunks);
     }
 
-    @Override
-    public LandDto land() {
+    public LandEntity land() {
         return this.land;
     }
 

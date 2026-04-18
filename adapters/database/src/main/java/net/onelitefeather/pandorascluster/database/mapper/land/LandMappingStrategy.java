@@ -8,12 +8,14 @@ import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
+import net.onelitefeather.pandorascluster.database.mapper.flag.FlagContainerMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.player.LandPlayerMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.position.HomePositionMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
-import net.onelitefeather.pandorascluster.dto.land.LandDto;
 
 import java.util.List;
 import java.util.function.Function;
@@ -27,37 +29,63 @@ public final class LandMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {
-        return model -> {
-            if(model == null) return null;
-            if(!(model instanceof LandDto land)) return null;
+        return entity -> {
+            if (entity == null) return null;
+            if (!(entity instanceof LandEntity land)) return null;
 
-            MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-            mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
+            MappingContext areaCtx = MappingContext.create();
+            areaCtx.setMappingStrategy(LandAreaMappingStrategy.create());
+            areaCtx.setMappingType(MapperType.ENTITY_TO_MODEL);
+            List<LandArea> landAreas = land.areas().stream()
+                    .map(area -> (LandArea) areaCtx.doMapping(area))
+                    .toList();
 
-            List<LandArea> landAreas = land.areas().stream().map(area -> (LandArea) mappingContext.doMapping(area)).toList();
-            LandPlayer owner = (LandPlayer) mappingContext.doMapping(land.owner());
-            FlagContainer flagContainer = (FlagContainer) mappingContext.doMapping(land.flagContainer());
-            HomePosition homePosition = (HomePosition) mappingContext.doMapping(land.home());
+            MappingContext playerCtx = MappingContext.create();
+            playerCtx.setMappingStrategy(LandPlayerMappingStrategy.create());
+            playerCtx.setMappingType(MapperType.ENTITY_TO_MODEL);
+            LandPlayer owner = (LandPlayer) playerCtx.doMapping(land.owner());
+
+            MappingContext flagCtx = MappingContext.create();
+            flagCtx.setMappingStrategy(FlagContainerMappingStrategy.create());
+            flagCtx.setMappingType(MapperType.ENTITY_TO_MODEL);
+            FlagContainer flagContainer = (FlagContainer) flagCtx.doMapping(land.flagContainer());
+
+            MappingContext homeCtx = MappingContext.create();
+            homeCtx.setMappingStrategy(HomePositionMappingStrategy.create());
+            homeCtx.setMappingType(MapperType.ENTITY_TO_MODEL);
+            HomePosition homePosition = (HomePosition) homeCtx.doMapping(land.home());
+
             return new Land(land.id(), owner, homePosition, landAreas, flagContainer);
         };
     }
 
     @Override
     public Function<PandorasModel, PandorasModel> modelToEntity() {
-        return entity -> {
-            if(entity == null) return null;
-            if(!(entity instanceof Land land)) return null;
+        return model -> {
+            if (model == null) return null;
+            if (!(model instanceof Land land)) return null;
 
-            MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-            mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
+            MappingContext areaCtx = MappingContext.create();
+            areaCtx.setMappingStrategy(LandAreaMappingStrategy.create());
+            areaCtx.setMappingType(MapperType.MODEL_TO_ENTITY);
+            List<LandAreaEntity> landAreas = land.getAreas().stream()
+                    .map(area -> (LandAreaEntity) areaCtx.doMapping(area))
+                    .toList();
 
-            List<LandAreaEntity> landAreas = land.getAreas().stream().map(area -> (LandAreaEntity) mappingContext.doMapping(area)).toList();
+            MappingContext playerCtx = MappingContext.create();
+            playerCtx.setMappingStrategy(LandPlayerMappingStrategy.create());
+            playerCtx.setMappingType(MapperType.MODEL_TO_ENTITY);
+            LandPlayerEntity owner = (LandPlayerEntity) playerCtx.doMapping(land.getOwner());
 
-            LandPlayerEntity owner = (LandPlayerEntity) mappingContext.doMapping(land.getOwner());
-            HomePositionEntity homePosition = (HomePositionEntity) mappingContext.doMapping(land.getHome());
-            FlagContainerEntity flagContainer = (FlagContainerEntity) mappingContext.doMapping(land.getFlagContainer());
+            MappingContext flagCtx = MappingContext.create();
+            flagCtx.setMappingStrategy(FlagContainerMappingStrategy.create());
+            flagCtx.setMappingType(MapperType.MODEL_TO_ENTITY);
+            FlagContainerEntity flagContainer = (FlagContainerEntity) flagCtx.doMapping(land.getFlagContainer());
+
+            MappingContext homeCtx = MappingContext.create();
+            homeCtx.setMappingStrategy(HomePositionMappingStrategy.create());
+            homeCtx.setMappingType(MapperType.MODEL_TO_ENTITY);
+            HomePositionEntity homePosition = (HomePositionEntity) homeCtx.doMapping(land.getHome());
 
             return new LandEntity(land.getId(), owner, homePosition, landAreas, flagContainer);
         };

@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.database.models.position;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dto.position.HomePositionDto;
+import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_homes")
-public final class HomePositionEntity implements HomePositionDto {
+public final class HomePositionEntity implements PandorasModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,37 +47,30 @@ public final class HomePositionEntity implements HomePositionDto {
         this.pitch = pitch;
     }
 
-    @Override
     public @Nullable Long id() {
         return id;
     }
 
-    @Override
     public @NotNull String world() {
         return world;
     }
 
-    @Override
     public double posX() {
         return posX;
     }
 
-    @Override
     public double posY() {
         return posY;
     }
 
-    @Override
     public double posZ() {
         return posZ;
     }
 
-    @Override
     public float yaw() {
         return yaw;
     }
 
-    @Override
     public float pitch() {
         return pitch;
     }

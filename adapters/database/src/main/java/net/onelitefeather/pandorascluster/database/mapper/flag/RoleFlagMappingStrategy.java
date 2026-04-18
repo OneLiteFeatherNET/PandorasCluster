@@ -1,32 +1,25 @@
 package net.onelitefeather.pandorascluster.database.mapper.flag;
 
-import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
-import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
-import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity;
-import net.onelitefeather.pandorascluster.dto.flag.RoleFlagDto;
 
 import java.util.function.Function;
 
+/**
+ * The flag↔flagContainer back-reference is intentionally left null to avoid
+ * the mapper cycle (FlagContainer → roleFlags → roleFlag.parent → …).
+ * Callers that need the parent container must look it up separately.
+ */
 public final class RoleFlagMappingStrategy implements MapperStrategy {
 
     @Override
     public Function<PandorasModel, PandorasModel> entityToModel() {
         return entity -> {
             if (entity == null) return null;
-            if (!(entity instanceof RoleFlagDto flag)) return null;
-
-            MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());
-            mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
-
-            FlagContainer flagContainer = (FlagContainer) mappingContext.doMapping(flag.flagContainer());
-            if (flagContainer == null) return null;
-
-            return new LandRoleFlag(flag.id(), flag.name(), flag.state(), flag.role(), flagContainer);
+            if (!(entity instanceof LandRoleFlagEntity flag)) return null;
+            return new LandRoleFlag(flag.id(), flag.name(), flag.state(), flag.role(), null);
         };
     }
 
@@ -35,14 +28,7 @@ public final class RoleFlagMappingStrategy implements MapperStrategy {
         return model -> {
             if (model == null) return null;
             if (!(model instanceof LandRoleFlag flag)) return null;
-
-            MappingContext mappingContext = MappingContext.create();
-            mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());
-            mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
-
-            FlagContainerEntity flagContainer = (FlagContainerEntity) mappingContext.doMapping(flag.getParent());
-
-            return new LandRoleFlagEntity(flag.getId(), flag.getName(), flag.getState(), flag.getRole(), flagContainer);
+            return new LandRoleFlagEntity(flag.getId(), flag.getName(), flag.getState(), flag.getRole(), null);
         };
     }
 
