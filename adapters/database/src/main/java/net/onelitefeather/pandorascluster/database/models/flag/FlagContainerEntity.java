@@ -10,6 +10,7 @@ import net.onelitefeather.pandorascluster.dto.land.LandDto;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "flag_containers")
@@ -28,7 +29,7 @@ public final class FlagContainerEntity implements FlagContainerDto {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "flagContainer")
     private List<LandEntityCapFlagEntity> entityCapFlags;
 
-    @OneToOne
+    @OneToOne(mappedBy = "flagContainerEntity")
     private LandEntity land;
 
     public static final FlagContainerEntity EMPTY = new FlagContainerEntity(
@@ -82,5 +83,18 @@ public final class FlagContainerEntity implements FlagContainerDto {
     @Override
     public LandDto land() {
         return this.land;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FlagContainerEntity that)) return false;
+        if (id == null || that.id == null) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : Objects.hashCode(id);
     }
 }
