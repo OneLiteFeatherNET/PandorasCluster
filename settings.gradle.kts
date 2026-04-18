@@ -15,7 +15,6 @@ dependencyResolutionManagement {
         create("libs") {
 
             // Non Paper
-            version("liquibase", "2.2.2")
             version("guava", "33.3.1-jre")
             version("jaxb-runtime", "4.0.7")
             version("caffeine", "3.2.3")
@@ -41,7 +40,7 @@ dependencyResolutionManagement {
             // Gradle Plugins
             version("plugin.yml", "0.6.0")
             version("run-paper", "3.0.2")
-            version("shadow", "8.1.1")
+            version("shadow", "9.4.1")
 
             // Paper
             library("paper", "io.papermc.paper", "paper-api").versionRef("paper")
@@ -82,8 +81,7 @@ dependencyResolutionManagement {
             // Plugins
             plugin("plugin.yml", "net.minecrell.plugin-yml.paper").versionRef("plugin.yml")
             plugin("run.paper", "xyz.jpenilla.run-paper").versionRef("run-paper")
-            plugin("shadow", "com.github.johnrengelman.shadow").versionRef("shadow")
-            plugin("liquibase", "org.liquibase.gradle").versionRef("liquibase")
+            plugin("shadow", "com.gradleup.shadow").versionRef("shadow")
         }
     }
 }
