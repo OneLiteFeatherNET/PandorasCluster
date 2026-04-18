@@ -60,13 +60,13 @@ public final class DatabaseLandAreaService implements LandAreaService {
             transaction = session.beginTransaction();
             session.remove(toEntity(claimedChunk));
             transaction.commit();
+            return true;
 
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
             Constants.LOGGER.log(Level.SEVERE, "Cannot delete claimed chunk", e);
+            return false;
         }
-
-        return false;
     }
 
     @Override
@@ -74,6 +74,7 @@ public final class DatabaseLandAreaService implements LandAreaService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc WHERE cc.chunkIndex = :chunkIndex", ClaimedChunkEntity.class);
+            query.setParameter("chunkIndex", chunkIndex);
             return toModel(query.uniqueResult());
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Could not find any chunk with chunkIndex %s".formatted(chunkIndex), e);
@@ -85,7 +86,14 @@ public final class DatabaseLandAreaService implements LandAreaService {
     public @Nullable LandArea getLandArea(long chunkIndex) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
-            var query = session.createQuery("SELECT cc FROM ClaimedChunkEntity cc JOIN FETCH cc.landArea WHERE cc.chunkIndex = :chunkindex", ClaimedChunkEntity.class);
+            var query = session.createQuery(
+                    "SELECT DISTINCT cc FROM ClaimedChunkEntity cc " +
+                            "JOIN FETCH cc.landArea la " +
+                            "LEFT JOIN FETCH la.members " +
+                            "LEFT JOIN FETCH la.chunks " +
+                            "LEFT JOIN FETCH la.land " +
+                            "WHERE cc.chunkIndex = :chunkindex",
+                    ClaimedChunkEntity.class);
             query.setParameter("chunkindex", chunkIndex);
 
             ClaimedChunkEntity claimedChunk = query.uniqueResult();
@@ -100,6 +108,12 @@ public final class DatabaseLandAreaService implements LandAreaService {
         }
     }
 
+    /**
+     * Best-effort composition of already-transactional sub-operations. Each call
+     * to {@code removeLandMember} and {@code removeClaimedChunk} opens its own
+     * Hibernate session and commits independently, so a partial failure leaves
+     * the area in an intermediate state. Do not rely on atomicity here.
+     */
     @Override
     public void unclaimArea(LandArea landArea) {
         landArea.getMembers().forEach(this.pandorasCluster.getLandPlayerService()::removeLandMember);
