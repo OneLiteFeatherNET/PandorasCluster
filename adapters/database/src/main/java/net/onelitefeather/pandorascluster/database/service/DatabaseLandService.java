@@ -126,20 +126,23 @@ public final class DatabaseLandService implements LandService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            var flagContainerEntity = new FlagContainerEntity(null, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-            var landEntity = new LandEntity(null,
-                    new LandPlayerEntity(owner.getId(), owner.getUniqueId().toString(), owner.getName()),
-                    toHomePositionEntity(home),
-                    Collections.emptyList(),
-                    flagContainerEntity);
+            // Persist in FK-dependency order: home and flag container first (no outgoing
+            // non-null FKs), then the land (needs owner, home, flag_container), then the
+            // area and its first chunk.
+            var homeEntity = toHomePositionEntity(home);
+            session.persist(homeEntity);
 
-            session.persist(flagContainerEntity.withLand(landEntity));
+            var flagContainerEntity = new FlagContainerEntity(null, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            session.persist(flagContainerEntity);
+
+            var ownerRef = session.getReference(LandPlayerEntity.class, owner.getId());
+            var landEntity = new LandEntity(null, ownerRef, homeEntity, Collections.emptyList(), flagContainerEntity);
             session.persist(landEntity);
-            session.persist(landEntity.home());
 
             var landAreaEntity = new LandAreaEntity(null, "default", Collections.emptyList(), Collections.emptyList(), landEntity);
-            var claimedChunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex(), landAreaEntity);
             session.persist(landAreaEntity);
+
+            var claimedChunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex(), landAreaEntity);
             session.persist(claimedChunkEntity);
 
             transaction.commit();
