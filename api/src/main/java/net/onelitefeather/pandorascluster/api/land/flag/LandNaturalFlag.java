@@ -5,7 +5,7 @@ import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.NaturalFlag;
 import org.jetbrains.annotations.Nullable;
 
-public record LandNaturalFlag(Long id, String name, Boolean state, FlagContainer parent) {
+public record LandNaturalFlag(Long id, String name, Boolean state, FlagContainer parent) implements LandFlag {
 
     public Long getId() {
         return id;

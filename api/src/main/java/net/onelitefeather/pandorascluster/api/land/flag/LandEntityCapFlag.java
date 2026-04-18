@@ -5,7 +5,7 @@ import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.EntityCapFlag;
 import org.jetbrains.annotations.Nullable;
 
-public record LandEntityCapFlag(Long id, String name, int spawnLimit, FlagContainer parent) {
+public record LandEntityCapFlag(Long id, String name, int spawnLimit, FlagContainer parent) implements LandFlag {
 
     public Long getId() {
         return id;

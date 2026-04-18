@@ -6,7 +6,7 @@ import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
 import org.jetbrains.annotations.Nullable;
 
-public record LandRoleFlag(Long id, String name, Boolean state, LandRole role, FlagContainer parent) {
+public record LandRoleFlag(Long id, String name, Boolean state, LandRole role, FlagContainer parent) implements LandFlag {
 
     public Long getId() {
         return id;
