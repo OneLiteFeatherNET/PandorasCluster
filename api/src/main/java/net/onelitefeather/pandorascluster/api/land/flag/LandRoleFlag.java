@@ -5,24 +5,9 @@ import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
 import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class LandRoleFlag implements PandorasModel {
-
-    private final Long id;
-    private String name;
-    private Boolean state;
-    private LandRole role;
-    private FlagContainer parent;
-
-    public LandRoleFlag(Long id, String name, Boolean state, LandRole role, FlagContainer parent) {
-        this.id = id;
-        this.name = name;
-        this.state = state;
-        this.role = role;
-        this.parent = parent;
-    }
+public record LandRoleFlag(Long id, String name, Boolean state, LandRole role, FlagContainer parent) implements PandorasModel {
 
     public Long getId() {
         return id;
@@ -32,40 +17,20 @@ public final class LandRoleFlag implements PandorasModel {
         return name;
     }
 
-    @Nullable
-    public RoleFlag getFlag() {
-        return FlagRegistry.roleFlagOf(name);
-    }
-
-    public FlagContainer getParent() {
-        return parent;
+    public Boolean getState() {
+        return state;
     }
 
     public LandRole getRole() {
         return role;
     }
 
-    public LandRoleFlag withRole(LandRole role) {
-        this.role = role;
-        return this;
+    public FlagContainer getParent() {
+        return parent;
     }
 
-    public LandRoleFlag withFlag(@NotNull String flag) {
-        this.name = flag;
-        return this;
-    }
-
-    public LandRoleFlag withState(Boolean state) {
-        this.state = state;
-        return this;
-    }
-
-    public LandRoleFlag withParent(FlagContainer parent) {
-        this.parent = parent;
-        return this;
-    }
-
-    public Boolean getState() {
-        return state;
+    @Nullable
+    public RoleFlag getFlag() {
+        return FlagRegistry.roleFlagOf(name);
     }
 }
