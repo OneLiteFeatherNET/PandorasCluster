@@ -75,7 +75,6 @@ public final class DatabaseLandFlagService implements LandFlagService {
 
             transaction = session.beginTransaction();
 
-            flagContainer.removeRoleFlag(roleFlag);
             session.remove(getRoleFlagEntity(roleFlag));
             transaction.commit();
 
@@ -124,7 +123,6 @@ public final class DatabaseLandFlagService implements LandFlagService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            flagContainer.removeNaturalFlag(naturalFlag);
             session.remove(getNaturalFlagEntity(naturalFlag));
             transaction.commit();
 
@@ -173,7 +171,6 @@ public final class DatabaseLandFlagService implements LandFlagService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            flagContainer.removeEntityCapFlag(entityCapFlag);
             session.remove(getEntityCapFlagEntity(entityCapFlag));
             transaction.commit();
 
