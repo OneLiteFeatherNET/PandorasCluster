@@ -12,6 +12,7 @@ import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStr
 import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -86,20 +87,25 @@ public final class DatabaseLandAreaService implements LandAreaService {
     public @Nullable LandArea getLandArea(long chunkIndex) {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
-            var query = session.createQuery(
-                    "SELECT DISTINCT cc FROM ClaimedChunkEntity cc " +
+            var chunkQuery = session.createQuery(
+                    "SELECT cc FROM ClaimedChunkEntity cc " +
                             "JOIN FETCH cc.landArea la " +
-                            "LEFT JOIN FETCH la.members " +
-                            "LEFT JOIN FETCH la.chunks " +
                             "LEFT JOIN FETCH la.land " +
                             "WHERE cc.chunkIndex = :chunkindex",
                     ClaimedChunkEntity.class);
-            query.setParameter("chunkindex", chunkIndex);
+            chunkQuery.setParameter("chunkindex", chunkIndex);
 
-            ClaimedChunkEntity claimedChunk = query.uniqueResult();
+            ClaimedChunkEntity claimedChunk = chunkQuery.uniqueResult();
             if (claimedChunk == null) return null;
 
             LandAreaEntity landArea = (LandAreaEntity) claimedChunk.landArea();
+
+            // Hibernate forbids JOIN FETCH-ing two bag-style collections in one query
+            // (MultipleBagFetchException), so the members and chunks collections are
+            // initialized in separate round-trips.
+            Hibernate.initialize(landArea.members());
+            Hibernate.initialize(landArea.chunks());
+
             return toModel(landArea);
 
         } catch (HibernateException e) {
