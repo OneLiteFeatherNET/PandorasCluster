@@ -41,18 +41,51 @@ public record LandArea(Long id,
         return members;
     }
 
-    public boolean hasMemberAccess(UUID uuid, RoleFlag flag, Land land) {
-        if (land.isOwner(uuid)) return true;
+    /**
+     * Evaluates whether a caller may interact with this area given a role flag.
+     * Returns a structured {@link AccessDecision} so consumers can surface the
+     * concrete reason for allow/deny instead of a bare boolean.
+     */
+    public AccessDecision evaluateAccess(UUID uuid, RoleFlag flag, Land land) {
+        if (land.isOwner(uuid)) {
+            return AccessDecision.allowed(AccessDecision.Allowed.Reason.OWNER);
+        }
 
-        var hasVisitorAccess = hasVisitorAccess(flag);
         var member = getMember(uuid);
-        if (member == null) return hasVisitorAccess;
+        if (member == null) {
+            if (hasVisitorAccess(flag)) {
+                return AccessDecision.allowed(AccessDecision.Allowed.Reason.VISITOR_FLAG);
+            }
+            if (PlayerUtil.Instances.instance.hasPermission(uuid, flag.getWildernessPermission())) {
+                return AccessDecision.allowed(AccessDecision.Allowed.Reason.WILDERNESS_PERMISSION);
+            }
+            return AccessDecision.denied(AccessDecision.Denied.Reason.NOT_MEMBER);
+        }
 
-        var access = member.getRole().getPriority() >= flag.getRole().getPriority();
-        var hasMemberRoleAccess = member.getRole() == LandRole.MEMBER && access && !isAdminOnline(land);
-        if (hasMemberRoleAccess) return false;
-        if (access) return true;
-        return PlayerUtil.Instances.instance.hasPermission(uuid, flag.getWildernessPermission());
+        if (member.getRole() == LandRole.BANNED) {
+            return AccessDecision.denied(AccessDecision.Denied.Reason.BANNED);
+        }
+
+        boolean access = member.getRole().getPriority() >= flag.getRole().getPriority();
+        if (member.getRole() == LandRole.MEMBER && access && !isAdminOnline(land)) {
+            return AccessDecision.denied(AccessDecision.Denied.Reason.ADMIN_OFFLINE_GUARD);
+        }
+        if (access) {
+            return AccessDecision.allowed(AccessDecision.Allowed.Reason.ROLE);
+        }
+        if (PlayerUtil.Instances.instance.hasPermission(uuid, flag.getWildernessPermission())) {
+            return AccessDecision.allowed(AccessDecision.Allowed.Reason.WILDERNESS_PERMISSION);
+        }
+        return AccessDecision.denied(AccessDecision.Denied.Reason.INSUFFICIENT_ROLE);
+    }
+
+    /**
+     * Boolean convenience wrapper over {@link #evaluateAccess}. Prefer
+     * {@code evaluateAccess} when the concrete outcome is needed (e.g. to show
+     * the right message to the player).
+     */
+    public boolean hasMemberAccess(UUID uuid, RoleFlag flag, Land land) {
+        return evaluateAccess(uuid, flag, land).isAllowed();
     }
 
     public boolean hasVisitorAccess(RoleFlag flag) {
