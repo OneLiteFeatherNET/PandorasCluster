@@ -1,10 +1,9 @@
 package net.onelitefeather.pandorascluster.api.player;
 
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 
 import java.util.UUID;
 
-public record LandPlayer(Long id, UUID uniqueId, String name) implements PandorasModel {
+public record LandPlayer(Long id, UUID uniqueId, String name) {
 
     public Long getId() {
         return id;

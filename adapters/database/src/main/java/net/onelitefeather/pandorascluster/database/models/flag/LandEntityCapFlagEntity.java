@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +14,7 @@ import java.util.Objects;
                 columnNames = {"flagContainer_id", "name"}
         )
 )
-public final class LandEntityCapFlagEntity implements PandorasModel {
+public final class LandEntityCapFlagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

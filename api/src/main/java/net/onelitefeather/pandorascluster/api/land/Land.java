@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.api.land;
 
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 
@@ -12,7 +11,7 @@ public record Land(Long id,
                    LandPlayer owner,
                    HomePosition home,
                    List<LandArea> areas,
-                   FlagContainer flagContainer) implements PandorasModel {
+                   FlagContainer flagContainer) {
 
     public Land {
         areas = List.copyOf(areas);

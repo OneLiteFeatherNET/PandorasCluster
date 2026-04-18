@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.player;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_players")
-public final class LandPlayerEntity implements PandorasModel {
+public final class LandPlayerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

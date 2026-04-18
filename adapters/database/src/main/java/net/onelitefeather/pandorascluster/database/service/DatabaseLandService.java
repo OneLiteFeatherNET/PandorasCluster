@@ -4,17 +4,14 @@ import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.Land;
-import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
-import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.service.LandService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandMappingStrategy;
-import net.onelitefeather.pandorascluster.database.mapper.position.HomePositionMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.land.LandMapper;
+import net.onelitefeather.pandorascluster.database.mapper.position.HomePositionMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
@@ -96,14 +93,7 @@ public final class DatabaseLandService implements LandService {
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
-
-            MappingContext mappingContext = MappingContext.create();
-//            mappingContext.setMappingStrategy(LandMappingStrategy.create());
-            mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-            mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-
-            LandEntity landEntity = (LandEntity) mappingContext.doMapping(land);
-            session.merge(landEntity);
+            session.merge(LandMapper.toEntity(land));
             transaction.commit();
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
@@ -203,18 +193,11 @@ public final class DatabaseLandService implements LandService {
     }
 
     private Land toModel(LandEntity land) {
-        MappingContext mappingContext = MappingContext.create();
-//        mappingContext.setMappingStrategy(LandMappingStrategy.create());
-        mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
-        return (Land) mappingContext.doMapping(land);
+        return LandMapper.toModel(land);
     }
 
     private HomePositionEntity toEntity(HomePosition homePosition) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(HomePositionMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (HomePositionEntity) mappingContext.doMapping(homePosition);
+        return HomePositionMapper.toEntity(homePosition);
     }
 
     private HomePositionEntity toHomePositionEntity(HomePosition homePosition) {
@@ -226,7 +209,6 @@ public final class DatabaseLandService implements LandService {
                 homePosition.getPosZ(),
                 homePosition.getYaw(),
                 homePosition.getPitch());
-
     }
 
     private void removeFlagsFromLand(Land land) {

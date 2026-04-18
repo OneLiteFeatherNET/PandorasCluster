@@ -2,15 +2,13 @@ package net.onelitefeather.pandorascluster.database.service;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
-import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandPlayerService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
-import net.onelitefeather.pandorascluster.database.mapper.player.LandMemberMappingStrategy;
-import net.onelitefeather.pandorascluster.database.mapper.player.LandPlayerMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.player.LandMemberMapper;
+import net.onelitefeather.pandorascluster.database.mapper.player.LandPlayerMapper;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import org.hibernate.HibernateException;
@@ -169,23 +167,14 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
     }
 
     private LandPlayer toModel(@NotNull LandPlayerEntity entity) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandPlayerMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
-        return (LandPlayer) mappingContext.doMapping(entity);
+        return LandPlayerMapper.toModel(entity);
     }
 
     private LandPlayerEntity toEntity(@NotNull LandPlayer player) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandPlayerMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (LandPlayerEntity) mappingContext.doMapping(player);
+        return LandPlayerMapper.toEntity(player);
     }
 
     private LandMemberEntity toEntity(@NotNull LandMember member) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandMemberMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (LandMemberEntity) mappingContext.doMapping(member);
+        return LandMemberMapper.toEntity(member);
     }
 }

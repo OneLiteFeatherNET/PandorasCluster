@@ -3,7 +3,6 @@ package net.onelitefeather.pandorascluster.api.land;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.util.PlayerUtil;
 
@@ -15,7 +14,7 @@ public record LandArea(Long id,
                        Long landId,
                        String name,
                        List<ClaimedChunk> chunks,
-                       List<LandMember> members) implements PandorasModel {
+                       List<LandMember> members) {
 
     public LandArea {
         chunks = List.copyOf(chunks);

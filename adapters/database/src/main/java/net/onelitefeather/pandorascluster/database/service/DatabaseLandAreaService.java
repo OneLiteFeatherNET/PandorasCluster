@@ -3,13 +3,11 @@ package net.onelitefeather.pandorascluster.database.service;
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
-import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
-import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMappingStrategy;
-import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMapper;
+import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import org.hibernate.Hibernate;
@@ -133,23 +131,14 @@ public final class DatabaseLandAreaService implements LandAreaService {
     }
 
     public ClaimedChunkEntity toEntity(ClaimedChunk chunk) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (ClaimedChunkEntity) mappingContext.doMapping(chunk);
+        return ClaimedChunkMapper.toEntity(chunk);
     }
 
     public ClaimedChunk toModel(ClaimedChunkEntity chunk) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
-        return (ClaimedChunk) mappingContext.doMapping(chunk);
+        return ClaimedChunkMapper.toModel(chunk);
     }
 
     public LandArea toModel(LandAreaEntity landArea) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandAreaMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.ENTITY_TO_MODEL);
-        return (LandArea) mappingContext.doMapping(landArea);
+        return LandAreaMapper.toModel(landArea);
     }
 }

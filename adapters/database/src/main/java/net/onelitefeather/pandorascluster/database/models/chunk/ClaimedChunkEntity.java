@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.chunk;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 
 import java.util.Objects;
@@ -14,7 +13,7 @@ import java.util.Objects;
                 columnNames = {"landArea_id", "chunk_index"}
         )
 )
-public final class ClaimedChunkEntity implements PandorasModel {
+public final class ClaimedChunkEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

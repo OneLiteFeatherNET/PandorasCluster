@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.land;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity;
 import net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity;
@@ -14,7 +13,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "lands")
-public final class LandEntity implements PandorasModel {
+public final class LandEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

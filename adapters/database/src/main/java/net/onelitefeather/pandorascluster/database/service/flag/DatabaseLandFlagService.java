@@ -8,12 +8,10 @@ import net.onelitefeather.pandorascluster.api.flag.types.RoleFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
-import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
-import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandFlagService;
 import net.onelitefeather.pandorascluster.api.util.Constants;
-import net.onelitefeather.pandorascluster.database.mapper.flag.FlagContainerMappingStrategy;
+import net.onelitefeather.pandorascluster.database.mapper.flag.FlagContainerMapper;
 import net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity;
 import net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity;
@@ -205,9 +203,6 @@ public final class DatabaseLandFlagService implements LandFlagService {
     }
 
     private FlagContainerEntity getFlagContainer(FlagContainer flagContainer) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(FlagContainerMappingStrategy.create());
-        mappingContext.setMappingType(MapperStrategy.MapperType.MODEL_TO_ENTITY);
-        return (FlagContainerEntity) mappingContext.doMapping(flagContainer);
+        return FlagContainerMapper.toEntity(flagContainer);
     }
 }

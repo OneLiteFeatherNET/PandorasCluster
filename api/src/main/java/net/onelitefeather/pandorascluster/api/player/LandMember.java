@@ -1,9 +1,8 @@
 package net.onelitefeather.pandorascluster.api.player;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 
-public record LandMember(Long id, LandPlayer member, LandRole role) implements PandorasModel {
+public record LandMember(Long id, LandPlayer member, LandRole role) {
 
     public Long getId() {
         return id;

@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.api.position;
 
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
 import net.onelitefeather.pandorascluster.api.util.NumberUtil;
 
 public record HomePosition(Long id,
@@ -9,7 +8,7 @@ public record HomePosition(Long id,
                            Double posY,
                            Double posZ,
                            Float yaw,
-                           Float pitch) implements PandorasModel {
+                           Float pitch) {
 
     public Long getId() {
         return id;
