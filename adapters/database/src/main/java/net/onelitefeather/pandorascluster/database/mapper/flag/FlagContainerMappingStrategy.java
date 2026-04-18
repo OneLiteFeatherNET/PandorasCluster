@@ -57,7 +57,7 @@ public final class FlagContainerMappingStrategy implements MapperStrategy {
                     .map(flag -> (LandEntityCapFlag) capCtx.doMapping(flag))
                     .toList();
 
-            return new FlagContainer(flagContainer.id(), null, naturalFlags, roleFlags, entityCapFlags);
+            return new FlagContainer(flagContainer.id(), naturalFlags, roleFlags, entityCapFlags);
         };
     }
 
