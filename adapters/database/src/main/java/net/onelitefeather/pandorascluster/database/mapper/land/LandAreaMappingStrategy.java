@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.mapper.land;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
-import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.mapper.MapperStrategy;
 import net.onelitefeather.pandorascluster.api.mapper.MappingContext;
@@ -14,7 +13,6 @@ import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 import net.onelitefeather.pandorascluster.dto.chunk.ClaimedChunkDto;
-import net.onelitefeather.pandorascluster.dto.land.LandDto;
 import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 
 import java.util.List;
@@ -35,7 +33,13 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
         return entity -> {
             if (entity == null) return null;
             if (!(entity instanceof LandAreaEntity landArea)) return null;
-            return new LandArea(landArea.id(), landArea.name(), getChunks(landArea.chunks()), getMembers(landArea.members()), null);
+            Long landId = landArea.land() instanceof LandEntity landEntity ? landEntity.id() : null;
+            return new LandArea(
+                    landArea.id(),
+                    landId,
+                    landArea.name(),
+                    getChunks(landArea.chunks()),
+                    getMembers(landArea.members()));
         };
     }
 
@@ -45,8 +49,6 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
             if (model == null) return null;
             if (!(model instanceof LandArea landArea)) return null;
 
-            Land land = landArea.getLand();
-            if (land == null) return null;
             return new LandAreaEntity(
                     landArea.getId(),
                     landArea.getName(),
@@ -54,13 +56,6 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
                     getChunkEntities(landArea.getChunks()),
                     null);
         };
-    }
-
-    private Land getLand(LandDto land) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandMappingStrategy.create());
-        mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
-        return (Land) mappingContext.doMapping(land);
     }
 
     private List<ClaimedChunk> getChunks(List<ClaimedChunkDto> chunks) {
@@ -75,13 +70,6 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
         mappingContext.setMappingStrategy(LandMemberMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
         return members.stream().map(chunk -> (LandMember) mappingContext.doMapping(chunk)).toList();
-    }
-
-    private LandEntity getLandEntity(Land land) {
-        MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(LandMappingStrategy.create());
-        mappingContext.setMappingType(MapperType.MODEL_TO_ENTITY);
-        return (LandEntity) mappingContext.doMapping(land);
     }
 
     private List<LandMemberEntity> getMemberEntities(List<LandMember> members) {

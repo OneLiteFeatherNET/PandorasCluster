@@ -14,30 +14,29 @@ import java.util.function.Predicate;
 public final class LandArea implements PandorasModel {
 
     private final Long id;
-    private String name;
-
+    private final Long landId;
+    private final String name;
     private final List<ClaimedChunk> chunks;
     private final List<LandMember> members;
-    private Land land;
 
     public LandArea(Long id,
+                    Long landId,
                     String name,
                     List<ClaimedChunk> chunks,
-                    List<LandMember> members,
-                    Land land) {
+                    List<LandMember> members) {
         this.id = id;
+        this.landId = landId;
         this.name = name;
         this.chunks = chunks;
         this.members = members;
-        this.land = land;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Long getLandId() {
+        return landId;
     }
 
     public String getName() {
@@ -52,16 +51,7 @@ public final class LandArea implements PandorasModel {
         return members;
     }
 
-    public LandArea setLand(Land land) {
-        this.land = land;
-        return this;
-    }
-
-    public Land getLand() {
-        return land;
-    }
-
-    public boolean hasMemberAccess(UUID uuid, RoleFlag flag) {
+    public boolean hasMemberAccess(UUID uuid, RoleFlag flag, Land land) {
         if (land.isOwner(uuid)) return true;
 
         var hasVisitorAccess = hasVisitorAccess(flag);
@@ -69,7 +59,7 @@ public final class LandArea implements PandorasModel {
         if (member == null) return hasVisitorAccess;
 
         var access = member.getRole().getPriority() >= flag.getRole().getPriority();
-        var hasMemberRoleAccess = member.getRole() == LandRole.MEMBER && access && !isAdminOnline();
+        var hasMemberRoleAccess = member.getRole() == LandRole.MEMBER && access && !isAdminOnline(land);
         if (hasMemberRoleAccess) return false;
         if (access) return true;
         return PlayerUtil.Instances.instance.hasPermission(uuid, flag.getWildernessPermission());
@@ -85,7 +75,7 @@ public final class LandArea implements PandorasModel {
         return member.getRole() == LandRole.BANNED;
     }
 
-    public boolean isAdmin(UUID uuid) {
+    public boolean isAdmin(UUID uuid, Land land) {
         if (land.isOwner(uuid)) return true;
         var member = getMember(uuid);
         if (member == null) return false;
@@ -104,13 +94,11 @@ public final class LandArea implements PandorasModel {
         return members.stream().filter(landMember -> landMember.getMember().getUniqueId().equals(uuid)).findFirst().orElse(null);
     }
 
-    private boolean isAdmin(LandMember landMember) {
-        return isAdmin(landMember.getMember().getUniqueId());
-    }
-
-    private boolean isAdminOnline() {
+    private boolean isAdminOnline(Land land) {
         if (PlayerUtil.Instances.instance.isOnline(land.getOwner().getUniqueId())) return true;
         Predicate<LandMember> isAdminOnline = landMember -> PlayerUtil.Instances.instance.isOnline(landMember.getMember().getUniqueId());
-        return members.stream().filter(isAdminOnline).anyMatch(this::isAdmin);
+        return members.stream()
+                .filter(isAdminOnline)
+                .anyMatch(landMember -> isAdmin(landMember.getMember().getUniqueId(), land));
     }
 }

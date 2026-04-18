@@ -24,7 +24,7 @@ public final class Land implements PandorasModel {
                 FlagContainer flagContainer) {
         this.id = id;
         this.owner = owner;
-        this.areas = areas.stream().map(landArea -> landArea.setLand(this)).toList();
+        this.areas = List.copyOf(areas);
         this.home = home;
         this.flagContainer = flagContainer;
     }

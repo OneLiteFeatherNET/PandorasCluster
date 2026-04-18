@@ -41,7 +41,13 @@ public class LandCommand {
             return;
         }
 
-        var land = landArea.getLand();
+        var landId = landArea.getLandId();
+        if (landId == null) {
+            player.sendMessage("You're not on a Land!");
+            return;
+        }
+
+        var land = this.pandorasCluster.getLandService().getLand(landId);
         if (land == null) {
             player.sendMessage("You're not on a Land!");
             return;
