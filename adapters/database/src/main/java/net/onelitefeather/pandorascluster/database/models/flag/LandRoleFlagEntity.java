@@ -7,25 +7,34 @@ import net.onelitefeather.pandorascluster.dto.flag.RoleFlagDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 @Entity
-@Table(name = "role_flags")
+@Table(
+        name = "role_flags",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_role_flags_container_name",
+                columnNames = {"flagContainer_id", "name"}
+        )
+)
 public final class LandRoleFlagEntity implements RoleFlagDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "name", length = 64, nullable = false)
     private String name;
 
-    @Column
+    @Column(name = "state", nullable = false)
     private boolean state;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 32, nullable = false)
     private LandRole role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "flagContainer_id")
+    @JoinColumn(name = "flagContainer_id", nullable = false)
     private FlagContainerEntity flagContainer;
 
     public LandRoleFlagEntity() {
@@ -65,4 +74,16 @@ public final class LandRoleFlagEntity implements RoleFlagDto {
         return this.flagContainer;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LandRoleFlagEntity that)) return false;
+        if (id == null || that.id == null) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : Objects.hashCode(id);
+    }
 }

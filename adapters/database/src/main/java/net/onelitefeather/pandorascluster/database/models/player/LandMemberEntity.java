@@ -19,7 +19,8 @@ public final class LandMemberEntity implements LandMemberDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private LandPlayerEntity member;
 
     @Enumerated(EnumType.STRING)

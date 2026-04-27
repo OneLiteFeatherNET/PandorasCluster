@@ -18,6 +18,11 @@ import net.onelitefeather.pandorascluster.dto.land.LandDto;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Must be invoked while the Hibernate {@link org.hibernate.Session} that loaded the entity
+ * is still open — this strategy traverses {@code owner}, {@code home}, {@code flagContainer},
+ * and {@code areas}. Use {@code DatabaseLandService#getLands()} as the canonical JOIN FETCH pattern.
+ */
 public final class LandMappingStrategy implements MapperStrategy {
 
     @Override

@@ -20,6 +20,10 @@ import net.onelitefeather.pandorascluster.dto.player.LandMemberDto;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Must be invoked while the Hibernate {@link org.hibernate.Session} that loaded the entity
+ * is still open — this strategy traverses {@code members} and {@code chunks} lazy collections.
+ */
 public final class LandAreaMappingStrategy implements MapperStrategy {
 
     public static LandAreaMappingStrategy create() {
@@ -61,7 +65,7 @@ public final class LandAreaMappingStrategy implements MapperStrategy {
 
     private List<ClaimedChunk> getChunks(List<ClaimedChunkDto> chunks) {
         MappingContext mappingContext = MappingContext.create();
-        mappingContext.setMappingStrategy(create());
+        mappingContext.setMappingStrategy(ClaimedChunkMappingStrategy.create());
         mappingContext.setMappingType(MapperType.ENTITY_TO_MODEL);
         return chunks.stream().map(chunk -> (ClaimedChunk) mappingContext.doMapping(chunk)).toList();
     }
