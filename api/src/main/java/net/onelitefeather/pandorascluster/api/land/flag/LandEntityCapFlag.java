@@ -7,22 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public record LandEntityCapFlag(Long id, String name, int spawnLimit, FlagContainer parent) implements LandFlag {
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSpawnLimit() {
-        return spawnLimit;
-    }
-
-    public FlagContainer getParent() {
-        return parent;
-    }
-
     @Nullable
     public EntityCapFlag getFlag() {
         return FlagRegistry.entityCapFlagOf(this.name);

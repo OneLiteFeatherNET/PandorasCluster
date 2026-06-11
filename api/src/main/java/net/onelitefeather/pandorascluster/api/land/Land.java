@@ -11,34 +11,11 @@ public record Land(Long id,
                    LandPlayer owner,
                    HomePosition home,
                    List<LandArea> areas,
-                   FlagContainer flagContainer) {
+                   FlagContainer flagContainer,
+                   LandWorld world) {
 
     public Land {
         areas = List.copyOf(areas);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LandPlayer getOwner() {
-        return owner;
-    }
-
-    public HomePosition getHome() {
-        return home;
-    }
-
-    public List<LandArea> getAreas() {
-        return areas;
-    }
-
-    public FlagContainer getFlagContainer() {
-        return flagContainer;
-    }
-
-    public String getWorld() {
-        return this.home.getWorld();
     }
 
     public LandArea getDefaultArea() {
@@ -46,6 +23,6 @@ public record Land(Long id,
     }
 
     public boolean isOwner(UUID uuid) {
-        return owner.getUniqueId().equals(uuid);
+        return owner.uniqueId().equals(uuid);
     }
 }
