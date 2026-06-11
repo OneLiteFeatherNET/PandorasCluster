@@ -29,8 +29,10 @@
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.WorldNaturalFlagEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.land.LandEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.land.LandWorldEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity" />
         <mapping class="net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity" />
