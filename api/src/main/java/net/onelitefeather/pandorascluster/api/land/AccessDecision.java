@@ -1,6 +1,5 @@
 package net.onelitefeather.pandorascluster.api.land;
 
-import net.onelitefeather.pandorascluster.api.enums.LandRole;
 
 /**
  * Discriminated union describing the outcome of a land-access check. Every
