@@ -4,6 +4,8 @@ import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -25,20 +27,28 @@ public record FlagContainer(Long id,
         entityCapFlags = List.copyOf(entityCapFlags);
     }
 
-    public Long getId() {
-        return id;
+    @Nullable
+    public LandRoleFlag getRoleFlag(String name) {
+        return roleFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public List<LandNaturalFlag> getNaturalFlags() {
-        return naturalFlags;
+    @Nullable
+    public LandNaturalFlag getNaturalFlag(String name) {
+        return naturalFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public List<LandRoleFlag> getRoleFlags() {
-        return roleFlags;
-    }
-
-    public List<LandEntityCapFlag> getEntityCapFlags() {
-        return entityCapFlags;
+    @Nullable
+    public LandEntityCapFlag getEntityCapFlag(String name) {
+        return entityCapFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -49,7 +59,11 @@ public record FlagContainer(Long id,
     public List<LandFlag> getAllFlags() {
         return Stream.of(naturalFlags, roleFlags, entityCapFlags)
                 .flatMap(List::stream)
-                .map(flag -> (LandFlag) flag)
+                .map(LandFlag.class::cast)
                 .toList();
+    }
+
+    public boolean hasFlag(@NotNull LandFlag landFlag) {
+        return getAllFlags().stream().anyMatch(flag -> flag.name().equalsIgnoreCase(landFlag.name()));
     }
 }
