@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.service;
+package net.onelitefeather.pandorascluster.api.service.result;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 

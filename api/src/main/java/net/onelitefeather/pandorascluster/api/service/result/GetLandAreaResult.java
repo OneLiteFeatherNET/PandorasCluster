@@ -1,6 +1,7 @@
-package net.onelitefeather.pandorascluster.api.service;
+package net.onelitefeather.pandorascluster.api.service.result;
 
 import net.onelitefeather.pandorascluster.api.land.LandArea;
+import net.onelitefeather.pandorascluster.api.service.LandAreaService;
 
 /**
  * Outcome of {@link LandAreaService#getLandArea}. Exhaustive switch keeps

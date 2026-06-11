@@ -1,6 +1,7 @@
-package net.onelitefeather.pandorascluster.api.service;
+package net.onelitefeather.pandorascluster.api.service.result;
 
 import net.onelitefeather.pandorascluster.api.land.Land;
+import net.onelitefeather.pandorascluster.api.service.LandService;
 
 /**
  * Outcome of {@link LandService#getLand(Long)}. Exhaustive switch forces
