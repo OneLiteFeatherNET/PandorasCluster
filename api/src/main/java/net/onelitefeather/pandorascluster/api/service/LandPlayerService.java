@@ -1,10 +1,13 @@
 package net.onelitefeather.pandorascluster.api.service;
 
 import net.onelitefeather.pandorascluster.api.enums.LandRole;
-import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
+import net.onelitefeather.pandorascluster.api.service.result.AddLandMemberResult;
+import net.onelitefeather.pandorascluster.api.service.result.CreateLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.DeleteLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.RemoveLandMemberResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,14 +21,14 @@ public interface LandPlayerService {
      * @param member the member to add
      * @param landRole the land role
      */
-    void addLandMember(@NotNull LandArea landArea, @NotNull LandPlayer member, @Nullable LandRole landRole);
+    AddLandMemberResult addLandMember(@NotNull LandArea landArea, @NotNull LandPlayer member, @Nullable LandRole landRole);
 
     void updateLandMember(@NotNull LandArea landArea, @NotNull LandMember member);
 
     /**
      * @param member the member to remove
      */
-    void removeLandMember(@NotNull LandMember member);
+    RemoveLandMemberResult removeLandMember(@NotNull LandMember member);
 
     @NotNull
     List<LandPlayer> getLandPlayers();
@@ -34,12 +37,12 @@ public interface LandPlayerService {
      * @param uuid the uuid of the player.
      * @param name the name of the player.
      */
-    boolean createPlayer(@NotNull UUID uuid, @NotNull String name);
+    CreateLandPlayerResult createPlayer(@NotNull UUID uuid, @NotNull String name);
 
     /**
      * @param uuid the uuid of the player.
      */
-    void deletePlayer(@NotNull UUID uuid);
+    DeleteLandPlayerResult deletePlayer(@NotNull UUID uuid);
 
     @Nullable
     LandPlayer getLandPlayer(@NotNull UUID uuid);
