@@ -47,7 +47,13 @@ public final class DatabaseLandService implements LandService {
     @Override
     public @NotNull List<Land> getLands() {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
-            var query = session.createQuery("SELECT l FROM LandEntity l", LandEntity.class);
+            var query = session.createQuery(
+                    "SELECT DISTINCT l FROM LandEntity l " +
+                            "LEFT JOIN FETCH l.owner " +
+                            "LEFT JOIN FETCH l.home " +
+                            "LEFT JOIN FETCH l.flagContainerEntity " +
+                            "LEFT JOIN FETCH l.areas",
+                    LandEntity.class);
             var lands = query.list();
             return lands.stream().map(this::toModel).toList();
         } catch (HibernateException e) {
@@ -120,23 +126,28 @@ public final class DatabaseLandService implements LandService {
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            var flagContainerEntity = new FlagContainerEntity(null, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
-            var landEntity = new LandEntity(null,
-                    new LandPlayerEntity(owner.getId(), owner.getUniqueId().toString(), owner.getName()),
-                    toHomePositionEntity(home),
-                    Collections.emptyList(),
-                    flagContainerEntity);
+            // Persist in FK-dependency order: home and flag container first (no outgoing
+            // non-null FKs), then the land (needs owner, home, flag_container), then the
+            // area and its first chunk.
+            var homeEntity = toHomePositionEntity(home);
+            session.persist(homeEntity);
 
-            session.persist(flagContainerEntity.withLand(landEntity));
+            var flagContainerEntity = new FlagContainerEntity(null, null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            session.persist(flagContainerEntity);
+
+            var ownerRef = session.getReference(LandPlayerEntity.class, owner.getId());
+            var landEntity = new LandEntity(null, ownerRef, homeEntity, Collections.emptyList(), flagContainerEntity);
             session.persist(landEntity);
-            session.persist(landEntity.home());
+
+            var landAreaEntity = new LandAreaEntity(null, "default", Collections.emptyList(), Collections.emptyList(), landEntity);
+            session.persist(landAreaEntity);
+
+            var claimedChunkEntity = new ClaimedChunkEntity(null, chunk.getChunkIndex(), landAreaEntity);
+            session.persist(claimedChunkEntity);
 
             transaction.commit();
-            var land = new Land(landEntity.id(), owner, home, Collections.emptyList(), FlagContainer.EMPTY);
 
-            addLandArea(land, "default", List.of(chunk));
-
-            return land;
+            return new Land(landEntity.id(), owner, home, Collections.emptyList(), FlagContainer.EMPTY);
         } catch (HibernateException e) {
             Constants.LOGGER.log(Level.SEVERE, "Cannot create land!", e);
             if (transaction != null) transaction.rollback();
@@ -147,19 +158,23 @@ public final class DatabaseLandService implements LandService {
 
     @Override
     public void unclaimLand(@NotNull Land land) {
+        removeFlagsFromLand(land);
+        land.getAreas().forEach(this.landAreaService::unclaimArea);
 
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            removeFlagsFromLand(land);
-            land.getAreas().forEach(this.landAreaService::unclaimArea);
-
-            session.remove(land);
-            session.remove(toEntity(land.getHome()));
+            LandEntity landEntity = session.byId(LandEntity.class).load(land.getId());
+            if (landEntity != null) {
+                HomePositionEntity homeEntity = (HomePositionEntity) landEntity.home();
+                session.remove(landEntity);
+                if (homeEntity != null) session.remove(homeEntity);
+            }
             transaction.commit();
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
+            Constants.LOGGER.log(Level.SEVERE, "Cannot unclaim land.", e);
         }
     }
 

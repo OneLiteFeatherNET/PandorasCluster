@@ -20,6 +20,7 @@ dependencies {
 
     testImplementation(project(":adapters:database"))
     testImplementation(project(":api"))
+    testImplementation(libs.h2)
 
     testImplementation(platform(libs.junitBom))
     testImplementation(libs.junitApi)

@@ -20,7 +20,6 @@ import net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEn
 import net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,8 +39,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     public void addRoleFlag(@NotNull RoleFlag roleFlag, FlagContainer flagContainer) {
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
 
@@ -58,8 +56,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void updateRoleFlag(@NotNull LandRoleFlag roleFlag) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.merge(getRoleFlagEntity(roleFlag));
@@ -74,8 +71,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void removeRoleFlag(@NotNull LandRoleFlag roleFlag, @NotNull FlagContainer flagContainer) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
 
@@ -93,8 +89,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     public void addNaturalFlag(@NotNull NaturalFlag naturalFlag, FlagContainer flagContainer) {
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
 
@@ -111,8 +106,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void updateNaturalCapFlag(@NotNull LandNaturalFlag naturalFlag) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.merge(getNaturalFlagEntity(naturalFlag));
@@ -127,8 +121,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void removeNaturalFlag(@NotNull LandNaturalFlag naturalFlag, @NotNull FlagContainer flagContainer) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
             flagContainer.removeNaturalFlag(naturalFlag);
@@ -145,8 +138,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     public void addEntityCapFlag(@NotNull EntityCapFlag entityCapFlag, FlagContainer flagContainer) {
         Transaction transaction = null;
 
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
 
@@ -163,8 +155,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void updateEntityCapFlag(@NotNull LandEntityCapFlag entityCapFlag) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
 
             transaction = session.beginTransaction();
             session.merge(getEntityCapFlagEntity(entityCapFlag));
@@ -179,8 +170,7 @@ public final class DatabaseLandFlagService implements LandFlagService {
     @Override
     public void removeEntityCapFlag(@NotNull LandEntityCapFlag entityCapFlag, @NotNull FlagContainer flagContainer) {
         Transaction transaction = null;
-        try (SessionFactory factory = this.databaseService.sessionFactory();
-             Session session = factory.openSession()) {
+        try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
             flagContainer.removeEntityCapFlag(entityCapFlag);
