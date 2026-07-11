@@ -1,6 +1,7 @@
 package net.onelitefeather.pandorascluster.database.mapper;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
+import net.onelitefeather.pandorascluster.database.mapper.land.LandAreaMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 
 public final class ClaimedChunkMapper {
@@ -15,6 +16,6 @@ public final class ClaimedChunkMapper {
 
     public static ClaimedChunkEntity toEntity(ClaimedChunk model) {
         if (model == null) return null;
-        return new ClaimedChunkEntity(model.getId(), model.getChunkIndex(), null);
+        return new ClaimedChunkEntity(model.id(), model.chunkIndex(),null);
     }
 }
