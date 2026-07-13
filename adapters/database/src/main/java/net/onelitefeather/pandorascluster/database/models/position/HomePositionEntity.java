@@ -15,22 +15,22 @@ public final class HomePositionEntity implements HomePositionDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "world", length = 64, nullable = false)
     private String world;
 
-    @Column
+    @Column(name = "pos_x", nullable = false)
     private Double posX;
 
-    @Column
+    @Column(name = "pos_y", nullable = false)
     private Double posY;
 
-    @Column
+    @Column(name = "pos_z", nullable = false)
     private Double posZ;
 
-    @Column
+    @Column(name = "yaw", nullable = false)
     private Float yaw;
 
-    @Column
+    @Column(name = "pitch", nullable = false)
     private Float pitch;
 
     public HomePositionEntity() {

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "lands")
@@ -24,15 +25,18 @@ public final class LandEntity implements LandDto {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
     private LandPlayerEntity owner;
 
     @ManyToOne
+    @JoinColumn(name = "home_id", nullable = false)
     private HomePositionEntity home;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
     private List<LandAreaEntity> areas;
 
     @OneToOne
+    @JoinColumn(name = "flag_container_id", nullable = false)
     private FlagContainerEntity flagContainerEntity;
 
     public LandEntity() {
@@ -74,5 +78,18 @@ public final class LandEntity implements LandDto {
     @Override
     public FlagContainerDto flagContainer() {
         return this.flagContainerEntity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LandEntity that)) return false;
+        if (id == null || that.id == null) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : Objects.hashCode(id);
     }
 }

@@ -23,6 +23,16 @@
         <!-- Disable the second-level cache  -->
         <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
 
-        <!-- Drop and re-create the database schema on startup -->
+        <!-- Mapping files or annotated classes -->
+        <mapping class="net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.FlagContainerEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandEntityCapFlagEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandNaturalFlagEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.flag.LandRoleFlagEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.land.LandEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.player.LandPlayerEntity" />
+        <mapping class="net.onelitefeather.pandorascluster.database.models.position.HomePositionEntity" />
     </session-factory>
 </hibernate-configuration>

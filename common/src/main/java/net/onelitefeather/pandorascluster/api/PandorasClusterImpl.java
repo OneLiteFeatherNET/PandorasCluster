@@ -1,13 +1,10 @@
 package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.service.*;
-import net.onelitefeather.pandorascluster.api.util.Constants;
 import net.onelitefeather.pandorascluster.database.service.*;
 import net.onelitefeather.pandorascluster.database.service.flag.DatabaseLandFlagService;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
-
-import java.util.logging.Level;
 
 public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
 
@@ -25,12 +22,10 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
                 var sessionFactory = new Configuration().configure().configure("connection.cfg.xml").buildSessionFactory();
                 this.databaseService = new DatabaseServiceImpl(sessionFactory);
             } catch (HibernateException e) {
-                this.databaseService = null;
-                Constants.LOGGER.log(Level.SEVERE, "Cannot build session factory.", e);
+                throw new IllegalStateException("Failed to build Hibernate SessionFactory — plugin cannot start", e);
             }
         });
 
-        if (databaseService == null) return;
         this.landPlayerService = new DatabaseLandPlayerService(databaseService);
         this.landFlagService = new DatabaseLandFlagService(this);
         this.landAreaService = new DatabaseLandAreaService(this, databaseService);

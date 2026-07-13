@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.run.paper)
     alias(libs.plugins.plugin.yml)
     alias(libs.plugins.shadow)
-    alias(libs.plugins.liquibase)
     `maven-publish`
 }
 
