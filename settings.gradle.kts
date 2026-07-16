@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             version("gson", "2.14.0")
 
              // Testing
-            version("junit", "6.1.1")
+            version("junit", "6.1.2")
 
             // Paper Dependencies
             version("paper", "1.21.8-R0.1-SNAPSHOT")
