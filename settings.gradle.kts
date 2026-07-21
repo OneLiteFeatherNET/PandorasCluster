@@ -33,7 +33,7 @@ dependencyResolutionManagement {
             version("paper", "1.21.8-R0.1-SNAPSHOT")
             version("adventure-api", "4.26.1")
             version("cloud", "2.0.0")
-            version("cloudAnnotations", "2.0.0")
+            version("cloudAnnotations", "2.1.0")
             version("adventure-platform-bukkit", "4.4.1")
             version("fawe", "2.15.3")
             version("worldguard", "7.1.0-SNAPSHOT")
