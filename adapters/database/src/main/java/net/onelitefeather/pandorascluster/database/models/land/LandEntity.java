@@ -30,6 +30,10 @@ public final class LandEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "land")
     private List<LandAreaEntity> areas;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "world_id", nullable = false)
+    private LandWorldEntity worldEntity;
+
     @OneToOne
     @JoinColumn(name = "flag_container_id", nullable = false)
     private FlagContainerEntity flagContainerEntity;
@@ -42,11 +46,13 @@ public final class LandEntity {
                       LandPlayerEntity owner,
                       HomePositionEntity home,
                       List<LandAreaEntity> areas,
+                      LandWorldEntity worldEntity,
                       FlagContainerEntity flagContainerEntity) {
         this.id = id;
         this.owner = owner;
         this.home = home;
         this.areas = areas;
+        this.worldEntity = worldEntity;
         this.flagContainerEntity = flagContainerEntity;
     }
 
@@ -65,6 +71,8 @@ public final class LandEntity {
     public @NotNull List<LandAreaEntity> areas() {
         return Collections.unmodifiableList(areas);
     }
+
+    public LandWorldEntity world() {return this.worldEntity; }
 
     public FlagContainerEntity flagContainer() {
         return this.flagContainerEntity;

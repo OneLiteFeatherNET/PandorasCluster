@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.position;
 
 import jakarta.persistence.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -13,9 +12,6 @@ public final class HomePositionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "world", length = 64, nullable = false)
-    private String world;
 
     @Column(name = "pos_x", nullable = false)
     private Double posX;
@@ -36,9 +32,8 @@ public final class HomePositionEntity {
         // Empty constructor for Hibernate
     }
 
-    public HomePositionEntity(Long id, String world, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
+    public HomePositionEntity(Long id, Double posX, Double posY, Double posZ, Float yaw, Float pitch) {
         this.id = id;
-        this.world = world;
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
@@ -48,10 +43,6 @@ public final class HomePositionEntity {
 
     public @Nullable Long id() {
         return id;
-    }
-
-    public @NotNull String world() {
-        return world;
     }
 
     public double posX() {
@@ -80,7 +71,6 @@ public final class HomePositionEntity {
         if (!(o instanceof HomePositionEntity that)) return false;
 
         return Objects.equals(id, that.id) &&
-                Objects.equals(world, that.world) &&
                 Objects.equals(posX, that.posX) &&
                 Objects.equals(posY, that.posY) &&
                 Objects.equals(posZ, that.posZ) &&
@@ -91,7 +81,6 @@ public final class HomePositionEntity {
     @Override
     public int hashCode() {
         int result = Objects.hashCode(id);
-        result = 31 * result + Objects.hashCode(world);
         result = 31 * result + Objects.hashCode(posX);
         result = 31 * result + Objects.hashCode(posY);
         result = 31 * result + Objects.hashCode(posZ);
