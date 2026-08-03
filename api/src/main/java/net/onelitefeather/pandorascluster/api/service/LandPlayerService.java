@@ -4,10 +4,10 @@ import net.onelitefeather.pandorascluster.api.enums.LandRole;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
 import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
-import net.onelitefeather.pandorascluster.api.service.result.AddLandMemberResult;
-import net.onelitefeather.pandorascluster.api.service.result.CreateLandPlayerResult;
-import net.onelitefeather.pandorascluster.api.service.result.DeleteLandPlayerResult;
-import net.onelitefeather.pandorascluster.api.service.result.RemoveLandMemberResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.AddLandMemberResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.CreateLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.DeleteLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.RemoveLandMemberResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

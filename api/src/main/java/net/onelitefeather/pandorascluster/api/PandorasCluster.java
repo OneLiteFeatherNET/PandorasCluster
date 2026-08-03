@@ -2,13 +2,12 @@ package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
-import net.onelitefeather.pandorascluster.api.land.Land;
-import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.land.LandWorld;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.*;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetLandResult;
+import net.onelitefeather.pandorascluster.api.service.result.world.GetLandWorldResult;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface PandorasCluster {
@@ -25,17 +24,17 @@ public interface PandorasCluster {
 
     LandAreaService getLandAreaService();
 
-    Optional<LandArea> getLandArea(long chunkKey);
+    GetLandAreaResult getLandArea(long chunkKey);
 
-    Optional<LandArea> getLandArea(ClaimedChunk chunk);
+    GetLandAreaResult getLandArea(ClaimedChunk chunk);
 
-    Optional<Land> getLand(UUID playerId, int landId);
+    GetLandResult getLand(UUID playerId, int landId);
 
-    Optional<Land> getLand(UUID playerId);
+    GetLandResult getLand(UUID playerId);
 
-    Optional<Land> getLand(LandPlayer landPlayer);
+    GetLandResult getLand(LandPlayer landPlayer);
 
-    Optional<LandWorld> getLandWorld(UUID worldId);
+    GetLandWorldResult getLandWorld(UUID worldId);
 
     FlagRegistry getFlagRegistry();
 }

@@ -3,10 +3,10 @@ package net.onelitefeather.pandorascluster.api.service;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.service.result.CreateLandAreaResult;
-import net.onelitefeather.pandorascluster.api.service.result.DeleteLandAreaResult;
-import net.onelitefeather.pandorascluster.api.service.result.GetClaimedChunkResult;
-import net.onelitefeather.pandorascluster.api.service.result.GetLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.CreateLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.DeleteLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetClaimedChunkResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

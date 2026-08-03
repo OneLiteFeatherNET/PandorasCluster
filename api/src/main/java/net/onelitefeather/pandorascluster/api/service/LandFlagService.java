@@ -4,8 +4,8 @@ import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
 import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
-import net.onelitefeather.pandorascluster.api.service.result.AddLandFlagResult;
-import net.onelitefeather.pandorascluster.api.service.result.RemoveLandFlagResult;
+import net.onelitefeather.pandorascluster.api.service.result.flag.AddLandFlagResult;
+import net.onelitefeather.pandorascluster.api.service.result.flag.RemoveLandFlagResult;
 import org.jetbrains.annotations.NotNull;
 
 public interface LandFlagService {
@@ -28,7 +28,7 @@ public interface LandFlagService {
     /**
      * @param naturalFlag the flag to update
      */
-    void updateNaturalCapFlag(@NotNull LandNaturalFlag naturalFlag);
+    void updateNaturalFlag(@NotNull LandNaturalFlag naturalFlag);
 
     /**
      * @param naturalFlag the flag to remove from the land.
