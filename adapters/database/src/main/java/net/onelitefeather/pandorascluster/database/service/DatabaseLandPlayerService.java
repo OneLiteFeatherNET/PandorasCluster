@@ -6,6 +6,10 @@ import net.onelitefeather.pandorascluster.api.player.LandMember;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import net.onelitefeather.pandorascluster.api.service.LandPlayerService;
+import net.onelitefeather.pandorascluster.api.service.result.player.AddLandMemberResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.CreateLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.DeleteLandPlayerResult;
+import net.onelitefeather.pandorascluster.api.service.result.player.RemoveLandMemberResult;
 import net.onelitefeather.pandorascluster.api.util.Constants;
 import net.onelitefeather.pandorascluster.database.mapper.player.LandMemberMapper;
 import net.onelitefeather.pandorascluster.database.mapper.player.LandPlayerMapper;
@@ -22,35 +26,34 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public final class DatabaseLandPlayerService implements LandPlayerService {
-
-    private final DatabaseService databaseService;
-
-    public DatabaseLandPlayerService(DatabaseService databaseService) {
-        this.databaseService = databaseService;
-    }
+public record DatabaseLandPlayerService(DatabaseService databaseService) implements LandPlayerService {
 
     @Override
-    public void addLandMember(@NotNull LandArea landArea, @NotNull LandPlayer member, @Nullable LandRole landRole) {
+    public AddLandMemberResult addLandMember(@NotNull LandArea landArea, @NotNull LandPlayer member, @Nullable LandRole landRole) {
 
         LandRole role = landRole != null ? landRole : LandRole.VISITOR;
         var landMember = new LandMember(null, member, role);
         Transaction transaction = null;
 
+        if (landArea.getMember(member.uniqueId()) != null)
+            return new AddLandMemberResult.AlreadyAdded("Player is already a member of this land area.");
+
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.persist(toEntity(landMember));
             transaction.commit();
+            return new AddLandMemberResult.Added(landMember);
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            Constants.LOGGER.log(Level.SEVERE, "Cannot add land member %s with role %s".formatted(member.getName(), role), e);
+            Constants.LOGGER.log(Level.SEVERE, "Cannot add land member %s with role %s".formatted(member.name(), role), e);
+            return new AddLandMemberResult.Failed("Cannot add land member", e);
         }
     }
 
     @Override
     public void updateLandMember(@NotNull LandArea landArea, @NotNull LandMember member) {
 
-        var landMember = landArea.getMember(member.getMember().getUniqueId());
+        var landMember = landArea.getMember(member.member().uniqueId());
         if (landMember == null) return;
 
         Transaction transaction = null;
@@ -60,20 +63,22 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
             transaction.commit();
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            Constants.LOGGER.log(Level.SEVERE, "Cannot update land member %s".formatted(member.getMember().getName()), e);
+            Constants.LOGGER.log(Level.SEVERE, "Cannot update land member %s".formatted(member.member().name()), e);
         }
     }
 
     @Override
-    public void removeLandMember(@NotNull LandMember member) {
+    public RemoveLandMemberResult removeLandMember(@NotNull LandMember member) {
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.remove(toEntity(member));
             transaction.commit();
+            return new RemoveLandMemberResult.Removed(member);
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
-            Constants.LOGGER.log(Level.SEVERE, "Cannot remove land member %s".formatted(member.getMember().getName()), e);
+            Constants.LOGGER.log(Level.SEVERE, "Cannot remove land member %s".formatted(member.member().name()), e);
+            return new RemoveLandMemberResult.Failed("Cannot remove land member", e);
         }
     }
 
@@ -90,31 +95,28 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
     }
 
     @Override
-    public boolean createPlayer(@NotNull UUID uuid, @NotNull String name) {
-        if (playerExists(uuid)) return false;
-
+    public CreateLandPlayerResult createPlayer(@NotNull UUID uuid, @NotNull String name) {
+        if (getLandPlayer(uuid) != null)
+            return new CreateLandPlayerResult.AlreadyCreated("A land player with uuid %s already exists.".formatted(uuid.toString()));
         Transaction transaction = null;
-
         try (Session session = this.databaseService.sessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
             LandPlayerEntity landPlayerEntity = new LandPlayerEntity(null, uuid.toString(), name);
             session.persist(landPlayerEntity);
             transaction.commit();
+            return new CreateLandPlayerResult.Created(uuid, name);
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
             Constants.LOGGER.log(Level.SEVERE, "Cannot create land player with uuid %s and name %s".formatted(uuid.toString(), name), e);
-            return false;
+            return new CreateLandPlayerResult.Failed("Cannot create land player", e);
         }
-
-        return true;
     }
 
     @Override
-    public void deletePlayer(@NotNull UUID uuid) {
+    public DeleteLandPlayerResult deletePlayer(@NotNull UUID uuid) {
 
         var landPlayer = getLandPlayer(uuid);
-        if (landPlayer == null) return;
+        if (landPlayer == null) return new DeleteLandPlayerResult.NotFound();
 
         Transaction transaction = null;
 
@@ -123,10 +125,12 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
             transaction = session.beginTransaction();
             session.remove(toEntity(landPlayer));
             transaction.commit();
+            return new DeleteLandPlayerResult.Deleted(landPlayer);
         } catch (HibernateException e) {
             if (transaction != null) transaction.rollback();
             Constants.LOGGER.log(Level.SEVERE,
-                    "Cannot delete land player with uuid %s and name %s".formatted(uuid.toString(), landPlayer.getName()), e);
+                    "Cannot delete land player with uuid %s and name %s".formatted(uuid.toString(), landPlayer.name()), e);
+            return new DeleteLandPlayerResult.Failed("Cannot delete land player", e);
         }
     }
 
@@ -150,7 +154,7 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
 
     @Override
     public void updateLandPlayer(@NotNull LandPlayer landPlayer) {
-        if (!playerExists(landPlayer.getUniqueId())) return;
+        if (!playerExists(landPlayer.uniqueId())) return;
         Transaction transaction = null;
         try (Session session = this.databaseService.sessionFactory().openSession()) {
 
@@ -161,8 +165,8 @@ public final class DatabaseLandPlayerService implements LandPlayerService {
             if (transaction != null) transaction.rollback();
             Constants.LOGGER.log(Level.SEVERE,
                     "Cannot update land player with uuid %s and name %s".formatted(
-                            landPlayer.getUniqueId().toString(),
-                            landPlayer.getName()), e);
+                            landPlayer.uniqueId().toString(),
+                            landPlayer.name()), e);
         }
     }
 
