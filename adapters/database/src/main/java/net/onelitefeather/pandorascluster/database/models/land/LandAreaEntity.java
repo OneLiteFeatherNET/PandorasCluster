@@ -67,6 +67,10 @@ public final class LandAreaEntity {
         return this.land;
     }
 
+    public void setLand(LandEntity land) {
+        this.land = land;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
