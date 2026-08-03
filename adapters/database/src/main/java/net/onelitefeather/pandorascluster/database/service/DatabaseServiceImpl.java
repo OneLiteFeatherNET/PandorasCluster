@@ -4,17 +4,11 @@ import net.onelitefeather.pandorascluster.api.service.DatabaseService;
 import org.hibernate.SessionFactory;
 import org.jetbrains.annotations.NotNull;
 
-public final class DatabaseServiceImpl implements DatabaseService, ThreadHelper {
-
-    private final SessionFactory sessionFactory;
-
-    public DatabaseServiceImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+public record DatabaseServiceImpl(SessionFactory sessionFactory) implements DatabaseService, ThreadHelper {
 
     @Override
     public void shutdown() {
-        if(!this.sessionFactory.isOpen()) return;
+        if (!this.sessionFactory.isOpen()) return;
         this.sessionFactory.close();
     }
 
