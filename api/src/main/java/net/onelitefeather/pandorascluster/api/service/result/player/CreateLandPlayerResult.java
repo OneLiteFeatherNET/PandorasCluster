@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.service.result;
+package net.onelitefeather.pandorascluster.api.service.result.player;
 
 import java.util.UUID;
 

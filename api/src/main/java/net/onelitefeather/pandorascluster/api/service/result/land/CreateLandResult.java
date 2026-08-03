@@ -1,4 +1,4 @@
-package net.onelitefeather.pandorascluster.api.service.result;
+package net.onelitefeather.pandorascluster.api.service.result.land;
 
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.service.LandService;
