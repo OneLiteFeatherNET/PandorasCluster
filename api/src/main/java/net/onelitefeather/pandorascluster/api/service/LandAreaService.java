@@ -3,10 +3,7 @@ package net.onelitefeather.pandorascluster.api.service;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.service.result.land.CreateLandAreaResult;
-import net.onelitefeather.pandorascluster.api.service.result.land.DeleteLandAreaResult;
-import net.onelitefeather.pandorascluster.api.service.result.land.GetClaimedChunkResult;
-import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,9 +23,9 @@ public interface LandAreaService {
     /**
      * @param chunkIndex the chunk to remove from the land.
      **/
-    boolean removeClaimedChunk(long chunkIndex);
+    UnclaimChunkResult removeClaimedChunk(long chunkIndex);
 
-    default boolean removeClaimedChunk(ClaimedChunk claimedChunk) {
+    default UnclaimChunkResult removeClaimedChunk(ClaimedChunk claimedChunk) {
         return removeClaimedChunk(claimedChunk.chunkIndex());
     }
 
