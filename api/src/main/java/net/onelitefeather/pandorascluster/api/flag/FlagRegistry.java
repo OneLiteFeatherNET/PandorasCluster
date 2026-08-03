@@ -17,11 +17,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public final class FlagRegistry {
-
-    private static FlagRegistry instance;
 
     private static final List<Flag<?>> knownFlags = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
@@ -32,25 +31,37 @@ public final class FlagRegistry {
         }
     }
 
+    public static List<EntityCapFlag> getEntityCapFlags() {
+        return knownFlags.stream().filter(EntityCapFlag.class::isInstance).map(EntityCapFlag.class::cast).toList();
+    }
+
+    public static List<RoleFlag> getRoleFlags() {
+        return knownFlags.stream().filter(RoleFlag.class::isInstance).map(RoleFlag.class::cast).toList();
+    }
+
+    public static List<NaturalFlag> getNaturalFlags() {
+        return knownFlags.stream().filter(NaturalFlag.class::isInstance).map(NaturalFlag.class::cast).toList();
+    }
+
     @Nullable
     public static EntityCapFlag entityCapFlagOf(String name) {
-        return (EntityCapFlag) knownFlags.stream()
-                .filter(EntityCapFlag.class::isInstance)
+        return getEntityCapFlags().stream()
+                .filter(Objects::nonNull)
                 .filter(flag -> flag.getName().equalsIgnoreCase(name))
                 .findFirst().orElse(null);
     }
 
     @Nullable
     public static RoleFlag roleFlagOf(String name) {
-        return (RoleFlag) knownFlags.stream()
-                .filter(RoleFlag.class::isInstance).filter(flag -> flag.getName().equalsIgnoreCase(name))
+        return getRoleFlags().stream()
+                .filter(Objects::nonNull).filter(flag -> flag.getName().equalsIgnoreCase(name))
                 .findFirst().orElse(null);
     }
 
     @Nullable
     public static NaturalFlag naturalFlagOf(String name) {
-        return (NaturalFlag) knownFlags.stream()
-                .filter(NaturalFlag.class::isInstance).filter(flag -> flag.getName().equalsIgnoreCase(name))
+        return getNaturalFlags().stream()
+                .filter(Objects::nonNull).filter(flag -> flag.getName().equalsIgnoreCase(name))
                 .findFirst().orElse(null);
     }
 
@@ -58,11 +69,6 @@ public final class FlagRegistry {
         registerRoleFlags();
         registerNaturalFlags();
         registerEntityCapFlags();
-    }
-
-    public static FlagRegistry getInstance() {
-        if (instance == null) instance = new FlagRegistry();
-        return instance;
     }
 
     private void registerEntityCapFlags() {
