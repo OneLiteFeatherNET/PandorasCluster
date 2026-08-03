@@ -2,23 +2,16 @@ package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
-import net.onelitefeather.pandorascluster.api.land.Land;
-import net.onelitefeather.pandorascluster.api.land.LandArea;
-import net.onelitefeather.pandorascluster.api.land.LandWorld;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.*;
-import net.onelitefeather.pandorascluster.api.service.result.GetLandAreaResult;
-import net.onelitefeather.pandorascluster.api.service.result.GetLandResult;
-import net.onelitefeather.pandorascluster.api.service.result.GetLandWorldResult;
-import net.onelitefeather.pandorascluster.api.util.Constants;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
+import net.onelitefeather.pandorascluster.api.service.result.land.GetLandResult;
+import net.onelitefeather.pandorascluster.api.service.result.world.GetLandWorldResult;
 import net.onelitefeather.pandorascluster.database.service.*;
-import net.onelitefeather.pandorascluster.database.service.flag.DatabaseLandFlagService;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 
-import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
 
@@ -42,7 +35,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
         });
 
         this.landPlayerService = new DatabaseLandPlayerService(databaseService);
-        this.landFlagService = new DatabaseLandFlagService(this);
+        this.landFlagService = new DatabaseLandFlagService(databaseService);
         this.landAreaService = new DatabaseLandAreaService(databaseService);
         this.landService = new DatabaseLandService(this);
         this.staffNotificationService = new StaffNotificationService();
@@ -81,63 +74,33 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     }
 
     @Override
-    public Optional<LandArea> getLandArea(long chunkKey) {
-
-        var landArea = switch (this.landAreaService.getLandArea(chunkKey)) {
-            case GetLandAreaResult.Found(LandArea found) -> found;
-            case GetLandAreaResult.Failed(String msg, Throwable throwable) -> {
-                Constants.LOGGER.log(Level.SEVERE, msg, throwable);
-                yield null;
-            }
-            case GetLandAreaResult.NotFound ignored -> null;
-        };
-
-        return Optional.ofNullable(landArea);
+    public GetLandAreaResult getLandArea(long chunkKey) {
+        return this.landAreaService.getLandArea(chunkKey);
     }
 
     @Override
-    public Optional<LandArea> getLandArea(ClaimedChunk chunk) {
+    public GetLandAreaResult getLandArea(ClaimedChunk chunk) {
         return this.getLandArea(chunk.chunkIndex());
     }
 
     @Override
-    public Optional<Land> getLand(UUID playerId, int landId) {
-
-        var land = switch (this.landService.getLand(playerId, landId)) {
-            case GetLandResult.Found(Land found) -> found;
-            case GetLandResult.Failed(String msg, Throwable throwable) -> {
-                Constants.LOGGER.log(Level.SEVERE, msg, throwable);
-                yield null;
-            }
-            case GetLandResult.NotFound ignored -> null;
-        };
-
-        return Optional.ofNullable(land);
+    public GetLandResult getLand(UUID playerId, int landId) {
+        return this.landService.getLand(playerId, landId);
     }
 
     @Override
-    public Optional<Land> getLand(UUID playerId) {
+    public GetLandResult getLand(UUID playerId) {
         return this.getLand(playerId, 1);
     }
 
     @Override
-    public Optional<Land> getLand(LandPlayer landPlayer) {
+    public GetLandResult getLand(LandPlayer landPlayer) {
         return this.getLand(landPlayer.uniqueId());
     }
 
     @Override
-    public Optional<LandWorld> getLandWorld(UUID worldId) {
-
-        var landWorld = switch (this.landService.getLandWorld(worldId)) {
-            case GetLandWorldResult.Found(LandWorld world) -> world;
-            case GetLandWorldResult.Failed(String msg, Throwable throwable) -> {
-                Constants.LOGGER.log(Level.SEVERE, msg, throwable);
-                yield null;
-            }
-            case GetLandWorldResult.NotFound ignored -> null;
-        };
-
-        return Optional.ofNullable(landWorld);
+    public GetLandWorldResult getLandWorld(UUID worldId) {
+        return this.landService.getLandWorld(worldId);
     }
 
     @Override
