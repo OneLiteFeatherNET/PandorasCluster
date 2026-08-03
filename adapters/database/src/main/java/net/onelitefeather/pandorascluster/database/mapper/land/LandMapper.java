@@ -22,16 +22,18 @@ public final class LandMapper {
                 LandPlayerMapper.toModel(entity.owner()),
                 HomePositionMapper.toModel(entity.home()),
                 entity.areas().stream().map(LandAreaMapper::toModel).toList(),
-                FlagContainerMapper.toModel(entity.flagContainer()));
+                FlagContainerMapper.toModel(entity.flagContainer()),
+                LandWorldMapper.toModel(entity.world()));
     }
 
     public static LandEntity toEntity(Land model) {
         if (model == null) return null;
         return new LandEntity(
-                model.getId(),
-                LandPlayerMapper.toEntity(model.getOwner()),
-                HomePositionMapper.toEntity(model.getHome()),
-                model.getAreas().stream().map(LandAreaMapper::toEntity).toList(),
-                FlagContainerMapper.toEntity(model.getFlagContainer()));
+                model.id(),
+                LandPlayerMapper.toEntity(model.owner()),
+                HomePositionMapper.toEntity(model.home()),
+                model.areas().stream().map(LandAreaMapper::toEntity).toList(),
+                LandWorldMapper.toEntity(model.world()),
+                FlagContainerMapper.toEntity(model.flagContainer()));
     }
 }

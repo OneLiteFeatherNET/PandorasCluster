@@ -29,9 +29,9 @@ public final class FlagContainerMapper {
 
     public static FlagContainerEntity toEntity(FlagContainer model) {
         if (model == null) return null;
-        List<LandNaturalFlagEntity> naturalFlags = model.getNaturalFlags().stream().map(NaturalFlagMapper::toEntity).toList();
-        List<LandRoleFlagEntity> roleFlags = model.getRoleFlags().stream().map(RoleFlagMapper::toEntity).toList();
-        List<LandEntityCapFlagEntity> entityCapFlags = model.getEntityCapFlags().stream().map(EntityCapFlagMapper::toEntity).toList();
-        return new FlagContainerEntity(model.getId(), null, naturalFlags, roleFlags, entityCapFlags);
+        List<LandNaturalFlagEntity> naturalFlags = model.naturalFlags().stream().map(NaturalFlagMapper::toEntity).toList();
+        List<LandRoleFlagEntity> roleFlags = model.roleFlags().stream().map(RoleFlagMapper::toEntity).toList();
+        List<LandEntityCapFlagEntity> entityCapFlags = model.entityCapFlags().stream().map(EntityCapFlagMapper::toEntity).toList();
+        return new FlagContainerEntity(model.id(), null, naturalFlags, roleFlags, entityCapFlags);
     }
 }

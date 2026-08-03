@@ -15,6 +15,6 @@ public final class EntityCapFlagMapper {
 
     public static LandEntityCapFlagEntity toEntity(LandEntityCapFlag model) {
         if (model == null) return null;
-        return new LandEntityCapFlagEntity(model.getId(), model.getName(), model.getSpawnLimit(), null);
+        return new LandEntityCapFlagEntity(model.id(), model.name(), model.spawnLimit(), null);
     }
 }

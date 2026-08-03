@@ -15,6 +15,6 @@ public final class LandMemberMapper {
 
     public static LandMemberEntity toEntity(LandMember model) {
         if (model == null) return null;
-        return new LandMemberEntity(model.getId(), LandPlayerMapper.toEntity(model.getMember()), model.getRole(), null);
+        return new LandMemberEntity(model.id(), LandPlayerMapper.toEntity(model.member()), model.role(), null);
     }
 }

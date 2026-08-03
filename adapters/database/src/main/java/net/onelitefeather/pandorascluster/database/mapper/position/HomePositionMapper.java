@@ -12,7 +12,6 @@ public final class HomePositionMapper {
         if (entity == null) return null;
         return new HomePosition(
                 entity.id(),
-                entity.world(),
                 entity.posX(),
                 entity.posY(),
                 entity.posZ(),
@@ -23,12 +22,11 @@ public final class HomePositionMapper {
     public static HomePositionEntity toEntity(HomePosition model) {
         if (model == null) return null;
         return new HomePositionEntity(
-                model.getId(),
-                model.getWorld(),
-                model.getPosX(),
-                model.getPosY(),
-                model.getPosZ(),
-                model.getYaw(),
-                model.getPitch());
+                model.id(),
+                model.posX(),
+                model.posY(),
+                model.posZ(),
+                model.yaw(),
+                model.pitch());
     }
 }

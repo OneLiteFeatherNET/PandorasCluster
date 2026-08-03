@@ -5,7 +5,6 @@ import net.onelitefeather.pandorascluster.database.mapper.ClaimedChunkMapper;
 import net.onelitefeather.pandorascluster.database.mapper.player.LandMemberMapper;
 import net.onelitefeather.pandorascluster.database.models.chunk.ClaimedChunkEntity;
 import net.onelitefeather.pandorascluster.database.models.land.LandAreaEntity;
-import net.onelitefeather.pandorascluster.database.models.land.LandEntity;
 import net.onelitefeather.pandorascluster.database.models.player.LandMemberEntity;
 
 import java.util.List;
@@ -32,9 +31,8 @@ public final class LandAreaMapper {
 
     public static LandAreaEntity toEntity(LandArea model) {
         if (model == null) return null;
-        List<ClaimedChunkEntity> chunks = model.getChunks().stream().map(ClaimedChunkMapper::toEntity).toList();
-        List<LandMemberEntity> members = model.getMembers().stream().map(LandMemberMapper::toEntity).toList();
-        LandEntity landRef = null; // parent link is set by the service layer when persisting
-        return new LandAreaEntity(model.getId(), model.getName(), members, chunks, landRef);
+        List<ClaimedChunkEntity> chunks = model.chunks().stream().map(ClaimedChunkMapper::toEntity).toList();
+        List<LandMemberEntity> members = model.members().stream().map(LandMemberMapper::toEntity).toList();
+        return new LandAreaEntity(model.id(), model.name(), members, chunks, null);
     }
 }

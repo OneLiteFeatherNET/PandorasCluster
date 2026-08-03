@@ -15,6 +15,6 @@ public final class RoleFlagMapper {
 
     public static LandRoleFlagEntity toEntity(LandRoleFlag model) {
         if (model == null) return null;
-        return new LandRoleFlagEntity(model.getId(), model.getName(), model.getState(), model.getRole(), null);
+        return new LandRoleFlagEntity(model.id(), model.name(), model.state(), model.role(), null);
     }
 }

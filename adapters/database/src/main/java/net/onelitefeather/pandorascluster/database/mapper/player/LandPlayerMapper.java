@@ -17,6 +17,6 @@ public final class LandPlayerMapper {
 
     public static LandPlayerEntity toEntity(LandPlayer model) {
         if (model == null) return null;
-        return new LandPlayerEntity(model.getId(), model.getUniqueId().toString(), model.getName());
+        return new LandPlayerEntity(model.id(), model.uniqueId().toString(), model.name());
     }
 }
