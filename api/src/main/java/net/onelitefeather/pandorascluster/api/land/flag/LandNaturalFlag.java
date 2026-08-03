@@ -7,22 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 public record LandNaturalFlag(Long id, String name, Boolean state, FlagContainer parent) implements LandFlag {
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Boolean getState() {
-        return state;
-    }
-
-    public FlagContainer getParent() {
-        return parent;
-    }
-
     @Nullable
     public NaturalFlag getFlag() {
         return FlagRegistry.naturalFlagOf(name);
