@@ -15,7 +15,13 @@ public class PandorasClusterPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        this.pandorasCluster = new PandorasClusterImpl();
+        try {
+            this.pandorasCluster = new PandorasClusterImpl();
+        } catch (IllegalStateException e) {
+            getLogger().log(java.util.logging.Level.SEVERE, "PandorasCluster failed to initialize.", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         this.paperCommandService = new PaperCommandService(this);
         this.paperCommandService.registerCommands();
         // Register the service for third-party plugins to use

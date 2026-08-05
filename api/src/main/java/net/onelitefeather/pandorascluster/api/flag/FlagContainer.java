@@ -1,96 +1,69 @@
 package net.onelitefeather.pandorascluster.api.flag;
 
-import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.flag.LandEntityCapFlag;
+import net.onelitefeather.pandorascluster.api.land.flag.LandFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandNaturalFlag;
 import net.onelitefeather.pandorascluster.api.land.flag.LandRoleFlag;
-import net.onelitefeather.pandorascluster.api.mapper.PandorasModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
-public final class FlagContainer implements PandorasModel {
+public record FlagContainer(Long id,
+                            List<LandNaturalFlag> naturalFlags,
+                            List<LandRoleFlag> roleFlags,
+                            List<LandEntityCapFlag> entityCapFlags) {
 
     public static final FlagContainer EMPTY = new FlagContainer(
             null,
-            null,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            Collections.emptyList());
+            List.of(),
+            List.of(),
+            List.of());
 
-    private final Long id;
-    private Land land;
-    private final List<LandNaturalFlag> naturalFlags;
-    private final List<LandRoleFlag> roleFlags;
-    private final List<LandEntityCapFlag> entityCapFlags;
-
-    public FlagContainer(Long id,
-                         Land land,
-                         List<LandNaturalFlag> naturalFlags,
-                         List<LandRoleFlag> roleFlags,
-                         List<LandEntityCapFlag> entityCapFlags) {
-        this.id = id;
-        this.naturalFlags = naturalFlags;
-        this.roleFlags = roleFlags;
-        this.entityCapFlags = entityCapFlags;
-        this.land = land;
+    public FlagContainer {
+        naturalFlags = List.copyOf(naturalFlags);
+        roleFlags = List.copyOf(roleFlags);
+        entityCapFlags = List.copyOf(entityCapFlags);
     }
 
-    public Long getId() {
-        return id;
+    @Nullable
+    public LandRoleFlag getRoleFlag(String name) {
+        return roleFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public Land getLand() {
-        return land;
+    @Nullable
+    public LandNaturalFlag getNaturalFlag(String name) {
+        return naturalFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public FlagContainer withLand(Land land) {
-        this.land = land;
-        return this;
+    @Nullable
+    public LandEntityCapFlag getEntityCapFlag(String name) {
+        return entityCapFlags.stream()
+                .filter(flag -> flag.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    public List<LandNaturalFlag> getNaturalFlags() {
-        return naturalFlags;
+    /**
+     * Returns all flags in a single list, typed over the sealed {@link LandFlag}
+     * interface. Use this with an exhaustive switch when behaviour is uniform
+     * across flag variants.
+     */
+    public List<LandFlag> getAllFlags() {
+        return Stream.of(naturalFlags, roleFlags, entityCapFlags)
+                .flatMap(List::stream)
+                .map(LandFlag.class::cast)
+                .toList();
     }
 
-    public List<LandRoleFlag> getRoleFlags() {
-        return roleFlags;
-    }
-
-    public List<LandEntityCapFlag> getEntityCapFlags() {
-        return entityCapFlags;
-    }
-
-    public void removeRoleFlag(LandRoleFlag roleFlag) {
-        this.roleFlags.remove(roleFlag);
-    }
-
-    public void removeNaturalFlag(LandNaturalFlag naturalFlag) {
-        this.naturalFlags.remove(naturalFlag);
-    }
-
-    public void removeEntityCapFlag(LandEntityCapFlag entityCapFlag) {
-        this.entityCapFlags.remove(entityCapFlag);
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FlagContainer that)) return false;
-
-        return Objects.equals(land, that.land) &&
-                Objects.equals(naturalFlags, that.naturalFlags) &&
-                Objects.equals(roleFlags, that.roleFlags) &&
-                Objects.equals(entityCapFlags, that.entityCapFlags);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hashCode(land);
-        result = 31 * result + Objects.hashCode(naturalFlags);
-        result = 31 * result + Objects.hashCode(roleFlags);
-        result = 31 * result + Objects.hashCode(entityCapFlags);
-        return result;
+    public boolean hasFlag(@NotNull LandFlag landFlag) {
+        return getAllFlags().stream().anyMatch(flag -> flag.name().equalsIgnoreCase(landFlag.name()));
     }
 }

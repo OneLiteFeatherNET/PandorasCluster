@@ -1,7 +1,6 @@
 package net.onelitefeather.pandorascluster.database.models.player;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dto.player.LandPlayerDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,16 +8,16 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "land_players")
-public final class LandPlayerEntity implements LandPlayerDto {
+public final class LandPlayerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "VARCHAR(36)")
+    @Column(name = "uuid", length = 36, nullable = false, unique = true)
     private String uuid;
 
-    @Column(columnDefinition = "VARCHAR(16)")
+    @Column(name = "name", length = 16, nullable = false)
     private String name;
 
     public LandPlayerEntity() {
@@ -31,17 +30,14 @@ public final class LandPlayerEntity implements LandPlayerDto {
         this.name = name;
     }
 
-    @Override
     public @Nullable Long id() {
         return id;
     }
 
-    @Override
     public @NotNull String uuid() {
         return uuid;
     }
 
-    @Override
     public @NotNull String name() {
         return name;
     }

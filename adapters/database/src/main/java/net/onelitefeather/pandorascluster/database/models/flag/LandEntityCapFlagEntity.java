@@ -1,27 +1,33 @@
 package net.onelitefeather.pandorascluster.database.models.flag;
 
 import jakarta.persistence.*;
-import net.onelitefeather.pandorascluster.dto.flag.EntityCapFlagDto;
-import net.onelitefeather.pandorascluster.dto.flag.FlagContainerDto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 @Entity
-@Table(name = "entityCap_flags")
-public final class LandEntityCapFlagEntity implements EntityCapFlagDto {
+@Table(
+        name = "entityCap_flags",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_entitycap_flags_container_name",
+                columnNames = {"flagContainer_id", "name"}
+        )
+)
+public final class LandEntityCapFlagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "name", length = 64, nullable = false)
     private String name;
 
-    @Column
+    @Column(name = "spawn_limit", nullable = false)
     private Integer spawnLimit;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "flagContainer_id")
+    @JoinColumn(name = "flagContainer_id", nullable = false)
     private FlagContainerEntity flagContainer;
 
 
@@ -37,23 +43,32 @@ public final class LandEntityCapFlagEntity implements EntityCapFlagDto {
     }
 
 
-    @Override
     public @Nullable Long id() {
         return this.id;
     }
 
-    @Override
     public @NotNull String name() {
         return this.name;
     }
 
-    @Override
     public Integer spawnLimit() {
         return this.spawnLimit;
     }
 
-    @Override
-    public FlagContainerDto flagContainer() {
+    public FlagContainerEntity flagContainer() {
         return this.flagContainer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LandEntityCapFlagEntity that)) return false;
+        if (id == null || that.id == null) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : Objects.hashCode(id);
     }
 }

@@ -22,6 +22,7 @@ public interface PlayerUtil {
     boolean hasPermission(@NotNull UUID uuid, @NotNull Permission permission);
 
     final class Instances {
+        private Instances() {}
 
         @NotNull
         public static final PlayerUtil instance;
