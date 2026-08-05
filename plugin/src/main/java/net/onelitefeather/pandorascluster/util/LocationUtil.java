@@ -5,12 +5,12 @@ import net.onelitefeather.pandorascluster.api.position.HomePosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public class LocationUtil {
 
     public static HomePosition of(Location location) {
         return new HomePosition(null,
-                location.getWorld().getName(),
                 location.getX(),
                 location.getY(),
                 location.getZ(),
@@ -22,15 +22,12 @@ public class LocationUtil {
         return new ClaimedChunk(null, chunk.getChunkKey());
     }
 
-    public static Location fromHomePosition(HomePosition homePosition) {
-        var worldName = homePosition.getWorld();
-        var world = Bukkit.getWorld(worldName);
-        if (world == null) return Bukkit.getWorlds().getFirst().getSpawnLocation();
+    public static Location fromHomePosition(World world, HomePosition homePosition) {
         return new Location(world,
                 homePosition.getBlockX(),
                 homePosition.getBlockY(),
                 homePosition.getBlockZ(),
-                homePosition.getYaw(),
-                homePosition.getPitch());
+                homePosition.yaw(),
+                homePosition.pitch());
     }
 }
