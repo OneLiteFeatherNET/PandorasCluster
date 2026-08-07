@@ -40,7 +40,7 @@ dependencyResolutionManagement {
             // Gradle Plugins
             version("plugin.yml", "0.6.0")
             version("run-paper", "3.0.2")
-            version("shadow", "9.4.3")
+            version("shadow", "9.6.1")
 
             // Paper
             library("paper", "io.papermc.paper", "paper-api").versionRef("paper")
