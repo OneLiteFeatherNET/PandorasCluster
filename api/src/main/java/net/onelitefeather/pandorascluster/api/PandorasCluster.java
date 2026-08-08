@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
-import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
+import net.onelitefeather.pandorascluster.api.service.FlagRegistryService;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.*;
 import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
@@ -36,5 +36,5 @@ public interface PandorasCluster {
 
     GetLandWorldResult getLandWorld(UUID worldId);
 
-    FlagRegistry getFlagRegistry();
+    FlagRegistryService getFlagRegistry();
 }
