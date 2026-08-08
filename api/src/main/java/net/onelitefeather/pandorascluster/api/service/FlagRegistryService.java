@@ -83,7 +83,10 @@ public final class FlagRegistryService {
     }
 
     private void registerEntityCapFlags() {
-        saveResource(ENTITY_CAP_FLAGS_FILE_NAME, false);
+
+        if (Files.notExists(PLUGIN_FOLDER.resolve(ENTITY_CAP_FLAGS_FILE_NAME)))
+            saveResource(ENTITY_CAP_FLAGS_FILE_NAME, false);
+
         try (InputStream stream = getResource(ENTITY_CAP_FLAGS_FILE_NAME)) {
             if (stream == null)
                 throw new FileNotFoundException("File %s was not found!".formatted(ENTITY_CAP_FLAGS_FILE_NAME));
@@ -96,7 +99,10 @@ public final class FlagRegistryService {
     }
 
     private void registerRoleFlags() {
-        saveResource(ROLE_FLAGS_FILE_NAME, false);
+
+        if (Files.notExists(PLUGIN_FOLDER.resolve(ROLE_FLAGS_FILE_NAME)))
+            saveResource(ROLE_FLAGS_FILE_NAME, false);
+
         try (InputStream stream = getResource(ROLE_FLAGS_FILE_NAME)) {
             if (stream == null)
                 throw new FileNotFoundException("File %s was not found!".formatted(ROLE_FLAGS_FILE_NAME));
@@ -109,7 +115,10 @@ public final class FlagRegistryService {
     }
 
     private void registerNaturalFlags() {
-        saveResource(NATURAL_FLAGS_FILE_NAME, false);
+
+        if (Files.notExists(PLUGIN_FOLDER.resolve(NATURAL_FLAGS_FILE_NAME)))
+            saveResource(NATURAL_FLAGS_FILE_NAME, false);
+
         try (InputStream stream = getResource(NATURAL_FLAGS_FILE_NAME)) {
             if (stream == null)
                 throw new FileNotFoundException("File %s was not found!".formatted(NATURAL_FLAGS_FILE_NAME));
