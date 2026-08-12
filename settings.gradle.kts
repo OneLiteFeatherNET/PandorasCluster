@@ -30,7 +30,7 @@ dependencyResolutionManagement {
 
             // Paper Dependencies
             version("paper", "1.21.8-R0.1-SNAPSHOT")
-            version("adventure-api", "4.26.1")
+            version("adventure-api", "5.2.0")
             version("cloud", "2.0.0")
             version("cloudAnnotations", "2.1.0")
             version("adventure-platform-bukkit", "4.4.1")
