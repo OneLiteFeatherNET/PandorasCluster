@@ -8,5 +8,6 @@
       "package-name": "PandorasCluster",
       "changelog-path": "CHANGELOG.md"
     }
-  }
+  },
+  "bootstrap-sha": "bd207756f120a4b5d605d9f3363d5b70c75a7f00"
 }
