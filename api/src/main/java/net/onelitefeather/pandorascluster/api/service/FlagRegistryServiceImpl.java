@@ -57,6 +57,7 @@ public final class FlagRegistryServiceImpl implements FlagRegistryService {
         return knownFlags.stream().filter(NaturalFlag.class::isInstance).map(NaturalFlag.class::cast).toList();
     }
 
+    @Override
     @Nullable
     public EntityCapFlag entityCapFlagOf(String name) {
         return getEntityCapFlags().stream()
@@ -65,6 +66,7 @@ public final class FlagRegistryServiceImpl implements FlagRegistryService {
                 .findFirst().orElse(null);
     }
 
+    @Override
     @Nullable
     public RoleFlag roleFlagOf(String name) {
         return getRoleFlags().stream()
@@ -72,6 +74,7 @@ public final class FlagRegistryServiceImpl implements FlagRegistryService {
                 .findFirst().orElse(null);
     }
 
+    @Override
     @Nullable
     public NaturalFlag naturalFlagOf(String name) {
         return getNaturalFlags().stream()

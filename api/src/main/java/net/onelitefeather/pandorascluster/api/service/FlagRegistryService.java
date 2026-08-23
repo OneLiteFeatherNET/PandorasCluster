@@ -14,4 +14,9 @@ public interface FlagRegistryService {
 
     List<NaturalFlag> getNaturalFlags();
 
+    EntityCapFlag entityCapFlagOf(String name);
+
+    RoleFlag roleFlagOf(String name);
+
+    NaturalFlag naturalFlagOf(String name);
 }
