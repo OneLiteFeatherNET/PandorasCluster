@@ -1,7 +1,7 @@
 package net.onelitefeather.pandorascluster.api;
 
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
-import net.onelitefeather.pandorascluster.api.flag.FlagRegistry;
+import net.onelitefeather.pandorascluster.api.service.FlagRegistryServiceImpl;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
 import net.onelitefeather.pandorascluster.api.service.*;
 import net.onelitefeather.pandorascluster.api.service.result.land.GetLandAreaResult;
@@ -21,7 +21,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     private final LandService landService;
     private final LandAreaService landAreaService;
     private final StaffNotificationService staffNotificationService;
-    private final FlagRegistry flagRegistry;
+    private final FlagRegistryService flagRegistryService;
 
     public PandorasClusterImpl() {
 
@@ -39,8 +39,8 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
         this.landAreaService = new DatabaseLandAreaService(databaseService);
         this.landService = new DatabaseLandService(this);
         this.staffNotificationService = new StaffNotificationService();
-        this.flagRegistry = new FlagRegistry();
-        this.flagRegistry.loadDefaultFlags();
+        this.flagRegistryService = new FlagRegistryServiceImpl();
+        this.flagRegistryService.registerDefaults();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     }
 
     @Override
-    public FlagRegistry getFlagRegistry() {
-        return this.flagRegistry;
+    public FlagRegistryService getFlagRegistry() {
+        return this.flagRegistryService;
     }
 }
