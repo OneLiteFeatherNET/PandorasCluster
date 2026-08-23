@@ -82,7 +82,8 @@ public final class FlagRegistryServiceImpl implements FlagRegistryService {
                 .findFirst().orElse(null);
     }
 
-    public void loadDefaultFlags() {
+    @Override
+    public void registerDefaults() {
         registerRoleFlags();
         registerNaturalFlags();
         registerEntityCapFlags();

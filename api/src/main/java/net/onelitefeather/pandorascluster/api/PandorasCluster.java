@@ -36,5 +36,5 @@ public interface PandorasCluster {
 
     GetLandWorldResult getLandWorld(UUID worldId);
 
-    FlagRegistryServiceImpl getFlagRegistry();
+    FlagRegistryService getFlagRegistry();
 }

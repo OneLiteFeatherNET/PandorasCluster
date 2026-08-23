@@ -19,4 +19,6 @@ public interface FlagRegistryService {
     RoleFlag roleFlagOf(String name);
 
     NaturalFlag naturalFlagOf(String name);
+
+    void registerDefaults();
 }
