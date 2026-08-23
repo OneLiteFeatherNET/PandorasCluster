@@ -21,7 +21,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     private final LandService landService;
     private final LandAreaService landAreaService;
     private final StaffNotificationService staffNotificationService;
-    private final FlagRegistryServiceImpl flagRegistryService;
+    private final FlagRegistryService flagRegistryService;
 
     public PandorasClusterImpl() {
 
@@ -40,7 +40,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
         this.landService = new DatabaseLandService(this);
         this.staffNotificationService = new StaffNotificationService();
         this.flagRegistryService = new FlagRegistryServiceImpl();
-        this.flagRegistryService.loadDefaultFlags();
+        this.flagRegistryService.registerDefaults();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PandorasClusterImpl implements PandorasCluster, ThreadHelper {
     }
 
     @Override
-    public FlagRegistryServiceImpl getFlagRegistry() {
+    public FlagRegistryService getFlagRegistry() {
         return this.flagRegistryService;
     }
 }
