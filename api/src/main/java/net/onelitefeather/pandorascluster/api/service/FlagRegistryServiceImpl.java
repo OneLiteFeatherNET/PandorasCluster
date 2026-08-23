@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public final class FlagRegistryServiceImpl implements FlagRegistryService {
@@ -54,6 +55,28 @@ public final class FlagRegistryServiceImpl implements FlagRegistryService {
     @Override
     public List<NaturalFlag> getNaturalFlags() {
         return knownFlags.stream().filter(NaturalFlag.class::isInstance).map(NaturalFlag.class::cast).toList();
+    }
+
+    @Nullable
+    public EntityCapFlag entityCapFlagOf(String name) {
+        return getEntityCapFlags().stream()
+                .filter(Objects::nonNull)
+                .filter(flag -> flag.getName().equalsIgnoreCase(name))
+                .findFirst().orElse(null);
+    }
+
+    @Nullable
+    public RoleFlag roleFlagOf(String name) {
+        return getRoleFlags().stream()
+                .filter(Objects::nonNull).filter(flag -> flag.getName().equalsIgnoreCase(name))
+                .findFirst().orElse(null);
+    }
+
+    @Nullable
+    public NaturalFlag naturalFlagOf(String name) {
+        return getNaturalFlags().stream()
+                .filter(Objects::nonNull).filter(flag -> flag.getName().equalsIgnoreCase(name))
+                .findFirst().orElse(null);
     }
 
     public void loadDefaultFlags() {
