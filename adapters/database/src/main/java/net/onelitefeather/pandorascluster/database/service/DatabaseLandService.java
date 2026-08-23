@@ -3,7 +3,6 @@ package net.onelitefeather.pandorascluster.database.service;
 import net.onelitefeather.pandorascluster.api.PandorasCluster;
 import net.onelitefeather.pandorascluster.api.chunk.ClaimedChunk;
 import net.onelitefeather.pandorascluster.api.flag.FlagContainer;
-import net.onelitefeather.pandorascluster.api.service.FlagRegistryService;
 import net.onelitefeather.pandorascluster.api.land.Land;
 import net.onelitefeather.pandorascluster.api.land.LandWorld;
 import net.onelitefeather.pandorascluster.api.player.LandPlayer;
