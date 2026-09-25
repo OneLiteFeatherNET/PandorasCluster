@@ -17,7 +17,7 @@ dependencyResolutionManagement {
             // Non Paper
             version("guava", "33.3.1-jre")
             version("jaxb-runtime", "4.0.9")
-            version("caffeine", "3.2.4")
+            version("caffeine", "3.3.0")
             version("h2", "2.4.240")
             version("mariadb-java-client", "3.5.10")
             version("hibernate-core", "7.4.10.Final")
