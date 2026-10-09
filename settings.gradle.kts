@@ -34,7 +34,7 @@ dependencyResolutionManagement {
             version("cloud", "2.0.1")
             version("cloudAnnotations", "2.1.0")
             version("adventure-platform-bukkit", "4.4.1")
-            version("fawe", "2.15.3")
+            version("fawe", "2.16.1")
             version("worldguard", "7.1.0-SNAPSHOT")
 
             // Gradle Plugins
