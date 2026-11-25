@@ -22,7 +22,7 @@ dependencyResolutionManagement {
             version("mariadb-java-client", "3.5.11")
             version("hibernate-core", "7.4.17.Final")
             version("jetbrains-annotations", "26.1.0")
-            version("postgresql", "42.7.14")
+            version("postgresql", "42.7.15")
             version("gson", "2.14.0")
 
              // Testing
