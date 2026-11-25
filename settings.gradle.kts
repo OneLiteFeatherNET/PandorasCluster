@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             version("hibernate-core", "7.4.17.Final")
             version("jetbrains-annotations", "26.1.0")
             version("postgresql", "42.7.15")
-            version("gson", "2.14.0")
+            version("gson", "2.15.0")
 
              // Testing
             version("junit", "6.1.3")
